@@ -1,7 +1,7 @@
 const Chartscii = require('./index');
 
 const chart = new Chartscii([
-    { value: 1, label: 'a' },
+    { value: 1, label: new Date().toLocaleDateString()  },
     { value: 2, label: 'b' },
     { value: 3, label: 'c' },
     { value: 4, label: 'd' },

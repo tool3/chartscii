@@ -26,7 +26,7 @@ class Chartscii {
         let counter = 0;
         this.maxValue = Math.max(...this.data.map(point => point.label.length || point));
         const maxNumeric = Math.max(...this.data.map(point => point.value || point));
-        this.maxSpace = this.maxValue.toString().length;
+        this.maxSpace = this.maxValue;
 
         this.data.map(point => {
             this.charCount += point.value || point;
@@ -34,8 +34,8 @@ class Chartscii {
                 this.graph[`${counter++} ${this.options.structure.y}`] = point;
             } else {
                 let space = 0;
-                if (point.value.toString().length < this.maxSpace) {
-                    space = point.value.toString().length;
+                if (point.label.length < this.maxSpace) {
+                    space = this.maxSpace - 1;
                 }
                 this.graph[`${' '.repeat(space)}${point.label} ${this.options.structure.y}`] = point.value;
             }
@@ -61,7 +61,7 @@ class Chartscii {
         if (this.maxSpace % 2 === 0) {
             return ' '.repeat(this.maxSpace)
         } else if (this.maxSpace % 3 === 0) {
-            return ' '.repeat(this.maxSpace - 7)
+            return this.maxSpace  === 3 ? ' ' : ' '.repeat(this.maxSpace - 7)
         } else if (this.maxSpace < 2) {
             return ' '.repeat(this.maxSpace + 1);
         } else {
@@ -70,7 +70,7 @@ class Chartscii {
     }
 
     create() {
-        let asciiGraph = `${this.makeSpace()}${this.options.structure.leftCorner}`;
+        let asciiGraph = `${' '.repeat(this.maxValue + 1)}${this.options.structure.leftCorner}`;
 
         for (let x = 0; x < (this.width || this.data.length); x++) {
             asciiGraph = `${asciiGraph}${this.options.structure.x}`;
