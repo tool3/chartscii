@@ -33,10 +33,7 @@ class Chartscii {
             if (!point.label) {
                 this.graph[`${counter++} ${this.options.structure.y}`] = point;
             } else {
-                let space = 0;
-                if (point.label.length < this.maxSpace) {
-                    space = this.maxSpace - 1;
-                }
+                const space = this.maxSpace - point.label.length;
                 this.graph[`${' '.repeat(space)}${point.label} ${this.options.structure.y}`] = point.value;
             }
         });
@@ -83,8 +80,9 @@ class Chartscii {
         });
 
         if (this.options.label) {
-            const graph = `${asciiGraph}\n${this.makeSpace()}`;
-            asciiGraph = this.options.color ? `${graph}\x1b[32;1m${this.options.label}\x1b[0m` : graph;
+            const space = ' '.repeat(this.maxSpace + 1); 
+            const graph = `${asciiGraph}\n${space}`;
+            asciiGraph = this.options.color ? `${graph}\x1b[32;1m${this.options.label}\x1b[0m` : `${graph}${this.options.label}`;
         }
 
 
