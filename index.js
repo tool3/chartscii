@@ -24,19 +24,19 @@ class Chartscii {
 
     createGraphAxis() {
         let counter = 0;
-        this.maxValue = Math.max(...this.data.map(point => point.y || point));
+        this.maxValue = Math.max(...this.data.map(point => point.value || point));
         this.maxSpace = this.maxValue.toString().length;
 
         this.data.map(point => {
-            this.charCount += point.y || point;
-            if (!point.x) {
+            this.charCount += point.value || point;
+            if (!point.label) {
                 this.graph[`${counter++} ${this.options.structure.y}`] = point;
             } else {
                 let space = 0;
-                if (point.y.toString().length <= this.maxSpace) {
-                    space = point.y.toString().length;
+                if (point.value.toString().length < this.maxSpace) {
+                    space = point.value.toString().length;
                 }
-                this.graph[`${' '.repeat(space)}${point.y} ${this.options.structure.y}`] = point.y;
+                this.graph[`${' '.repeat(space)}${point.value} ${this.options.structure.y}`] = point.value;
             }
         });
         this.width = Math.round((this.maxValue / this.charCount) * this.options.structure.width) / 2;
@@ -54,9 +54,11 @@ class Chartscii {
     }
 
     makeSpace() {
+        if (this.maxSpace === 2) {
+            return ' '.repeat(this.maxSpace + 1);
+        }
         if (this.maxSpace % 2 === 0) {
             return ' '.repeat(this.maxSpace)
-
         } else if (this.maxSpace % 3 === 0) {
             return ' '.repeat(this.maxSpace - 7)
         } else {
@@ -79,7 +81,7 @@ class Chartscii {
 
         if (this.options.label) {
             const graph = `${asciiGraph}\n${this.makeSpace()}`;
-            asciiGraph = this.options.color ?  `${graph}\x1b[32;1m${this.options.label}\x1b[0m` :  graph;
+            asciiGraph = this.options.color ? `${graph}\x1b[32;1m${this.options.label}\x1b[0m` : graph;
         }
 
 
