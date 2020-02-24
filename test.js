@@ -1,14 +1,13 @@
 const Chartscii = require('./index');
 
-const chart = new Chartscii([
-    { value: 1, label: 'aaaaaaaaaaaa'  },
-    { value: 2, label: 'b' },
-    { value: 3, label: 'c' },
-    { value: 4, label: 'd' },
-    { value: 5, label: 'sssssse' },
-    { value: 6, label: 'f' },
-    { value: 7, label: 'g' },
-    { value: 8, label: 'h' },
-    { value: 9, label: 'i' },
-    { value: 10, label: 'j' }], { label: 'expense per month', width: 200, color:true });
+// generate chart data
+let count = 0;
+const data = [];
+
+for (let i = 1; i <= 10; i++) {
+    data.push({ value: i, label: `label ${count++}` });
+}
+
+// create chart
+const chart = new Chartscii(data, { label: 'expense per month', width: 300, color:true });
 console.log(chart.create());

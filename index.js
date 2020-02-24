@@ -30,6 +30,7 @@ class Chartscii {
 
         this.data.map(point => {
             this.charCount += point.value || point;
+
             if (!point.label) {
                 this.graph[`${counter++} ${this.options.structure.y}`] = point;
             } else {
@@ -58,7 +59,7 @@ class Chartscii {
         if (this.maxSpace % 2 === 0) {
             return ' '.repeat(this.maxSpace)
         } else if (this.maxSpace % 3 === 0) {
-            return this.maxSpace  === 3 ? ' ' : ' '.repeat(this.maxSpace - 7)
+            return this.maxSpace === 3 ? ' ' : ' '.repeat(this.maxSpace - 7)
         } else if (this.maxSpace < 2) {
             return ' '.repeat(this.maxSpace + 1);
         } else {
@@ -80,7 +81,7 @@ class Chartscii {
         });
 
         if (this.options.label) {
-            const space = ' '.repeat(this.maxSpace + 1); 
+            const space = ' '.repeat(this.maxSpace + 1);
             const graph = `${asciiGraph}\n${space}`;
             asciiGraph = this.options.color ? `${graph}\x1b[32;1m${this.options.label}\x1b[0m` : `${graph}${this.options.label}`;
         }
