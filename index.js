@@ -66,8 +66,7 @@ class Chartscii {
         });
 
         if (this.options.label) {
-            const relativeSpace = this.width / 2;
-            asciiGraph = `${asciiGraph}\n${this.makeSpace()}${' '.repeat(relativeSpace)}${this.options.label}${' '.repeat(relativeSpace)}`
+            asciiGraph = `${asciiGraph}\n${this.makeSpace()}${this.options.label}`;
         }
 
 
