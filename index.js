@@ -5,7 +5,7 @@ class Chartscii {
         this.options = {
             color: options.color || false,
             label: options && options.label,
-            char: '█',
+            char: options.char || '█',
             negativeChar: '▒',
             structure:
             {
@@ -45,7 +45,8 @@ class Chartscii {
                 this.graph[`${counter++} ${this.options.structure.y}`] = point;
             } else {
                 const space = this.maxSpace - point.label.length;
-                this.graph[`${' '.repeat(space)}${point.label} ${this.options.structure.y}`] = point.value;
+                const key = `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
+                this.graph[key] = point.value;
             }
         });
         this.width = Math.round((maxNumeric / this.charCount) * this.options.structure.width) / 2;

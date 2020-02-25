@@ -14,7 +14,8 @@ const chart = new Chartscii(data, {
     width: 500,
     sort: false,
     reverse: false,
-    color: 'pink'
+    char: '■',
+    color: 'green'
 });
 
 //print chart

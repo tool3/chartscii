@@ -35,19 +35,40 @@ console.log(chart.create());
 ```
 
 outputs:
-
 ![img](docs/img/example.png)
+
+you can customize the acsii character for the bar chart using the `char` option. for example:   
+```js
+const chart = new Chartscii(data, {
+    label: 'Example Chart',
+    width: 500,
+    char: '■',
+    sort: false,
+    reverse: false,
+    color: 'green'
+});
+
+//print chart
+console.log(chart.create());
+```
+
+outputs:   
+![example](docs/img/example_char.png)
+
 
 ## options
 
 ### label (string)
-  a label for the chart. display in color if `color: true`;
+  a label for the chart. display in color if `color: true`.
 ### width (number)
-  the width of the chart, scales values accordingly.
+  the width of the chart, scales values accordingly. default: `100`
 ### sort (boolean)
-  sort data.
+  sort data. default: `false`
 ### reverse (boolean)
-  reverse chart values order.
+  reverse chart values order. default: `false`
+
+### char (string)
+  ascii char for bars. default: `█`
 ### color (string)
   color bars in chart and label if provided.   
   can be one of:
