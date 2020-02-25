@@ -9,5 +9,5 @@ for (let i = 1; i <= 10; i++) {
 }
 
 // create chart
-const chart = new Chartscii(data, { label: 'Jordan expenses', width: 300, sort: false, reverse: false, color: 'cyan' });
+const chart = new Chartscii(data, { label: 'Expenses', width: 500, sort: false, reverse: false, color: 'pink' });
 console.log(chart.create());
