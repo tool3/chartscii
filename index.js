@@ -1,6 +1,6 @@
 class Chartscii {
     constructor(data, options) {
-        this.data = this.sortSmallToLarge(data);
+        this.data = options.sort ? this.sortSmallToLarge(data) : data;
         this.options = {
             color: options.color || false,
             label: options && options.label,
@@ -44,8 +44,8 @@ class Chartscii {
 
     sortSmallToLarge(arr) {
         return arr.sort((a, b) => {
-            if (a.y) {
-                return a.y - b.y;
+            if (a.value) {
+                return a.value - b.value;
             } else {
                 return a - b;
             }
@@ -82,8 +82,8 @@ class Chartscii {
 
         if (this.options.label) {
             const space = ' '.repeat(this.maxSpace + 1);
-            const graph = `${asciiGraph}\n${space}`;
-            asciiGraph = this.options.color ? `${graph}\x1b[32;1m${this.options.label}\x1b[0m` : `${graph}${this.options.label}`;
+            const graph = `${space}\n${asciiGraph}`;
+            asciiGraph = this.options.color ? `\x1b[32;1m${this.options.label}\x1b[0m${graph}` : `${this.options.label}${graph}`;
         }
 
 
