@@ -1,5 +1,5 @@
 # chartscii
-![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)   
+![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)  ![release](https://github.com/tool3/chartscii/workflows/release/badge.svg?branch=release)  
 simple ascii bar charts
 
 # install
