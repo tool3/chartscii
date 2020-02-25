@@ -55,7 +55,6 @@ console.log(chart.create());
 outputs:   
 ![example](img/example_char.png)
 
-
 ## options
 
 ### label (string)
