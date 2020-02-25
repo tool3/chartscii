@@ -4,9 +4,17 @@
   "description": "simple ascii bar charts",
   "main": "index.js",
   "scripts": {
-    "test": "echo 'no tests yet'"
+    "test": "echo 'no tests yet'",
+    "lint": "eslint ."
   },
-  "keywords": ["ascii", "charts", "cli"],
+  "keywords": [
+    "ascii",
+    "charts",
+    "cli"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.8.0"
+  }
 }

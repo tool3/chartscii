@@ -14,7 +14,7 @@ class Chartscii {
                 leftCorner: '╚',
                 width: options && options.width || 100
             }
-        };
+        }
         this.graph = {};
         this.maxSpace = 1;
         this.maxValue = 0;
