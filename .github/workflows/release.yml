@@ -23,8 +23,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-          registry-url: https://registry.npmjs.org/
-          scope: "@tool3"
+          registry-url: 'https://registry.npmjs.org/'
+          scope: '@tool3'
       - run: | 
           npm ci
           git pull origin master --tags
@@ -40,11 +40,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-          registry-url: https://npm.pkg.github.com/
-          scope: "@tool3"
+          registry-url: 'https://npm.pkg.github.com/'
+          scope: '@tool3'
       - run: |
           npm ci
           git pull origin master --tags
-          npm publish --access=public
+          npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GP_TOKEN}}
+    
