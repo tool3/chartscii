@@ -10,7 +10,7 @@ npm install chartscii
 # usage
 `chartscii` accepts an array of data values, with optional labels, and outputs an ascii bar chart.   
 
-## usage example:
+## usage example
 ```js
 const Chartscii = require('./index');
 

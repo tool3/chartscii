@@ -2,5 +2,7 @@
 
 > simple ascii bar charts
 
-[Github](https://github.com/tool3/chartscii)
+
+
+[<i class="fab fa-github"></i>  Github](https://github.com/tool3/chartscii)
 [Get Started](/#chartscii)
