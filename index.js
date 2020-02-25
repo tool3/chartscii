@@ -102,6 +102,6 @@ class Chartscii {
         return this.graph;
     }
 
-};
+}
 
 module.exports = Chartscii;
