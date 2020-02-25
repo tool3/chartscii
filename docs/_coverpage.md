@@ -1,4 +1,4 @@
-# chartscii <small>1.0</small>
+# 📊 chartscii <small>1.0</small>
 
 > simple ascii bar charts
 
