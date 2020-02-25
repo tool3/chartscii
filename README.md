@@ -11,41 +11,48 @@ npm install chartscii
 
 ## usage example:
 ```js
-const Chartscii = require('chartscii');
+const Chartscii = require('./index');
 
-// generate chart data
+// generate random chart data
 let count = 0;
 const data = [];
 
 for (let i = 1; i <= 10; i++) {
-    // randomize value
-    data.push({ value: Math.floor(Math.random() * 6) + 1, label:`label_${count++}` });
+    data.push({ value: Math.floor(Math.random() * 6) + 1, label: `label_${count++}` });
 }
 
 // create chart
-const chart = new Chartscii(data, { label: 'Expenses', width: 500, sort: false, reverse: false, color: 'pink' });
+const chart = new Chartscii(data, {
+    label: 'Example Chart',
+    width: 500,
+    sort: false,
+    reverse: false,
+    color: 'pink'
+});
 
-// print chart
+//print chart
 console.log(chart.create());
 ```
 
 outputs:
-```text
-Expenses        
-label_9 ╢██████████████████████████████████████████████████████
-label_8 ╢██████████████
-label_7 ╢█████████████████████████████████████████████████████████████████████████████████
-label_6 ╢█████████████████████████████████████████
-label_5 ╢█████████████████████████████████████████████████████████████████████████████████
-label_4 ╢█████████████████████████████████████████████████████████████████████████████████
-label_3 ╢████████████████████████████████████████████████████████████████████
-label_2 ╢█████████████████████████████████████████
-label_1 ╢██████████████
-label_0 ╢███████████████████████████
-        ╚══════════════════════════════════════════════════════════════════════════════════
-```
+
+![img](docs/img/example.png)
 
 ## options
+
+```js
+color: options.color || false,
+            label: options && options.label,
+            char: '█',
+            negativeChar: '▒',
+            structure:
+            {
+                y: '╢',
+                x: '══',
+                leftCorner: '╚',
+                width: options && options.width || 100
+            }
+```
 
 ### label (string)
   a label for the chart. display in color if `color: true`;
