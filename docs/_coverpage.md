@@ -1,6 +1,6 @@
 # chartscii <small>1.0</small>
 
-> A multi mono-repo manager
+> simple ascii bar charts
 
 [Github](https://github.com/tool3/chartscii)
 [Get Started](/#install)
