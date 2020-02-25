@@ -45,7 +45,7 @@ jobs:
       - run: |
           npm ci
           git pull origin master --tags
-          npm publish
+          npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{secrets.GP_TOKEN}}
     
