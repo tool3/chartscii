@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 12
           registry-url: "https://registry.npmjs.org/"
-          scope: 'tool3'
+          scope: '@tool3'
       - run: |
           npm ci
           git pull origin master --tags
@@ -41,10 +41,10 @@ jobs:
         with:
           node-version: 12
           registry-url: 'https://npm.pkg.github.com/'
-          scope: 'tool3'
+          scope: '@tool3'
       - run: |
           npm ci
           git pull origin master --tags
-          npm publish --registry=https://npm.pkg.github.com/ --scope=tool3
+          npm publish --registry=https://npm.pkg.github.com/@tool3
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GP_TOKEN }}
