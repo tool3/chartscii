@@ -1,5 +1,5 @@
 # chartscii
-![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)  ![release](https://github.com/tool3/chartscii/workflows/release/badge.svg?branch=release)  
+[![Build Status](https://travis-ci.org/tool3/chartscii.svg?branch=master)](https://travis-ci.org/tool3/chartscii) ![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)   
 simple ascii bar charts
 
 # install
