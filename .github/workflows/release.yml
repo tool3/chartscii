@@ -45,6 +45,6 @@ jobs:
       - run: |
           npm ci
           git pull origin master --tags
-          npm publish --registry=https://npm.pkg.github.com/
+          npm publish --registry=https://npm.pkg.github.com/tool3
         env:
           NODE_AUTH_TOKEN: ${{secrets.GP_TOKEN}}
