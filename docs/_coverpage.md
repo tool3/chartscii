@@ -3,4 +3,4 @@
 > simple ascii bar charts
 
 [Github](https://github.com/tool3/chartscii)
-[Get Started](/#install)
+[Get Started](/#chartscii)
