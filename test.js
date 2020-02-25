@@ -9,5 +9,5 @@ for (let i = 1; i <= 10; i++) {
 }
 
 // create chart
-const chart = new Chartscii(data, { label: 'CURRENT LOAD', width: 300 });
+const chart = new Chartscii(data, { label: 'CPU', width: 300, sort: false, reverse: false, color: 'green' });
 console.log(chart.create());

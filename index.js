@@ -1,6 +1,7 @@
 class Chartscii {
     constructor(data, options) {
         this.data = options.sort ? this.sortSmallToLarge(data) : data;
+        this.data = options.reverse ? data.reverse() : data;
         this.options = {
             color: options.color || false,
             label: options && options.label,
@@ -20,6 +21,10 @@ class Chartscii {
         this.charCount = 0;
         this.width = 0;
         this.createGraphAxis();
+        this.colors = {
+            green: '\x1b[32;1m',
+            reset: '\x1b[0m'
+        }
     }
 
     createGraphAxis() {
@@ -77,13 +82,15 @@ class Chartscii {
         Object.keys(this.graph).map(point => {
             const graphValue = this.graph[point];
             const scaledValue = Math.round((graphValue / this.charCount) * this.options.structure.width);
-            asciiGraph = this.options.color ? point + `\x1b[32;1m${this.options.char.repeat(scaledValue)}\x1b[0m\n${asciiGraph}` : `${point}${this.options.char.repeat(scaledValue)}\n${asciiGraph}`;
+            asciiGraph = this.options.color ? point + `${this.colors[this.options.color]}${this.options.char.repeat(scaledValue)}${this.colors.reset}\n${asciiGraph}` : `${point}${this.options.char.repeat(scaledValue)}\n${asciiGraph}`;
         });
 
         if (this.options.label) {
             const space = ' '.repeat(this.maxSpace + 1);
             const graph = `${space}\n${asciiGraph}`;
-            asciiGraph = this.options.color ? `\x1b[32;1m${this.options.label}\x1b[0m${graph}` : `${this.options.label}${graph}`;
+            asciiGraph = this.options.color
+                ? `${this.colors[this.options.color]}${this.options.label}${this.colors.reset}${graph}`
+                : `${this.options.label}${graph}`;
         }
 
 
