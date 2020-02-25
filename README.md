@@ -40,20 +40,6 @@ outputs:
 
 ## options
 
-```js
-color: options.color || false,
-            label: options && options.label,
-            char: '█',
-            negativeChar: '▒',
-            structure:
-            {
-                y: '╢',
-                x: '══',
-                leftCorner: '╚',
-                width: options && options.width || 100
-            }
-```
-
 ### label (string)
   a label for the chart. display in color if `color: true`;
 ### width (number)
