@@ -12,7 +12,7 @@ npm install chartscii
 
 ## usage example
 ```js
-const Chartscii = require('./index');
+const Chartscii = require('chartscii');
 
 // generate random chart data
 let count = 0;
