@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/tool3/chartscii.svg?branch=master)](https://travis-ci.org/tool3/chartscii) ![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)   
 simple ascii bar charts
 
-![example](docs/img/example.mov)
+[![asciicast](https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3.svg)](https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3)
 
 # install
 ```bash
