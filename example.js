@@ -28,14 +28,13 @@ const createAsciiCharts = () => {
         label: 'Example Chart',
         width: 500,
         sort: false,
-        char: '■',
         reverse: false,
         color: color
     });
 
     //print chart
     process.stdout.write('\033c');
-    process.stdout.write(chart.create());
+    process.stdout.write(`${chart.create()}\n`);
     
 };
 
