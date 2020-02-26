@@ -3,7 +3,8 @@
 simple ascii bar charts
 
 [![asciicast](https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3.svg)](https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3)
-
+<script id="asciicast-cMahNRjeENKItWW1JXcbKmWf3" src="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3.js" async></script>
+<a href="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3" target="_blank"><img src="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3.svg" /></a>
 # install
 ```bash
 npm install chartscii
