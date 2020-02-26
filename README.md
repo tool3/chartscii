@@ -46,12 +46,11 @@ const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 500,
     char: '■',
-    sort: false,
-    reverse: false,
+    sort: true,
+    reverse: true,
     color: 'green'
 });
 
-//print chart
 console.log(chart.create());
 ```
 

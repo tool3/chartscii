@@ -14,22 +14,22 @@ npm install chartscii
 
 ## usage example
 ```js
-const Chartscii = require('chartscii');
+const Chartscii = require('./index');
+
 
 // generate random chart data
-let count = 0;
 const data = [];
 
-for (let i = 1; i <= 10; i++) {
-    data.push({ value: Math.floor(Math.random() * 6) + 1, label: `label_${count++}` });
+for (let i = 1; i <= 20; i++) {
+    data.push(Math.floor(Math.random() * 1000) + 1);
 }
 
 // create chart
 const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 500,
-    sort: false,
-    reverse: false,
+    sort: true,
+    reverse: true,
     color: 'pink'
 });
 
@@ -38,7 +38,7 @@ console.log(chart.create());
 ```
 
 outputs:
-![img](img/example.png)
+![img](docs/img/example.png)
 
 you can customize the acsii character for the bar chart using the `char` option. for example:   
 ```js
@@ -46,17 +46,16 @@ const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 500,
     char: '■',
-    sort: false,
-    reverse: false,
+    sort: true,
+    reverse: true,
     color: 'green'
 });
 
-//print chart
 console.log(chart.create());
 ```
 
 outputs:   
-![example](img/example_char.png)
+![example](docs/img/example_char.png)
 
 ## options
 
