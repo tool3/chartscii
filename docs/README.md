@@ -26,7 +26,7 @@ for (let i = 1; i <= 10; i++) {
 const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 500,
-    sort: true,
+    sort: false,
     reverse: false,
     color: 'pink'
 });
@@ -36,7 +36,7 @@ console.log(chart.create());
 ```
 
 outputs:
-![img](docs/img/example.png)
+![img](img/example.png)
 
 you can customize the acsii character for the bar chart using the `char` option. for example:   
 ```js
@@ -54,8 +54,7 @@ console.log(chart.create());
 ```
 
 outputs:   
-![example](docs/img/example_char.png)
-
+![example](img/example_char.png)
 
 ## options
 
