@@ -1,11 +1,8 @@
 const Chartscii = require('./index');
 
 
-
-
 const createAsciiCharts = () => {
     let color = '';
-    let count = 0;
 
     const colors = ['green',
         'red',
