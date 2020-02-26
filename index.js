@@ -1,8 +1,7 @@
 class Chartscii {
     constructor(data, options) {
-        this.data = options.sort ? this.sortSmallToLarge(data) : data;
-        this.data = options.reverse ? data.reverse() : data;
         this.options = {
+            sort: options.sort || false,
             color: options.color || false,
             label: options && options.label,
             char: options.char || '█',
@@ -15,6 +14,8 @@ class Chartscii {
                 width: options && options.width || 100
             }
         }
+        this.data = options.sort ? this.sortSmallToLarge(data) : data;
+        this.data = options.reverse ? data.reverse() : data;
         this.graph = {};
         this.maxSpace = 1;
         this.maxValue = 0;
@@ -33,28 +34,41 @@ class Chartscii {
     }
 
     createGraphAxis() {
-        let counter = 0;
-        this.maxValue = Math.max(...this.data.map(point => point.label.length || point));
-        const maxNumeric = Math.max(...this.data.map(point => point.value || point));
-        this.maxSpace = this.maxValue;
+        this.maxValue = Math.max(...this.data.map(point => {
+            if (point.label) {
+                return point.label.length;
+            } 
+            if (point.value) {
+                return point.value.toString().length;    
+            }
+            
+            return point.toString().length;
+        }));
+        this.maxNumeric = Math.max(...this.data.map(point => point.value || point));
+        this.maxSpace = this.maxValue > 0 ? this.maxValue : 1;
 
         this.data.map(point => {
             this.charCount += point.value || point;
 
             if (!point.label) {
-                this.graph[`${counter++} ${this.options.structure.y}`] = point;
+                const value = point.value || point;
+                const space = this.maxSpace - value.toString().length;
+                this.graph[`${' '.repeat(space)}${value} ${this.options.structure.y}`] = value;
             } else {
                 const space = this.maxSpace - point.label.length;
                 const key = `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
                 this.graph[key] = point.value;
             }
         });
-        this.width = Math.round((maxNumeric / this.charCount) * this.options.structure.width) / 2;
+        this.width = Math.round((this.maxNumeric / this.charCount) * this.options.structure.width) / 2;
         return this.graph;
     }
 
     sortSmallToLarge(arr) {
         return arr.sort((a, b) => {
+            if (a.label && this.options.sort === 'label') {
+                return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
+            }
             if (a.value) {
                 return a.value - b.value;
             } else {

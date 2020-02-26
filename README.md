@@ -26,7 +26,7 @@ for (let i = 1; i <= 10; i++) {
 const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 500,
-    sort: false,
+    sort: true,
     reverse: false,
     color: 'pink'
 });
