@@ -3,6 +3,8 @@ const colors = require('./consts/colors');
 class Chartscii {
     constructor(data, options) {
         this.options = {
+            percentage: options.percentage || false,
+            colorLabels: options.colorLabels || false,
             sort: options.sort || false,
             color: options.color || false,
             label: options && options.label,
@@ -20,38 +22,52 @@ class Chartscii {
         this.data = options.reverse ? data.reverse() : data;
         this.graph = {};
         this.maxSpace = 1;
-        this.maxValue = 0;
+        this.maxLabelLength = 0;
         this.charCount = 0;
         this.width = 0;
-        this.createGraphAxis();
         this.colors = colors;
+        this.createGraphAxis();
     }
 
     createGraphAxis() {
-        this.maxValue = Math.max(...this.data.map(point => {
+        this.maxLabelLength = Math.max(...this.data.map(point => {
             if (point.label) {
                 return point.label.length;
-            } 
-            if (point.value) {
-                return point.value.toString().length;    
             }
-            
+            if (point.value) {
+                return point.value.toString().length;
+            }
+
             return point.toString().length;
         }));
         this.maxNumeric = Math.max(...this.data.map(point => point.value || point));
-        this.maxSpace = this.maxValue > 0 ? this.maxValue : 1;
-
+        this.maxSpace = this.maxLabelLength > 0 ? this.maxLabelLength : 1;
+        this.charCount += this.data.reduce((acc, point) => {
+            const value = point.value || point;
+            return value + acc;
+        }, 0);
         this.data.map(point => {
-            this.charCount += point.value || point;
-
+            const value = point.value || point;
             if (!point.label) {
-                const value = point.value || point;
                 const space = this.maxSpace - value.toString().length;
                 this.graph[`${' '.repeat(space)}${value} ${this.options.structure.y}`] = value;
             } else {
+
+                // percentage
+                if (this.options.percentage) {
+                    const percentage = `${(value / this.maxNumeric * 100).toFixed(1)}%`;
+                    point.label = `${point.label} (${percentage})`;
+                    this.maxSpace = point.label.length >= this.maxSpace ? point.label.length : this.maxSpace;
+                    this.maxLabelLength = point.label.length >= this.maxLabelLength ? point.label.length : this.maxLabelLength;
+                }
+
+                // label coloring
+                let coloredLabel = this.options.colorLabels
+                    ? point.label.replace(point.label, `${this.colors[point.color || this.options.color]}${point.label}${this.colors.reset}`)
+                    : point.label;
                 const space = this.maxSpace - point.label.length;
-                const key = `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
-                this.graph[key] = point.value;
+                const key = `${' '.repeat(space)}${coloredLabel} ${this.options.structure.y}`;
+                this.graph[key] = value;
             }
         });
         this.width = Math.round((this.maxNumeric / this.charCount) * this.options.structure.width) / 2;
@@ -89,7 +105,7 @@ class Chartscii {
     }
 
     create() {
-        let asciiGraph = `${' '.repeat(this.maxValue + 1)}${this.options.structure.leftCorner}`;
+        let asciiGraph = `${' '.repeat(this.maxLabelLength + 1)}${this.options.structure.leftCorner}`;
 
         for (let x = 0; x < (this.width || this.data.length); x++) {
             asciiGraph = `${asciiGraph}${this.options.structure.x}`;
@@ -98,7 +114,15 @@ class Chartscii {
         Object.keys(this.graph).map(point => {
             const graphValue = this.graph[point];
             const scaledValue = Math.round((graphValue / this.charCount) * this.options.structure.width);
-            asciiGraph = this.options.color ? point + `${this.colors[this.options.color]}${this.options.char.repeat(scaledValue)}${this.colors.reset}\n${asciiGraph}` : `${point}${this.options.char.repeat(scaledValue)}\n${asciiGraph}`;
+
+            const dataPoint = this.data.find(point => {
+                const value = point.value || point;
+                return value === graphValue
+            });
+
+            asciiGraph = this.options.color
+                ? `${point}${this.colors[dataPoint && dataPoint.color || this.options.color]}${this.options.char.repeat(scaledValue)}${this.colors.reset}\n${asciiGraph}`
+                : `${point}${this.options.char.repeat(scaledValue)}\n${asciiGraph}`;
         });
 
         if (this.options.label) {
