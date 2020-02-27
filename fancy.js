@@ -29,8 +29,7 @@ const createAsciiCharts = () => {
         sort: true,
         reverse: true,
         color: color,
-        colorLabels: true,
-        percentage: true
+        colorLabels: true
     });
 
     //print chart
