@@ -1,4 +1,4 @@
-const Chartscii = require('./index');
+const Chartscii = require('chartscii');
 
 
 const createAsciiCharts = () => {

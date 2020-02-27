@@ -15,7 +15,7 @@ npm install chartscii
 
 ## usage example
 ```js
-const Chartscii = require('./index');
+const Chartscii = require('chartscii');
 
 
 // generate random chart data
@@ -91,7 +91,7 @@ color labels as well. default `false`
 ## intro example
 intro example, using no labels (value of bar is the default label)   
 ```js
-const Chartscii = require('./index');
+const Chartscii = require('chartscii');
 
 
 const createAsciiCharts = () => {
@@ -135,7 +135,7 @@ setInterval(() => createAsciiCharts(), 500);
 ## fancy example
 fancy example, using labels with colors   
 ```js
-const Chartscii = require('./index');
+const Chartscii = require('chartscii');
 
 
 const createAsciiCharts = () => {
@@ -180,7 +180,7 @@ setInterval(() => createAsciiCharts(), 500);
 ## percentage example
 using percentage, solid color with label colors   
 ```js
-const Chartscii = require('./index');
+const Chartscii = require('chartscii');
 
 
 const createAsciiCharts = () => {
