@@ -4,7 +4,7 @@ simple ascii bar charts
 
 <!-- <a href="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3?autoplay=1" target="_blank"><img src="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3.svg" /></a> -->
 
-<img width="1000" src="docs/img/example.svg">
+<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">
 
 # install
 ```bash
