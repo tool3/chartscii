@@ -38,7 +38,7 @@ console.log(chart.create());
 ```
 
 outputs:
-![img](docs/img/example.png)
+![img](img/example.png)
 
 you can customize the acsii character for the bar chart using the `char` option. for example:   
 ```js
@@ -55,7 +55,7 @@ console.log(chart.create());
 ```
 
 outputs:   
-![example](docs/img/example_char.png)
+![example](img/example_char.png)
 
 ## options
 
