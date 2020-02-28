@@ -137,6 +137,9 @@ setInterval(() => createAsciiCharts(), 500);
 
 ## fancy example
 fancy example, using labels with colors   
+
+<img width="1000" src="https://tool3.github.io/chartscii/img/fancy.svg">   
+
 ```js
 const Chartscii = require('chartscii');
 
