@@ -3,11 +3,8 @@ const colors = require('./consts/colors');
 class Chartscii {
     constructor(data, options) {
         this.options = {
-<<<<<<< HEAD
             percentage: options.percentage || false,
             colorLabels: options.colorLabels || false,
-=======
->>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
             sort: options.sort || false,
             color: options.color || false,
             label: options && options.label,
@@ -33,7 +30,6 @@ class Chartscii {
     }
 
     createGraphAxis() {
-<<<<<<< HEAD
         this.maxLabelLength = Math.max(...this.data.map(point => {
             if (point.label) {
                 return point.label.length;
@@ -41,20 +37,6 @@ class Chartscii {
             if (point.value) {
                 return point.value.toString().length;
             }
-=======
-        this.maxValue = Math.max(...this.data.map(point => {
-            if (point.label) {
-                return point.label.length;
-            } 
-            if (point.value) {
-                return point.value.toString().length;    
-            }
-            
-            return point.toString().length;
-        }));
-        this.maxNumeric = Math.max(...this.data.map(point => point.value || point));
-        this.maxSpace = this.maxValue > 0 ? this.maxValue : 1;
->>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
 
             return point.toString().length;
         }));
@@ -67,10 +49,6 @@ class Chartscii {
         this.data.map(point => {
             const value = point.value || point;
             if (!point.label) {
-<<<<<<< HEAD
-=======
-                const value = point.value || point;
->>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
                 const space = this.maxSpace - value.toString().length;
                 this.graph[`${' '.repeat(space)}${value} ${this.options.structure.y}`] = value;
             } else {
@@ -88,13 +66,8 @@ class Chartscii {
                     ? point.label.replace(point.label, `${this.colors[point.color || this.options.color]}${point.label}${this.colors.reset}`)
                     : point.label;
                 const space = this.maxSpace - point.label.length;
-<<<<<<< HEAD
                 const key = `${' '.repeat(space)}${coloredLabel} ${this.options.structure.y}`;
                 this.graph[key] = value;
-=======
-                const key = `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
-                this.graph[key] = point.value;
->>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
             }
         });
         this.width = Math.round((this.maxNumeric / this.charCount) * this.options.structure.width) / 2;
