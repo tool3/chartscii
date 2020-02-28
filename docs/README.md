@@ -90,6 +90,9 @@ color labels as well. default `false`
 # Examples
 ## intro example
 intro example, using no labels (value of bar is the default label)   
+
+<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">   
+
 ```js
 const Chartscii = require('chartscii');
 
