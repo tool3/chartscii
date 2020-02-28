@@ -20,7 +20,7 @@ class Chartscii {
         }
         this.data = options.sort ? this.sortSmallToLarge(data) : data;
         this.data = options.reverse ? data.reverse() : data;
-        this.graph = {};
+        this.graph = [];
         this.maxSpace = 1;
         this.maxLabelLength = 0;
         this.charCount = 0;
@@ -48,9 +48,10 @@ class Chartscii {
         }, 0);
         this.data.map(point => {
             const value = point.value || point;
+            
             if (!point.label) {
                 const space = this.maxSpace - value.toString().length;
-                this.graph[`${' '.repeat(space)}${value} ${this.options.structure.y}`] = value;
+                this.graph.push({ key: `${' '.repeat(space)}${value} ${this.options.structure.y}`, value: value })
             } else {
 
                 // percentage
@@ -67,7 +68,7 @@ class Chartscii {
                     : point.label;
                 const space = this.maxSpace - point.label.length;
                 const key = `${' '.repeat(space)}${coloredLabel} ${this.options.structure.y}`;
-                this.graph[key] = value;
+                this.graph.push({ key, value, color: point.color });
             }
         });
         this.width = Math.round((this.maxNumeric / this.charCount) * this.options.structure.width) / 2;
@@ -111,18 +112,13 @@ class Chartscii {
             asciiGraph = `${asciiGraph}${this.options.structure.x}`;
         }
 
-        Object.keys(this.graph).map(point => {
-            const graphValue = this.graph[point];
+        this.graph.map(point => {
+            const graphValue = point.value;
             const scaledValue = Math.round((graphValue / this.charCount) * this.options.structure.width);
 
-            const dataPoint = this.data.find(point => {
-                const value = point.value || point;
-                return value === graphValue
-            });
-
             asciiGraph = this.options.color
-                ? `${point}${this.colors[dataPoint && dataPoint.color || this.options.color]}${this.options.char.repeat(scaledValue)}${this.colors.reset}\n${asciiGraph}`
-                : `${point}${this.options.char.repeat(scaledValue)}\n${asciiGraph}`;
+                ? `${point.key}${this.colors[point && point.color || this.options.color]}${this.options.char.repeat(scaledValue)}${this.colors.reset}\n${asciiGraph}`
+                : `${point.key}${this.options.char.repeat(scaledValue)}\n${asciiGraph}`;
         });
 
         if (this.options.label) {
