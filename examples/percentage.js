@@ -18,7 +18,7 @@ const createAsciiCharts = () => {
 
     for (let i = 1; i <= 20; i++) {
         color = colors[Math.floor(Math.random() * colors.length)];
-        data.push({ value: Math.floor(Math.random() * 1000) + 1, label: `${count++}` });
+        data.push({ value: Math.floor(Math.random() * 1000) + 1, label: `label ${count++}` });
     }
 
     // create chart
