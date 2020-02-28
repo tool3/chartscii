@@ -37,7 +37,7 @@ console.log(chart.create());
 ```
 
 outputs:
-<img src="docs/img/example.png" />
+<img src="https://tool3.github.io/chartscii/img/example.png" width="1300"/>
 
 you can customize the acsii character for the bar chart using the `char` option. for example:   
 ```js
@@ -54,7 +54,8 @@ console.log(chart.create());
 ```
 
 outputs:   
-<img src="docs/img/example_char.png" width="1300"/>
+
+<img src="https://tool3.github.io/chartscii/img/example_char.png" width="1300"/>
 
 
 ## options
@@ -80,7 +81,7 @@ outputs:
   
 ### color (string)
   color bars in chart and label if provided      
-  can be one of:   
+  can be one of:
   - green
   - red
   - pink
