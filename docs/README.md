@@ -2,8 +2,7 @@
 [![Build Status](https://travis-ci.org/tool3/chartscii.svg?branch=master)](https://travis-ci.org/tool3/chartscii) ![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)   
 simple ascii bar charts
 
-<!-- <a href="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3?autoplay=1" target="_blank"><img src="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3.svg" /></a> -->
-<img width="1000" src="img/example.svg">
+<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">
 
 # install
 ```bash
@@ -11,7 +10,7 @@ npm install chartscii
 ```
 
 # usage
-`chartscii` accepts an array of data values, with optional labels, and outputs an ascii bar chart.   
+`chartscii` accepts an array of data objects, with optional labels, and outputs an ascii bar chart.   
 
 ## usage example
 ```js
@@ -58,42 +57,67 @@ console.log(chart.create());
 outputs:   
 ![example](img/example_char.png)
 
-## options
+### data options
+`chartscii` accepts data in objects or simply an array of numeric values
+```js
+[{ value: 2, label: 'some_label' }, { value: 2, label: 'some_label' }] 
+```
 
-### label (string)
-  a label for the chart. display in color if `color: true`   
+```js
+[3, 34, 45]
+```
 
-### width (number)
-  the width of the chart, scales values accordingly   
-  default: `100`
+#### label (string)
+a label for the data point   
+display in color if `color: true`  
+displays a unique color if provided in data array. (e.g `{ value: 3, color: 'red' }`)
 
-### sort (boolean)
-  sort data   
-  default: `false`
+#### value (number)
+a value for the bar chart
 
-### reverse (boolean)
-  reverse chart values order   
-  default: `false`
+#### color (string)
+a color to paint the bar, and label if `colorLabel: true`   
+color should correspond to the [supported colors](#supported-colors)
 
-### char (string)
-  ascii char for bars   
-  default: `█`
+### chart options
 
-### color (string)
-  color bars in chart and label if provided.     
-  can be one of:
-  - green
-  - red
-  - pink
-  - cyan
-  - blue
-  - yellow
+#### label (string)
+a label for the chart. display in color if `color: true`   
 
-### percentage (boolean)
+#### width (number)
+the width of the chart, scales values accordingly   
+default: `100`
+
+#### sort (boolean)
+sort data   
+default: `false`
+
+#### reverse (boolean)
+reverse chart values order   
+default: `false`
+
+#### char (string)
+ascii char for bars   
+default: `█`
+
+#### color (string)
+color bars in chart and label if provided.     
+see [supported colors](#supported-colors)
+
+## supported colors
+these are the currently supported colors for `chartscii`, provided as string in the data object (e.g `{ value: 3, color: 'green' }`)
+ - green
+ - red
+ - pink
+ - cyan
+ - blue
+ - yellow
+
+#### percentage (boolean)
 show percentage of each bar, using the highest value in the provided data array   
 default `false`
 
-### colorLabels (boolean)
+#### colorLabels (boolean)
 color labels as well   
 default `false`
 
