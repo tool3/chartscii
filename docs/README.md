@@ -61,18 +61,26 @@ outputs:
 ## options
 
 ### label (string)
-  a label for the chart. display in color if `color: true`.
+  a label for the chart. display in color if `color: true`   
+
 ### width (number)
-  the width of the chart, scales values accordingly. default: `100`
+  the width of the chart, scales values accordingly   
+  default: `100`
+
 ### sort (boolean)
-  sort data. default: `false`
+  sort data   
+  default: `false`
+
 ### reverse (boolean)
-  reverse chart values order. default: `false`
+  reverse chart values order   
+  default: `false`
 
 ### char (string)
-  ascii char for bars. default: `█`
+  ascii char for bars   
+  default: `█`
+
 ### color (string)
-  color bars in chart and label if provided.   
+  color bars in chart and label if provided.     
   can be one of:
   - green
   - red
@@ -82,10 +90,12 @@ outputs:
   - yellow
 
 ### percentage (boolean)
-show percentage of each bar, using the highest value in the provided data array. default `false`
+show percentage of each bar, using the highest value in the provided data array   
+default `false`
 
 ### colorLabels (boolean)
-color labels as well. default `false`
+color labels as well   
+default `false`
 
 # Examples
 ## intro example
