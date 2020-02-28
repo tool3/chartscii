@@ -2,9 +2,12 @@
 [![Build Status](https://travis-ci.org/tool3/chartscii.svg?branch=master)](https://travis-ci.org/tool3/chartscii) ![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)   
 simple ascii bar charts
 
+<<<<<<< HEAD
 <!-- <a href="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3?autoplay=1" target="_blank"><img src="https://asciinema.org/a/cMahNRjeENKItWW1JXcbKmWf3.svg" /></a> -->
 <img width="1000" src="img/example.svg">
 
+=======
+>>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
 # install
 ```bash
 npm install chartscii
@@ -17,20 +20,34 @@ npm install chartscii
 ```js
 const Chartscii = require('chartscii');
 
+<<<<<<< HEAD
 
 // generate random chart data
 const data = [];
 
 for (let i = 1; i <= 20; i++) {
     data.push(Math.floor(Math.random() * 1000) + 1);
+=======
+// generate random chart data
+let count = 0;
+const data = [];
+
+for (let i = 1; i <= 10; i++) {
+    data.push({ value: Math.floor(Math.random() * 6) + 1, label: `label_${count++}` });
+>>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
 }
 
 // create chart
 const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 500,
+<<<<<<< HEAD
     sort: true,
     reverse: true,
+=======
+    sort: false,
+    reverse: false,
+>>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
     color: 'pink'
 });
 
@@ -47,11 +64,20 @@ const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 500,
     char: '■',
+<<<<<<< HEAD
     sort: true,
     reverse: true,
     color: 'green'
 });
 
+=======
+    sort: false,
+    reverse: false,
+    color: 'green'
+});
+
+//print chart
+>>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
 console.log(chart.create());
 ```
 
@@ -80,6 +106,7 @@ outputs:
   - cyan
   - blue
   - yellow
+<<<<<<< HEAD
 
 ### percentage (boolean)
 show percentage of each bar, using the highest value in the provided data array. default `false`
@@ -232,3 +259,5 @@ const createAsciiCharts = () => {
 
 setInterval(() => createAsciiCharts(), 500);
 ```
+=======
+>>>>>>> 236f56404c9ec1daa0922e9bc4babc4a057d11e5
