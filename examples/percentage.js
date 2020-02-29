@@ -19,7 +19,7 @@ const createAsciiCharts = () => {
     for (let i = 1; i <= 20; i++) {
         color = colors[Math.floor(Math.random() * colors.length)];
         const value = Math.floor(Math.random() * 1000) + 1;
-        data.push({ value , label: `label ${count++}`, color: value > 200 ? 'red' : 'yellow' });
+        data.push({ value , label: `label ${count++}`, color: value > 200 ? 'green' : 'red' });
     }
 
     // create chart

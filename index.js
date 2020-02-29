@@ -36,32 +36,47 @@ class Chartscii {
             return value + acc;
         }, 0);
         this.maxLabelLength = Math.max(...this.data.map(point => {
-            const value = point.value || point;
+            const value = point.value|| point;
             const color = this.colors[point.color || this.options.color];
 
-            if (this.options.percentage) {
-                const percentage = `${((value / this.charCount) * 100).toFixed(1)}%`;
-                point.label = `${point.label} (${percentage})`;
-            }
-
-            if (this.options.colorLabels) {
-                point.labelColorless = point.label.length;
-                point.label = point.label.replace(point.label, `${color}${point.label}${this.colors.reset}`);
-                return point.labelColorless;
-            }
-
             if (point.label) {
+                if (this.options.percentage) {
+                    const percentage = `${((value / this.charCount) * 100).toFixed(1)}%`;
+                    point.label = `${value} (${percentage})`;
+                }
+
+                if (this.options.colorLabels) {
+                    point.labelColorless = point.label.length;
+                    point.label = point.label.replace(point.label, `${color}${point.label}${this.colors.reset}`);
+                    return point.labelColorless;
+                }
+
                 return point.label.length;
             }
+
             if (point.value) {
-                return point.value.toString().length;
+                const colorLess = point.value.toString().length;
+                if (this.options.colorLabels) {
+                    point.value = point.value.toString().replace(point.value, `${color}${point.value}${this.colors.reset}`);
+                    return colorLess
+                }
+                return point.value.length;
+            }
+
+            let colorLess = 0;
+
+            if (this.options.colorLabels) {
+                colorLess = point.toString().length;
+                point = point.toString().replace(point, `${color}${point}${this.colors.reset}`);
+                return colorLess;
             }
             
             return point.toString().length;
+            
         }));
-        
+
         this.maxSpace = this.maxLabelLength > 0 ? this.maxLabelLength : 1;
-        
+
         this.data.map(point => {
             const value = point.value || point;
 
