@@ -63,10 +63,8 @@ class Chartscii {
                 return point.value.length;
             }
 
-            let colorLess = 0;
-
             if (this.options.colorLabels) {
-                colorLess = point.toString().length;
+                const colorLess = point.toString().length;
                 point = point.toString().replace(point, `${color}${point}${this.colors.reset}`);
                 return colorLess;
             }
