@@ -27,8 +27,10 @@ const createAsciiCharts = () => {
         label: 'Example Chart',
         width: 500,
         sort: true,
+        percentage: true,
         reverse: true,
         color: color,
+        char: '═',
         colorLabels: true
     });
 
