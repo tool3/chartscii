@@ -276,9 +276,6 @@ const waka = 'your api call to get last 7 days waka stats: https://wakatime.com/
 const languages = waka.data.languages;
 
 const data = languages.map(lang => {
-    if (!lang.total_seconds) {
-        return;
-    }
     return { value: lang.total_seconds * 60, label: lang.name };
 });
 
