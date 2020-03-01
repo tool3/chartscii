@@ -9,7 +9,7 @@ class Chartscii {
             color: options && options.color || false,
             label: options && options && options.label,
             char: options && options.char || '█',
-            negativeChar: '▒',
+            fill: options && options.fill || '░',
             structure:
             {
                 y: '╢',
@@ -51,11 +51,11 @@ class Chartscii {
         }, 0);
 
         const graphData = this.data.map(point => {
-            let value = point.value || point;
+            let value = typeof point === 'object' ? point.value : point;
             let label = point.label;
 
             if (point.toString() === "0" || point.value === 0) {
-                value = typeof point === 'object' ? point.value.toString() : value.toString() ;
+                value = value.toString()
             }
 
             const color = this.colors[point.color || this.options.color];
@@ -66,10 +66,10 @@ class Chartscii {
                 if (this.options.percentage) {
                     point.label = this.getPercentageData(value, label);
                     this.maxLabelLength = this.updateMaxLabelLength(point.label);
+                    point.labelColorLess = point.label.length;
                 }
 
-                if (this.options.colorLabels) {
-                    point.labelColorLess = point.label.length;
+                if (this.options.colorLabels && this.options.color) {
                     point.label = this.colorLabel(point.label, color);
                 }
 
@@ -83,12 +83,13 @@ class Chartscii {
 
                 if (this.options.percentage) {
                     point.label = this.getPercentageData(value);
-                    this.maxLabelLength = this.updateMaxLabelLength(value);
+                    this.maxLabelLength = this.updateMaxLabelLength(point.label);
+                    labelColorLess = point.label.length;
                 }
 
-                if (this.options.colorLabels) {
-                    labelColorLess = value.toString().length;
-                    point.label = this.colorLabel(point.value.toString(), color);
+                if (this.options.colorLabels && this.options.color) {
+                    const printValue = point.label || (point.value || point);
+                    point.label = this.colorLabel(printValue, color);
                 }
 
                 return { value: point.value, label: point.label, labelColorLess };
@@ -153,10 +154,12 @@ class Chartscii {
         this.graph.map(point => {
             const graphValue = point.value;
             const scaledValue = Math.round((graphValue / this.charCount) * this.options.structure.width);
+            const scaledMaxNumeric = Math.round(((this.maxNumeric / this.charCount) * this.options.structure.width));
+            const fill = this.options.fill ? this.options.fill.repeat(scaledMaxNumeric - scaledValue) : '';
 
             asciiGraph = this.options.color
-                ? `${point.key}${this.colors[point && point.color || this.options.color]}${this.options.char.repeat(scaledValue)}${this.colors.reset}\n${asciiGraph}`
-                : `${point.key}${this.options.char.repeat(scaledValue)}\n${asciiGraph}`;
+                ? `${point.key}${this.colors[point && point.color || this.options.color]}${this.options.char.repeat(scaledValue)}${fill}${this.colors.reset}\n${asciiGraph}`
+                : `${point.key}${this.options.char.repeat(scaledValue)}${fill}\n${asciiGraph}`;
         });
 
         if (this.options.label) {
