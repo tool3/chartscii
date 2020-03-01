@@ -10,11 +10,12 @@ npm install chartscii
 ```
 
 # usage
-`chartscii` accepts an array of data values, with optional labels, and outputs an ascii bar chart.   
+`chartscii` accepts an array of data objects, with optional labels, and outputs an ascii bar chart.   
 
 ## usage example
 ```js
 const Chartscii = require('chartscii');
+
 
 // generate random chart data
 const data = [];
@@ -37,7 +38,7 @@ console.log(chart.create());
 ```
 
 outputs:
-<img src="https://tool3.github.io/chartscii/img/example.png" width="1300"/>
+![img](docs/img/example.png)
 
 you can customize the acsii character for the bar chart using the `char` option. for example:   
 ```js
@@ -54,47 +55,70 @@ console.log(chart.create());
 ```
 
 outputs:   
+![example](docs/img/example_char.png)
 
-<img src="https://tool3.github.io/chartscii/img/example_char.png" width="1300"/>
+### data options
+`chartscii` accepts data in objects or simply an array of numeric values
+```js
+[{ value: 2, label: 'some_label' }, { value: 2, label: 'some_label' }] 
+```
 
+```js
+[3, 34, 45]
+```
 
-## options
+#### label (string)
+a label for the data point   
+display in color if `color: true`  
+displays a unique color if provided in data array. (e.g `{ value: 3, color: 'red' }`)
 
-### label (string)
-  a label for the chart. display in color if `color: true`.
+#### value (number)
+a value for the bar chart
 
-### width (number)
-  the width of the chart, scales values accordingly   
-  default: `100`
+#### color (string)
+a color to paint the bar, and label if `colorLabel: true`   
+color should correspond to the [supported colors](#supported-colors)
 
-### sort (boolean)
-  sort data   
-  default: `false`
+### chart options
 
-### reverse (boolean)
-  reverse chart values order   
-  default: `false`
+#### label (string)
+a label for the chart. display in color if `color: true`   
 
-### char (string)
-  ascii char for bars  
-  default: `█`
-  
-### color (string)
-  color bars in chart and label if provided      
-  can be one of:
-  - green
-  - red
-  - pink
-  - cyan
-  - blue
-  - yellow
-  
-### percentage (boolean)
+#### width (number)
+the width of the chart, scales values accordingly   
+default: `100`
+
+#### sort (boolean)
+sort data   
+default: `false`
+
+#### reverse (boolean)
+reverse chart values order   
+default: `false`
+
+#### char (string)
+ascii char for bars   
+default: `█`
+
+#### color (string)
+color bars in chart and label if provided.     
+see [supported colors](#supported-colors)
+
+## supported colors
+these are the currently supported colors for `chartscii`, provided as string in the data object (e.g `{ value: 3, color: 'green' }`)
+ - green
+ - red
+ - pink
+ - cyan
+ - blue
+ - yellow
+
+#### percentage (boolean)
 show percentage of each bar, using the highest value in the provided data array   
 default `false`
 
-### colorLabels (boolean)
-color labels as well.   
+#### colorLabels (boolean)
+color labels as well   
 default `false`
 
 # Examples
@@ -241,4 +265,33 @@ const createAsciiCharts = () => {
 
 
 setInterval(() => createAsciiCharts(), 500);
+```
+
+## waka time example
+if you are using waka-time, then use this example to see your last 7 days coding stats with `chartscii`!   
+```js
+const Chartscii = require('../index');
+
+const waka = 'your api call to get last 7 days waka stats: https://wakatime.com/developers/#stats'
+const languages = waka.data.languages;
+
+const data = languages.map(lang => {
+    if (!lang.total_seconds) {
+        return;
+    }
+    return { value: lang.total_seconds * 60, label: lang.name };
+});
+
+const chart = new Chartscii(data, {
+    label: 'Waka Example',
+    width: 65,
+    sort: true,
+    reverse: false,
+    percentage: true,
+    fill: '░',
+    char: '█'
+});
+
+//print chart
+console.log(chart.create());
 ```

@@ -11,9 +11,12 @@ for (let i = 1; i <= 20; i++) {
 const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 500,
-    sort: true,
+    sort: false,
     reverse: true,
-    color: 'pink'
+    fill: '░',
+    char: '█',
+    colorLabels: true,
+    percentage: true
 });
 
 //print chart

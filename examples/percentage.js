@@ -18,16 +18,18 @@ const createAsciiCharts = () => {
 
     for (let i = 1; i <= 20; i++) {
         color = colors[Math.floor(Math.random() * colors.length)];
-        data.push({ value: Math.floor(Math.random() * 1000) + 1, label: `${count++}` });
+        const value = Math.floor(Math.random() * 1000) + 1;
+        data.push({ value , label: `label ${count++}`, color: value > 200 ? 'green' : 'red' });
     }
 
     // create chart
     const chart = new Chartscii(data, {
         label: 'Example Chart',
         width: 500,
-        sort: true,
-        reverse: true,
+        sort: false,
+        reverse: false,
         color: color,
+        char: '■',
         colorLabels: true,
         percentage: true
     });

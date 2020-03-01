@@ -1,13 +1,13 @@
 {
   "name": "chartscii",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "simple ascii bar charts",
   "main": "index.js",
   "repository": {
     "url": "https://github.com/tool3/chartscii"
   },
   "scripts": {
-    "test": "echo 'no tests yet'",
+    "test": "mocha index.test.js",
     "lint": "eslint ."
   },
   "keywords": [
@@ -18,6 +18,8 @@
   "author": "Tal Hayut",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^6.8.0"
+    "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "mocha": "^7.1.0"
   }
 }
