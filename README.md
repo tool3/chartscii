@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/tool3/chartscii.svg?branch=master)](https://travis-ci.org/tool3/chartscii) ![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)   
 simple ascii bar charts
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">
+<img width="1000" src="https://tool3.github.io/chartscii/docs/img/example.svg">
 
 # install
 ```bash
@@ -125,7 +125,7 @@ default `false`
 ## intro example
 intro example, using no labels (value of bar is the default label)   
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">   
+<img width="1000" src="https://tool3.github.io/chartscii/docs/img/example.svg">   
 
 ```js
 const Chartscii = require('chartscii');
@@ -172,7 +172,7 @@ setInterval(() => createAsciiCharts(), 500);
 ## fancy example
 fancy example, using labels with colors   
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/fancy.svg">   
+<img width="1000" src="https://tool3.github.io/chartscii/docs/img/fancy.svg">   
 
 ```js
 const Chartscii = require('chartscii');
@@ -220,7 +220,7 @@ setInterval(() => createAsciiCharts(), 500);
 ## percentage example
 using percentage, solid color with label colors   
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/percentage.svg">   
+<img width="1000" src="https://tool3.github.io/chartscii/docs/img/percentage.svg">   
 
 ```js
 const Chartscii = require('chartscii');
@@ -296,4 +296,4 @@ const chart = new Chartscii(data, {
 console.log(chart.create());
 ```
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/wakatime.png">   
+<img width="1000" src="https://tool3.github.io/chartscii/docs/img/wakatime.png">   
