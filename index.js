@@ -29,62 +29,78 @@ class Chartscii {
         this.createGraphAxis();
     }
 
+    getPercentageData(value, label = undefined) {
+        const percentage = `${((value / this.charCount) * 100).toFixed(1)}%`;
+        return `${label || value} (${percentage})`;
+    }
+
+    colorLabel(label, color) {
+        return label.replace(label, `${color}${label}${this.colors.reset}`);
+    }
+
+    updateMaxLabelLength(label) {
+        return label.length >= this.maxLabelLength ? label.length : this.maxLabelLength
+    }
+
     createGraphAxis() {
         this.maxNumeric = Math.max(...this.data.map(point => point.value || point));
+
         this.charCount += this.data.reduce((acc, point) => {
             const value = point.value || point;
             return value + acc;
         }, 0);
-        this.maxLabelLength = Math.max(...this.data.map(point => {
-            const value = point.value|| point;
+
+        const graphData = this.data.map(point => {
+            let value = point.value || point;
+            let label = point.label;
+            
             const color = this.colors[point.color || this.options.color];
 
-            if (point.label) {
+            if (label) {
+                this.maxLabelLength = this.updateMaxLabelLength(point.label);
+
                 if (this.options.percentage) {
-                    const percentage = `${((value / this.charCount) * 100).toFixed(1)}%`;
-                    point.label = `${value} (${percentage})`;
+                    point.label = this.getPercentageData(value, label);
+                    this.maxLabelLength = this.updateMaxLabelLength(point.label);
                 }
 
                 if (this.options.colorLabels) {
-                    point.labelColorless = point.label.length;
-                    point.label = point.label.replace(point.label, `${color}${point.label}${this.colors.reset}`);
-                    return point.labelColorless;
+                    point.labelColorLess = point.label.length;
+                    point.label = this.colorLabel(point.label, color);
                 }
 
-                return point.label.length;
+                return point;
             }
+            
+            if (value) {
+                const point = { value };
+                let labelColorLess = point.value.toString().length;
+                this.maxLabelLength = this.updateMaxLabelLength(point.value.toString());
 
-            if (point.value) {
-                const colorLess = point.value.toString().length;
+                if (this.options.percentage) {
+                    point.label = this.getPercentageData(value);
+                    this.maxLabelLength = this.updateMaxLabelLength(value);
+                }
+
                 if (this.options.colorLabels) {
-                    point.value = point.value.toString().replace(point.value, `${color}${point.value}${this.colors.reset}`);
-                    return colorLess
+                    labelColorLess = value.toString().length;
+                    point.label = this.colorLabel(point.value.toString(), color);
                 }
-                return point.value.length;
-            }
 
-            if (this.options.colorLabels) {
-                const colorLess = point.toString().length;
-                point = point.toString().replace(point, `${color}${point}${this.colors.reset}`);
-                return colorLess;
+                return { value: point.value, label: point.label, labelColorLess };
             }
-            
-            return point.toString().length;
-            
-        }));
+        });
 
         this.maxSpace = this.maxLabelLength > 0 ? this.maxLabelLength : 1;
 
-        this.data.map(point => {
+        graphData.map(point => {
             const value = point.value || point;
 
             if (!point.label) {
-                const space = this.maxSpace - value.toString().length;
-                const color = this.colors[point.color || this.options.color];
-                const displayValue = this.options.colorLabels ? `${color.trim()}${value}${this.colors.reset}` : value;
-                this.graph.push({ key: `${' '.repeat(space)}${displayValue} ${this.options.structure.y}`, value: value });
+                const space = this.maxLabelLength - point.labelColorLess;
+                this.graph.push({ key: `${' '.repeat(space)}${value} ${this.options.structure.y}`, value: value });
             } else {
-                const space = this.maxLabelLength - point.labelColorless;
+                const space = this.maxLabelLength - point.labelColorLess;
                 const key = `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
                 this.graph.push({ key, value, color: point.color, label: point.label });
             }
