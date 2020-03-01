@@ -18,8 +18,8 @@ class Chartscii {
                 width: options && options.width || 100
             }
         }
-        this.data = options && options.sort ? this.sortSmallToLarge(data) : data;
-        this.data = options && options.reverse ? data.reverse() : data;
+        const reverse = options && options.reverse;
+        this.data = options && options.sort ? this.sortSmallToLarge(data, reverse) : data;
         this.graph = [];
         this.maxSpace = 1;
         this.maxLabelLength = 0;
@@ -119,8 +119,8 @@ class Chartscii {
         return this.graph;
     }
 
-    sortSmallToLarge(arr) {
-        return arr.sort((a, b) => {
+    sortSmallToLarge(arr, reverse) {
+        const sorted = arr.sort((a, b) => {
             if (a.label && this.options.sort === 'label') {
                 return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
             }
@@ -130,6 +130,8 @@ class Chartscii {
                 return a - b;
             }
         });
+
+        return reverse ? sorted.reverse() : sorted;
     }
 
     makeSpace() {
