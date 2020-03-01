@@ -13,7 +13,8 @@ const chart = new Chartscii(data, {
     width: 500,
     sort: false,
     reverse: true,
-    color: 'pink',
+    fill: '░',
+    char: '█',
     colorLabels: true,
     percentage: true
 });

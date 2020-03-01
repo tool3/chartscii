@@ -26,7 +26,6 @@ const createAsciiCharts = () => {
     const chart = new Chartscii(data, {
         label: 'Example Chart',
         width: 500,
-        sort: true,
         percentage: true,
         reverse: true,
         color: color,
