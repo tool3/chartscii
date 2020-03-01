@@ -3,12 +3,12 @@ const colors = require('./consts/colors');
 class Chartscii {
     constructor(data, options) {
         this.options = {
-            percentage: options.percentage || false,
-            colorLabels: options.colorLabels || false,
-            sort: options.sort || false,
-            color: options.color || false,
-            label: options && options.label,
-            char: options.char || '█',
+            percentage: options && options.percentage || false,
+            colorLabels: options && options.colorLabels || false,
+            sort: options && options.sort || false,
+            color: options && options.color || false,
+            label: options && options && options.label,
+            char: options && options.char || '█',
             negativeChar: '▒',
             structure:
             {
@@ -18,8 +18,8 @@ class Chartscii {
                 width: options && options.width || 100
             }
         }
-        this.data = options.sort ? this.sortSmallToLarge(data) : data;
-        this.data = options.reverse ? data.reverse() : data;
+        this.data = options && options.sort ? this.sortSmallToLarge(data) : data;
+        this.data = options && options.reverse ? data.reverse() : data;
         this.graph = [];
         this.maxSpace = 1;
         this.maxLabelLength = 0;
@@ -53,7 +53,11 @@ class Chartscii {
         const graphData = this.data.map(point => {
             let value = point.value || point;
             let label = point.label;
-            
+
+            if (point.toString() === "0" || point.value === 0) {
+                value = typeof point === 'object' ? point.value.toString() : value.toString() ;
+            }
+
             const color = this.colors[point.color || this.options.color];
 
             if (label) {
@@ -71,9 +75,9 @@ class Chartscii {
 
                 return point;
             }
-            
+
             if (value) {
-                const point = { value };
+                const point = value.value ? { value: value.value } : { value };
                 let labelColorLess = point.value.toString().length;
                 this.maxLabelLength = this.updateMaxLabelLength(point.value.toString());
 
