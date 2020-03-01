@@ -295,3 +295,5 @@ const chart = new Chartscii(data, {
 //print chart
 console.log(chart.create());
 ```
+
+<img width="1000" src="https://tool3.github.io/chartscii/img/wakatime.png">   
