@@ -182,7 +182,7 @@ class Chartscii {
     }
 
 
-    toString() {
+    get() {
         return this.graph;
     }
 
