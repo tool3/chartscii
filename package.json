@@ -24,6 +24,8 @@
     "mocha": "^7.1.0"
   },
   "husky": {
-    "pre-commit": "npm lint && npm test"
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   }
 }
