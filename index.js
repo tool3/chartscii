@@ -82,6 +82,7 @@ class Chartscii {
                 
                 if (this.options.percentage) {
                     point.label = this.getPercentageData(value, label);
+                    point.labelColorLess = point.label.length;
                     this.maxLabelLength = this.updateMaxLabelLength(point.label);
                 }
 
