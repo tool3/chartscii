@@ -8,9 +8,9 @@ const data = languages.map(lang => {
 });
 
 const chart = new Chartscii(data, {
-    label: 'Weekly coding stats',
     sort: false,
     reverse: true,
+    naked: true,
     fill: '░',
     char: '█',
     percentage: true
