@@ -103,7 +103,7 @@ default: `█`
 #### fill (string)
 fill chart with ascii character.   
 no default.   
-recommended: ░
+recommended: `░`
 
 #### color (string)
 color bars in chart and label if provided.     
