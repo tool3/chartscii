@@ -10,6 +10,7 @@ class Chartscii {
             label: options && options && options.label,
             char: options && options.char || '█',
             fill: options && options.fill,
+            naked: options && options.naked || false,
             structure:
             {
                 y: '╢',
@@ -108,10 +109,11 @@ class Chartscii {
 
             if (!point.label) {
                 const space = this.maxLabelLength - point.labelColorLess;
-                this.graph.push({ key: `${' '.repeat(space)}${value} ${this.options.structure.y}`, value: value });
+                const char = this.options.naked ? `${' '.repeat(space)}${value}  ` : `${' '.repeat(space)}${value} ${this.options.structure.y}`;
+                this.graph.push({ key: char, value: value });
             } else {
                 const space = this.maxLabelLength - (point.labelColorLess || point.label.length);
-                const key = `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
+                const key = this.options.naked ? `${' '.repeat(space)}${point.label}  ` : `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
                 this.graph.push({ key, value, color: point.color, label: point.label });
             }
         });
@@ -155,7 +157,7 @@ class Chartscii {
         let asciiGraph = `${' '.repeat(this.maxLabelLength + 1)}${this.options.structure.leftCorner}`;
 
         for (let x = 0; x < (this.width || this.data.length); x++) {
-            asciiGraph = `${asciiGraph}${this.options.structure.x}`;
+            asciiGraph = this.options.naked ? '' : `${asciiGraph}${this.options.structure.x}`;
         }
 
         this.graph.map(point => {
