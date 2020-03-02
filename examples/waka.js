@@ -1,6 +1,6 @@
 const Chartscii = require('../index');
 
-const waka = require('../../waka.mock');
+const waka = 'your api call to get last 7 days waka stats: https://wakatime.com/developers/#stats'
 const languages = waka.data.languages;
 
 const data = languages.map(lang => {
