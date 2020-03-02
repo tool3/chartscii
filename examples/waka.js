@@ -8,7 +8,8 @@ const data = languages.map(lang => {
 });
 
 const chart = new Chartscii(data, {
-    sort: false,
+    width: 65,
+    sort: true,
     reverse: true,
     naked: true,
     fill: '░',

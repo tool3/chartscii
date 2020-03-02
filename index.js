@@ -20,7 +20,7 @@ class Chartscii {
             }
         }
         const reverse = options && options.reverse;
-        this.data = options && options.sort ? this.sortSmallToLarge(data, reverse) : data;
+        this.data = this.sortData(data, reverse);
         this.graph = [];
         this.maxSpace = 1;
         this.maxLabelLength = 0;
@@ -29,6 +29,16 @@ class Chartscii {
         this.width = 0;
         this.colors = colors;
         this.createGraphAxis();
+    }
+
+    sortData(data, reverse) {
+        if (this.options.sort) {
+            data = this.sortSmallToLarge(data, reverse);
+        }
+        if (reverse) {
+            data = data.reverse();
+        }
+        return data;
     }
 
     getPercentageData(value, label = undefined) {
