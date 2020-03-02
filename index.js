@@ -10,6 +10,7 @@ class Chartscii {
             label: options && options && options.label,
             char: options && options.char || '█',
             fill: options && options.fill,
+            naked: options && options.naked || false,
             structure:
             {
                 y: '╢',
@@ -18,8 +19,8 @@ class Chartscii {
                 width: options && options.width || 100
             }
         }
-        this.data = options && options.sort ? this.sortSmallToLarge(data) : data;
-        this.data = options && options.reverse ? data.reverse() : data;
+        const reverse = options && options.reverse;
+        this.data = this.sortData(data, reverse);
         this.graph = [];
         this.maxSpace = 1;
         this.maxLabelLength = 0;
@@ -28,6 +29,16 @@ class Chartscii {
         this.width = 0;
         this.colors = colors;
         this.createGraphAxis();
+    }
+
+    sortData(data, reverse) {
+        if (this.options.sort) {
+            data = this.sortSmallToLarge(data, reverse);
+        }
+        if (reverse) {
+            data = data.reverse();
+        }
+        return data;
     }
 
     getPercentageData(value, label = undefined) {
@@ -108,10 +119,11 @@ class Chartscii {
 
             if (!point.label) {
                 const space = this.maxLabelLength - point.labelColorLess;
-                this.graph.push({ key: `${' '.repeat(space)}${value} ${this.options.structure.y}`, value: value });
+                const char = this.options.naked ? `${' '.repeat(space)}${value}  ` : `${' '.repeat(space)}${value} ${this.options.structure.y}`;
+                this.graph.push({ key: char, value: value });
             } else {
                 const space = this.maxLabelLength - (point.labelColorLess || point.label.length);
-                const key = `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
+                const key = this.options.naked ? `${' '.repeat(space)}${point.label}  ` : `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
                 this.graph.push({ key, value, color: point.color, label: point.label });
             }
         });
@@ -119,8 +131,8 @@ class Chartscii {
         return this.graph;
     }
 
-    sortSmallToLarge(arr) {
-        return arr.sort((a, b) => {
+    sortSmallToLarge(arr, reverse) {
+        const sorted = arr.sort((a, b) => {
             if (a.label && this.options.sort === 'label') {
                 return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
             }
@@ -130,6 +142,8 @@ class Chartscii {
                 return a - b;
             }
         });
+
+        return reverse ? sorted.reverse() : sorted;
     }
 
     makeSpace() {
@@ -153,7 +167,7 @@ class Chartscii {
         let asciiGraph = `${' '.repeat(this.maxLabelLength + 1)}${this.options.structure.leftCorner}`;
 
         for (let x = 0; x < (this.width || this.data.length); x++) {
-            asciiGraph = `${asciiGraph}${this.options.structure.x}`;
+            asciiGraph = this.options.naked ? '' : `${asciiGraph}${this.options.structure.x}`;
         }
 
         this.graph.map(point => {
@@ -162,7 +176,7 @@ class Chartscii {
             const scaledMaxNumeric = Math.round(((this.maxNumeric / this.maxCount) * this.options.structure.width));
             const fill = this.options.fill ? this.options.fill.repeat(scaledMaxNumeric - scaledValue) : '';
 
-            asciiGraph = this.options.color
+            asciiGraph = (this.options.color || point.color)
                 ? `${point.key}${this.colors[point && point.color || this.options.color]}${this.options.char.repeat(scaledValue)}${fill}${this.colors.reset}\n${asciiGraph}`
                 : `${point.key}${this.options.char.repeat(scaledValue)}${fill}\n${asciiGraph}`;
         });
@@ -180,7 +194,7 @@ class Chartscii {
     }
 
 
-    toString() {
+    get() {
         return this.graph;
     }
 

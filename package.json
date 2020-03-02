@@ -1,6 +1,6 @@
 {
   "name": "chartscii",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "simple ascii bar charts",
   "main": "index.js",
   "repository": {
@@ -20,6 +20,12 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
+    "husky": "^4.2.3",
     "mocha": "^7.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint && npm test"
+    }
   }
 }
