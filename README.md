@@ -165,7 +165,7 @@ const createAsciiCharts = () => {
         width: 500,
         sort: true,
         reverse: true,
-        color: color
+        color
     });
 
     //print chart
@@ -236,22 +236,11 @@ const Chartscii = require('chartscii');
 
 
 const createAsciiCharts = () => {
-    let color = '';
-
-    const colors = ['green',
-        'red',
-        'cyan',
-        'pink',
-        'blue',
-        'yellow'
-    ];
-
     // generate random chart data
     const data = [];
     let count = 0;
-
     for (let i = 1; i <= 20; i++) {
-        color = colors[Math.floor(Math.random() * colors.length)];
+        
         data.push({ value: Math.floor(Math.random() * 1000) + 1, label: `${count++}` });
     }
 
@@ -261,7 +250,7 @@ const createAsciiCharts = () => {
         width: 500,
         sort: true,
         reverse: true,
-        color: color,
+        color: colors[Math.floor(Math.random() * colors.length)];
         colorLabels: true,
         percentage: true
     });
@@ -289,10 +278,9 @@ const data = languages.map(lang => {
 });
 
 const chart = new Chartscii(data, {
-    label: 'Waka Time',
+    label: 'Weekly Coding Stats',
     width: 65,
     sort: true,
-    reverse: false,
     percentage: true,
     fill: '░',
     char: '█'
@@ -315,7 +303,19 @@ JavaScript (68.3%) ╢███████████████████�
                    ╚════════════════════════════════════════════
 ```
 
-or naked and no title:
+or naked and no title:   
+```js
+const chart = new Chartscii(data, {
+    width: 65,
+    sort: true,
+    reverse: true,
+    naked: true,
+    fill: '░',
+    char: '█',
+    percentage: true
+});
+```
+
 
 ```text   
 JavaScript (68.3%)  ████████████████████████████████████████████

@@ -176,7 +176,7 @@ class Chartscii {
             const scaledMaxNumeric = Math.round(((this.maxNumeric / this.maxCount) * this.options.structure.width));
             const fill = this.options.fill ? this.options.fill.repeat(scaledMaxNumeric - scaledValue) : '';
 
-            asciiGraph = this.options.color
+            asciiGraph = (this.options.color || point.color)
                 ? `${point.key}${this.colors[point && point.color || this.options.color]}${this.options.char.repeat(scaledValue)}${fill}${this.colors.reset}\n${asciiGraph}`
                 : `${point.key}${this.options.char.repeat(scaledValue)}${fill}\n${asciiGraph}`;
         });
