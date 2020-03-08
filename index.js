@@ -1,34 +1,28 @@
 const colors = require('./consts/colors');
+const defaultOptions = require('./consts/defaultOptions');
 
 class Chartscii {
     constructor(data, options) {
-        this.options = {
-            percentage: options && options.percentage || false,
-            colorLabels: options && options.colorLabels || false,
-            sort: options && options.sort || false,
-            color: options && options.color || false,
-            label: options && options && options.label,
-            char: options && options.char || '█',
-            fill: options && options.fill,
-            naked: options && options.naked || false,
-            structure:
-            {
-                y: '╢',
-                x: '══',
-                leftCorner: '╚',
-                width: options && options.width || 100
-            }
-        }
-        const reverse = options && options.reverse;
-        this.data = this.sortData(data, reverse);
-        this.graph = [];
+        this.chart = [];
         this.maxSpace = 1;
         this.maxLabelLength = 0;
         this.maxNumeric = 0;
         this.maxCount = 0;
         this.width = 0;
         this.colors = colors;
+
+        this.options = this.setOptions(options);
+        this.data = this.sortData(data, this.options.reverse);
         this.createGraphAxis();
+    }
+
+    setOptions(options) {
+        return options ? Object.keys(defaultOptions).reduce((prev, option) => {
+            if (options) {
+                prev[option] = options[option] || defaultOptions[option];
+                return prev;
+            }
+        }, {}) : defaultOptions;
     }
 
     sortData(data, reverse) {
@@ -121,15 +115,15 @@ class Chartscii {
             if (!point.label) {
                 const space = this.maxLabelLength - point.labelColorLess;
                 const char = this.options.naked ? `${' '.repeat(space)}${value}  ` : `${' '.repeat(space)}${value} ${this.options.structure.y}`;
-                this.graph.push({ key: char, value: value });
+                this.chart.push({ key: char, value: value });
             } else {
                 const space = this.maxLabelLength - (point.labelColorLess || point.label.length);
                 const key = this.options.naked ? `${' '.repeat(space)}${point.label}  ` : `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
-                this.graph.push({ key, value, color: point.color, label: point.label });
+                this.chart.push({ key, value, color: point.color, label: point.label });
             }
         });
-        this.width = Math.round((this.maxNumeric / this.maxCount) * this.options.structure.width) / 2;
-        return this.graph;
+        this.width = Math.round((this.maxNumeric / this.maxCount) * this.options.width) / 2;
+        return this.chart;
     }
 
     sortSmallToLarge(arr, reverse) {
@@ -171,10 +165,10 @@ class Chartscii {
             asciiGraph = this.options.naked ? '' : `${asciiGraph}${this.options.structure.x}`;
         }
 
-        this.graph.map(point => {
+        this.chart.map(point => {
             const graphValue = point.value;
-            const scaledValue = Math.round((graphValue / this.maxCount) * this.options.structure.width);
-            const scaledMaxNumeric = Math.round(((this.maxNumeric / this.maxCount) * this.options.structure.width));
+            const scaledValue = Math.round((graphValue / this.maxCount) * this.options.width);
+            const scaledMaxNumeric = Math.round(((this.maxNumeric / this.maxCount) * this.options.width));
             const fill = this.options.fill ? this.options.fill.repeat(scaledMaxNumeric - scaledValue) : '';
 
             asciiGraph = (this.options.color || point.color)
@@ -184,10 +178,10 @@ class Chartscii {
 
         if (this.options.label) {
             const space = ' '.repeat(this.maxSpace + 1);
-            const graph = `${space}\n${asciiGraph}`;
+            const chart = `${space}\n${asciiGraph}`;
             asciiGraph = this.options.color
-                ? `${this.colors[this.options.color]}${this.options.label}${this.colors.reset}${graph}`
-                : `${this.options.label}${graph}`;
+                ? `${this.colors[this.options.color]}${this.options.label}${this.colors.reset}${chart}`
+                : `${this.options.label}${chart}`;
         }
 
 
@@ -196,7 +190,7 @@ class Chartscii {
 
 
     get() {
-        return this.graph;
+        return this.chart;
     }
 
 }
