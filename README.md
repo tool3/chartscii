@@ -109,15 +109,6 @@ recommended: `░`
 color bars in chart and label if provided.     
 see [supported colors](#supported-colors)
 
-## supported colors
-these are the currently supported colors for `chartscii`, provided as string in the data object (e.g `{ value: 3, color: 'green' }`)
- - green
- - red
- - pink
- - cyan
- - blue
- - yellow
-
 #### percentage (boolean)
 show percentage of each bar, using the highest value in the provided data array   
 default `false`
@@ -129,6 +120,15 @@ default `false`
 #### naked (boolean)
 don't print chart ascii structure
 default `false`
+
+## supported colors
+these are the currently supported colors for `chartscii`, provided as string in the data object (e.g `{ value: 3, color: 'green' }`)
+ - green
+ - red
+ - pink
+ - cyan
+ - blue
+ - yellow
 
 # Examples
 ## intro example
