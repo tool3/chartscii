@@ -6,7 +6,7 @@ on:
       - release
 
 jobs:
-  version_tag:
+  tag:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -15,36 +15,13 @@ jobs:
           github_token: ${{ secrets.GP_TOKEN }}
           unrelated: true
 
-  publish-npm:
-    needs: version_tag
+  publish:
+    needs: tag
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
+      - uses: tool3/publisher@master
         with:
-          node-version: 12
-          registry-url: "https://registry.npmjs.org/"
-          scope: '@tool3'
-      - run: |
-          npm ci
-          git pull origin master --tags
-          npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish-gpr:
-    needs: version_tag
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: '@tool3'
-      - run: |
-          npm ci
-          git pull origin master --tags
-          npm publish --registry=https://npm.pkg.github.com/@tool3
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GP_TOKEN }}
+          github_token: ${{ secrets.GP_TOKEN }}
+          npm_token: ${{ secrets.NPM_TOKEN }}
+          scope: "@tool3"
