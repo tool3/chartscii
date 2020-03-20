@@ -1,6 +1,6 @@
 {
   "name": "chartscii",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "description": "simple ascii bar charts",
   "main": "index.js",
   "repository": {
