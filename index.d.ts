@@ -1,6 +1,3 @@
-export default Chartscii;
-export = Chartscii;
-
 declare class Chartscii {
     constructor(data: Array<Chartscii.Data | Chartscii.Value>, options?: Chartscii.Options);
     get(): Array<Chartscii.DataPoint>
@@ -35,3 +32,5 @@ declare namespace Chartscii {
         label: string;
     }
 }
+
+export = Chartscii;

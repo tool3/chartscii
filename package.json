@@ -16,6 +16,11 @@
     "charts",
     "cli"
   ],
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "consts"
+  ],
   "author": "Tal Hayut",
   "license": "MIT",
   "devDependencies": {
