@@ -33,7 +33,7 @@ const createAsciiCharts = () => {
     });
 
     //print chart
-    process.stdout.write("\\033c");
+    process.stdout.write('\x1Bc');
     process.stdout.write(`${chart.create()}\n`);
     
 };
