@@ -1,3 +1,4 @@
+
 const colors = require('./consts/colors');
 const defaultOptions = require('./consts/defaultOptions');
 
