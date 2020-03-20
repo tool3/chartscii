@@ -12,9 +12,10 @@
     "lint": "eslint ."
   },
   "keywords": [
+    "bar-chart",
+    "cli",
     "ascii",
-    "charts",
-    "cli"
+    "chart"
   ],
   "files": [
     "index.js",
