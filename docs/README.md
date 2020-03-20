@@ -4,6 +4,9 @@ simple ascii bar charts
 
 <img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">
 
+* command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli);
+* typescript usage [typescript](#typescript)
+
 # install
 ```bash
 npm install chartscii
@@ -56,6 +59,15 @@ console.log(chart.create());
 
 outputs:   
 <img width="1000" src="https://tool3.github.io/chartscii/img/example_char.png">   
+
+# Typescript
+example usage in typescript:   
+```ts
+import * as Chartscii from 'chartscii';
+
+const chart: Chartscii = new Chartscii([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], { naked: true });
+console.log(chart.create());
+```
 
 ### data options
 `chartscii` accepts data in objects or simply an array of numeric values

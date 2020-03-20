@@ -1,4 +1,4 @@
-export as namespace Chartscii;
+export default Chartscii;
 export = Chartscii;
 
 declare class Chartscii {
