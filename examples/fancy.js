@@ -1,6 +1,5 @@
 const Chartscii = require('../index');
 
-
 const createAsciiCharts = () => {
     let color = '';
 
@@ -34,7 +33,7 @@ const createAsciiCharts = () => {
     });
 
     //print chart
-    process.stdout.write('\033c');
+    process.stdout.write("\\033c");
     process.stdout.write(`${chart.create()}\n`);
     
 };
