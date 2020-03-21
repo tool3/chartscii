@@ -60,7 +60,7 @@ console.log(chart.create());
 outputs:   
 <img width="1000" src="https://tool3.github.io/chartscii/img/example_char.png">   
 
-# Typescript
+## typescript usage example
 example usage in typescript:   
 ```ts
 import * as Chartscii from 'chartscii';
@@ -68,8 +68,8 @@ import * as Chartscii from 'chartscii';
 const chart: Chartscii = new Chartscii([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], { naked: true });
 console.log(chart.create());
 ```
-
-### data options
+# options 
+## data options
 `chartscii` accepts data in objects or simply an array of numeric values
 ```js
 [{ value: 2, label: 'some_label' }, { value: 2, label: 'some_label' }] 
@@ -79,57 +79,57 @@ console.log(chart.create());
 [3, 34, 45]
 ```
 
-#### label (string)
+### label (string)
 a label for the data point   
 display in color if `color: true`  
 displays a unique color if provided in data array. (e.g `{ value: 3, color: 'red' }`)
 
-#### value (number)
+### value (number)
 a value for the bar chart
 
-#### color (string)
+### color (string)
 a color to paint the bar, and label if `colorLabel: true`   
 color should correspond to the [supported colors](#supported-colors)
 
-### chart options
+## chart options
 
-#### label (string)
+### label (string)
 a label for the chart. display in color if `color: true`   
 
-#### width (number)
+### width (number)
 the width of the chart, scales values accordingly   
 default: `100`
 
-#### sort (boolean)
+### sort (boolean)
 sort data   
 default: `false`
 
-#### reverse (boolean)
+### reverse (boolean)
 reverse chart values order   
 default: `false`
 
-#### char (string)
+### char (string)
 ascii char for bars   
 default: `█`
 
-#### fill (string)
+### fill (string)
 fill chart with ascii character.   
 no default.   
 recommended: `░`
 
-#### color (string)
+### color (string)
 color bars in chart and label if provided.     
 see [supported colors](#supported-colors)
 
-#### percentage (boolean)
+### percentage (boolean)
 show percentage of each bar, using the highest value in the provided data array   
 default `false`
 
-#### colorLabels (boolean)
+### colorLabels (boolean)
 color labels as well   
 default `false`
 
-#### naked (boolean)
+### naked (boolean)
 don't print chart ascii structure
 default `false`
 
