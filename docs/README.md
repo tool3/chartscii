@@ -88,7 +88,7 @@ a value for the bar chart
 
 
 # options
-#### color (string)
+## color (string)
 a color to paint the bar, and label if `colorLabel: true`   
 color should correspond to the [supported colors](#supported-colors)
 
