@@ -5,7 +5,7 @@ simple ascii bar charts
 <img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">
 
 * command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli);
-* typescript usage [typescript](#typescript)
+* typescript usage [typescript](##typescript-usage-example)
 
 # install
 ```bash
@@ -60,7 +60,7 @@ console.log(chart.create());
 outputs:   
 <img width="1000" src="https://tool3.github.io/chartscii/img/example_char.png">   
 
-## typescript usage
+## typescript usage example
 example usage in typescript:   
 ```ts
 import * as Chartscii from 'chartscii';
