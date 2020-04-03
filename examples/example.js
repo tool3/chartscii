@@ -9,14 +9,15 @@ for (let i = 1; i <= 20; i++) {
 
 // create chart
 const chart = new Chartscii(data, {
-    label: 'Example Chart',
+    // label: 'Example Chart',
     width: 500,
     sort: false,
     reverse: true,
     fill: '░',
     char: '█',
-    colorLabels: true,
-    percentage: true
+    colorLabels: false,
+    percentage: false,
+    labels: true
 });
 
 //print chart

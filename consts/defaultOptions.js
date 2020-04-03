@@ -5,6 +5,7 @@ module.exports = {
     reverse: false,
     color: false,
     label:  '',
+    labels: true,
     char: '█',
     fill: false,
     naked: false,
@@ -13,6 +14,7 @@ module.exports = {
     {
         y: '╢',
         x: '══',
-        leftCorner: '╚'
+        leftCorner: '╚',
+        noLabelChar: '║'
     }
 };
