@@ -20,7 +20,7 @@ class Chartscii {
     setOptions(options) {
         return options ? Object.keys(defaultOptions).reduce((prev, option) => {
             if (options) {
-                prev[option] = options[option] !== undefined ?  options[option] : defaultOptions[option];
+                prev[option] = options[option] !== undefined ? options[option] : defaultOptions[option];
                 return prev;
             }
         }, {}) : defaultOptions;
@@ -74,7 +74,7 @@ class Chartscii {
             if (label) {
                 this.maxLabelLength = this.updateMaxLabelLength(point.label);
                 point.labelColorLess = point.label.length;
-                
+
                 if (this.options.percentage) {
                     point.label = this.getPercentageData(value, label);
                     point.labelColorLess = point.label.length;
@@ -115,9 +115,13 @@ class Chartscii {
 
             if (!point.label) {
                 const space = this.maxLabelLength - point.labelColorLess;
-                let char = this.options.naked ? `${' '.repeat(space)}${value}  ` : `${' '.repeat(space)}${value} ${this.options.structure.y}`;
+                let char = this.options.naked ?
+                    `${' '.repeat(space)}${value}  ` :
+                    `${' '.repeat(space)}${value} ${this.options.structure.y}`;
                 if (this.options.labels === false) {
-                    char = `${' '.repeat(space + value.length)} ${this.options.structure.noLabelChar}`
+                    char = this.options.naked ?
+                        `${' '.repeat(space + value.length)}` :
+                        `${' '.repeat(space + value.length)} ${this.options.structure.noLabelChar}`;
                 }
                 this.chart.push({ key: char, value: value });
             } else {
@@ -164,7 +168,7 @@ class Chartscii {
 
     create() {
         let asciiGraph = this.options.labels ? `${' '.repeat(this.maxLabelLength + 1)}${this.options.structure.leftCorner}` : `${' '.repeat(this.maxLabelLength - 2)}${this.options.structure.leftCorner}`;
-        
+
         for (let x = 0; x < (this.width || this.data.length); x++) {
             asciiGraph = this.options.naked ? '' : `${asciiGraph}${this.options.structure.x}`;
         }

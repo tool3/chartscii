@@ -17,7 +17,8 @@ const chart = new Chartscii(data, {
     char: '█',
     colorLabels: false,
     percentage: false,
-    labels: true
+    labels: false,
+    naked: true
 });
 
 //print chart
