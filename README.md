@@ -190,6 +190,10 @@ const createAsciiCharts = () => {
 setInterval(() => createAsciiCharts(), 500);
 ```
 
+## conditional colors example
+
+<img width="1000" src="https://tool3.github.io/chartscii/img/conditional_colors.svg">   
+
 ## fancy example
 fancy example, using labels with colors   
 

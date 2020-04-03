@@ -189,6 +189,47 @@ const createAsciiCharts = () => {
 setInterval(() => createAsciiCharts(), 500);
 ```
 
+## conditional colors example
+
+<img width="1000" src="https://tool3.github.io/chartscii/img/conditional_colors.svg">   
+
+```js
+const Chartscii = require('../index');
+
+
+const createAsciiCharts = () => {
+    // generate random chart data
+    const data = [];
+    let count = 0;
+
+    for (let i = 1; i <= 20; i++) {
+        const value = Math.floor(Math.random() * 1000) + 1;
+        data.push({ value , label: `label ${count++}`, color: value > 200 ? 'green' : 'red' });
+    }
+
+    // create chart
+    const chart = new Chartscii(data, {
+        label: 'Conditional Colors',
+        color: 'green',
+        width: 500,
+        sort: false,
+        reverse: false,
+        char: '■',
+        colorLabels: true,
+        percentage: true,
+        labels: true
+    });
+
+    //print chart
+    process.stdout.write('\x1Bc');
+    process.stdout.write(`${chart.create()}\n`);
+    
+};
+
+
+setInterval(() => createAsciiCharts(), 500);
+```
+
 ## fancy example
 fancy example, using labels with colors   
 
