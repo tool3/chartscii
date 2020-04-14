@@ -28,7 +28,7 @@ class Chartscii {
 
     sortData(data, reverse) {
         if (this.options.sort) {
-            data = this.sortSmallToLarge(data, reverse);
+            data = this.sortSmallToLarge(data);
         }
         if (reverse) {
             data = data.reverse();
@@ -134,7 +134,7 @@ class Chartscii {
         return this.chart;
     }
 
-    sortSmallToLarge(arr, reverse) {
+    sortSmallToLarge(arr) {
         const sorted = arr.sort((a, b) => {
             if (a.label && this.options.sort === 'label') {
                 return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
@@ -146,7 +146,7 @@ class Chartscii {
             }
         });
 
-        return reverse ? sorted.reverse() : sorted;
+        return sorted;
     }
 
     makeSpace() {
