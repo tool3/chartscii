@@ -9,7 +9,7 @@ declare namespace Chartscii {
         color?: boolean;
         colorLabels?: boolean;
         char?: string;
-        fill?: boolean;
+        fill?: string;
         naked?: boolean;
         label?: string;
         percentage?: boolean;

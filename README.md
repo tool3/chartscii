@@ -63,9 +63,10 @@ outputs:
 ## typescript usage example
 example usage in typescript:   
 ```ts
-import * as Chartscii from 'chartscii';
+import Chartscii, {ChartData} from 'chartscii';
 
-const chart: Chartscii = new Chartscii([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], { naked: true });
+const data: ChartData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const chart: Chartscii = new Chartscii(data, { naked: true });
 console.log(chart.create());
 ```
 # options 
