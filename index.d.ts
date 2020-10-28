@@ -1,5 +1,5 @@
 declare class Chartscii {
-    constructor(data: Array<Chartscii.Data | Chartscii.Value>, options?: Chartscii.Options);
+    constructor(data: Array<Chartscii.ChartData | Chartscii.Value>, options?: Chartscii.Options);
     get(): Array<Chartscii.DataPoint>
     create(): string;
 }
@@ -18,9 +18,10 @@ declare namespace Chartscii {
         reverse?: boolean,
     }
 
-    export interface Data {
+    export interface ChartData {
         value: number;
         label: string;
+        color: string | undefined;
     }
 
     export type Value = number;
