@@ -65,7 +65,7 @@ example usage in typescript:
 ```ts
 import Chartscii, {ChartData} from 'chartscii';
 
-const data: ChartData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const data: Array<ChartData> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const chart: Chartscii = new Chartscii(data, { naked: true });
 console.log(chart.create());
 ```
