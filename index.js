@@ -69,7 +69,7 @@ class Chartscii {
                 value = value.toString()
             }
 
-            const color = this.colors[point.color || this.options.color];
+            const color = this.colors[point.color || this.options.color] || this.options.color;
 
             if (label) {
                 this.maxLabelLength = this.updateMaxLabelLength(point.label);

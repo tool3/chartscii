@@ -143,6 +143,9 @@ these are the currently supported colors for `chartscii`, provided as string in 
  - blue
  - yellow
 
+ > NOTE: you can also provide a string formatted color: '\x1b[32;1m'
+ > see: https://misc.flogisoft.com/bash/tip_colors_and_formatting
+
 # Examples
 ## intro example
 intro example, using no labels (value of bar is the default label)   
