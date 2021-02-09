@@ -27,7 +27,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^7.0.0",
-    "husky": "^4.2.3",
+    "husky": "^5.0.9",
     "mocha": "^8.0.1"
   },
   "husky": {
