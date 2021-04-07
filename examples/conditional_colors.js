@@ -15,7 +15,7 @@ const createAsciiCharts = () => {
     const chart = new Chartscii(data, {
         label: 'Conditional Colors',
         color: 'green',
-        width: 500,
+        width: 100,
         sort: false,
         reverse: false,
         char: '■',

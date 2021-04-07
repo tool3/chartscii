@@ -10,7 +10,7 @@ for (let i = 1; i <= 20; i++) {
 // create chart
 const chart = new Chartscii(data, {
     // label: 'Example Chart',
-    width: 500,
+    width: 100,
     sort: false,
     reverse: true,
     fill: '░',
