@@ -130,7 +130,9 @@ class Chartscii {
                 this.chart.push({ key, value, color: point.color, label: point.label });
             }
         });
-        this.width = Math.round((this.maxNumeric / this.maxCount) * this.options.width) / 2;
+
+        // this.width = Math.max(this.options.width, this.maxNumeric)
+        this.width = this.options.width
         return this.chart;
     }
 
@@ -169,14 +171,16 @@ class Chartscii {
     create() {
         let asciiGraph = this.options.labels ? `${' '.repeat(this.maxLabelLength + 1)}${this.options.structure.leftCorner}` : `${' '.repeat(this.maxLabelLength - 2)}${this.options.structure.leftCorner}`;
 
-        for (let x = 0; x < (this.width || this.data.length); x++) {
+        for (let x = 0; x < (this.width / 2); x++) {
             asciiGraph = this.options.naked ? '' : `${asciiGraph}${this.options.structure.x}`;
         }
 
         this.chart.map(point => {
             const graphValue = point.value;
-            const scaledValue = Math.round((graphValue / this.maxCount) * this.options.width);
-            const scaledMaxNumeric = Math.round(((this.maxNumeric / this.maxCount) * this.options.width));
+
+            const scaledValue = Math.round((graphValue / this.maxNumeric) * this.width);
+            const scaledMaxNumeric = Math.round(this.width);
+            
             const fill = this.options.fill ? this.options.fill.repeat(scaledMaxNumeric - scaledValue) : '';
 
             asciiGraph = (this.options.color || point.color)
