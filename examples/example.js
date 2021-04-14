@@ -4,8 +4,8 @@ const Chartscii = require('../index');
 const data = [];
 
 for (let i = 1; i <= 10; i++) {
-    // data.push(Math.floor(Math.random() * 1000) + 1);
-    data.push(i)
+    data.push(Math.floor(Math.random() * 1000) + 1);
+    // data.push(i)
 }
 
 // create chart
@@ -13,7 +13,7 @@ const chart = new Chartscii(data, {
     // label: 'Example Chart',
     width: 100,
     sort: false,
-    reverse: true,
+    reverse: false,
     fill: '░',
     char: '█',
     color: 'green',

@@ -9,10 +9,9 @@ class Chartscii {
         this.maxLabelLength = 0;
         this.maxNumeric = 0;
         this.maxCount = 0;
-        this.width = 0;
         this.colors = colors;
-
         this.options = this.setOptions(options);
+        this.width = this.options.width
         this.data = this.sortData(data, this.options.reverse);
         this.createGraphAxis();
     }
@@ -37,7 +36,9 @@ class Chartscii {
     }
 
     getPercentageData(value, label = undefined) {
-        const percentage = `${((value / this.maxCount) * 100).toFixed(1)}%`;
+        const total = this.data.reduce((a, p) => a += p.value || p, 0)
+        const avg = (value / total);
+        const percentage = `${(avg * 100).toFixed(1)}%`
         return `${label || value} (${percentage})`;
     }
 
@@ -137,9 +138,7 @@ class Chartscii {
                 this.chart.push({ key, value, color, label });
             }
         });
-
-        // this.width = Math.max(this.options.width, this.maxNumeric)
-        this.width = this.options.width
+        
         return this.chart;
     }
 
@@ -185,7 +184,7 @@ class Chartscii {
         this.chart.map(point => {
             const graphValue = point.value;
 
-            const scaledValue = Math.round((graphValue / this.maxNumeric) * this.width);
+            const scaledValue = this.getScaledValue(graphValue);
             const scaledMaxNumeric = Math.round(this.width);
             
             const fill = this.options.fill ? this.options.fill.repeat(scaledMaxNumeric - scaledValue) : '';
@@ -207,6 +206,10 @@ class Chartscii {
         return asciiGraph;
     }
 
+    getScaledValue(value) {          
+         return Math.round((value / this.maxNumeric) * this.width);
+    }
+    
 
     get() {
         return this.chart;
