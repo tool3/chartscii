@@ -1,6 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 const Chartscii = require('./index');
+const snap = require('snaptdout');
 
 describe('chartscii tests', () => {
     let data, chart;
@@ -10,7 +11,7 @@ describe('chartscii tests', () => {
         chart = new Chartscii(data);
     });
 
-    it('should initialize graph array with all values', () => {
+    it('should initialize chart array with all values', () => {
         const result = chart.get();
         expect(result.length).to.equal(10);
     });
@@ -41,5 +42,16 @@ describe('chartscii tests', () => {
         chart = new Chartscii(data, { percentage: true });
         const result = chart.get()[0];
         expect(result.label).to.include('%');
+    });
+});
+
+describe('examples', () => {
+    it('should match example', async () => {
+        const data = [];
+        for (let i = 0; i < 20; i++) {
+            data.push({ value: i, label: `label ${i}`});
+        }
+        const chart = new Chartscii(data, {color: 'pink', colorLabels: true})
+        await snap(chart.create(), 'chart')
     });
 });

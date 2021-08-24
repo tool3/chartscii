@@ -960,6 +960,11 @@ slice-ansi@^4.0.0:
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
 
+snaptdout@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/snaptdout/-/snaptdout-1.5.0.tgz#aaab0b33ee29694d5fbaa050236d9af28ff957b7"
+  integrity sha512-YBua4ev+xyYNKFztL64JwWil39xUFmkRoel3PS8OJH+5aUYU2HHFhrxbJoGvXhroGWnW9uuLR7Msn4JkOsT2Nw==
+
 sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"

@@ -2,6 +2,8 @@
 const colors = require('./consts/colors');
 const defaultOptions = require('./consts/defaultOptions');
 
+
+
 class Chartscii {
     constructor(data, options) {
         this.chart = [];
