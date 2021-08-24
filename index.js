@@ -2,7 +2,16 @@
 const colors = require('./consts/colors');
 const defaultOptions = require('./consts/defaultOptions');
 
+class Line {
+    constructor(data, config) {
+        this.data = data;
+        this.config = config;
+    }
 
+    get () {
+
+    }
+}
 
 class Chartscii {
     constructor(data, options) {
@@ -66,7 +75,8 @@ class Chartscii {
             const value = typeof point === 'object' ? point.value : point;
             return value + acc;
         }, 0);
-
+        this.maxSpace = this.maxLabelLength > 0 ? this.maxLabelLength : 1;
+        
         const graphData = this.data.map(point => {
             let value = typeof point === 'object' ? point.value : point;
             let label = point.label;
@@ -116,9 +126,7 @@ class Chartscii {
             }
         });
 
-        this.maxSpace = this.maxLabelLength > 0 ? this.maxLabelLength : 1;
-
-        graphData.map(point => {
+        graphData.forEach(point => {
             const value = point.value || point;
 
             if (!point.label) {

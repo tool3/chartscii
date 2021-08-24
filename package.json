@@ -8,7 +8,7 @@
     "url": "https://github.com/tool3/chartscii"
   },
   "scripts": {
-    "test": "mocha index.test.js",
+    "test": "mocha index.test.js"
   },
   "keywords": [
     "bar-chart",
