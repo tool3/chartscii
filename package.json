@@ -26,8 +26,8 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^4.2.0",
-    "husky": "^6.0.0",
-    "mocha": "^8.0.1",
+    "husky": "^7.0.2",
+    "mocha": "^9.1.0",
     "snaptdout": "^1.5.0"
   },
   "husky": {
