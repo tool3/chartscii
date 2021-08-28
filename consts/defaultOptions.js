@@ -10,6 +10,7 @@ module.exports = {
     fill: '',
     naked: false,
     width: 100,
+    theme: 'pastel',
     structure:
     {
         y: '╢',

@@ -8,7 +8,8 @@
     "url": "https://github.com/tool3/chartscii"
   },
   "scripts": {
-    "test": "mocha index.test.js"
+    "test": "mocha index.test.js",
+    "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" "
   },
   "keywords": [
     "bar-chart",
@@ -25,14 +26,16 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^7.0.0",
     "husky": "^6.0.0",
     "mocha": "^8.0.1",
     "snaptdout": "^1.5.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && npm test"
+      "pre-commit": "npm test"
     }
+  },
+  "dependencies": {
+    "styl3": "^1.2.2"
   }
 }
