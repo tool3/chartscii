@@ -138,7 +138,7 @@ class Chartscii {
         this.maxLabelLength = this.updateMaxLabelLength(point.label);
       }
 
-      if (this.options.colorLabels && this.options.color) {
+      if (this.options.colorLabels) {
         point.label = this.colorLabel(point.label, color);
       }
 
@@ -156,7 +156,7 @@ class Chartscii {
         labelColorLess = point.label.length;
       }
 
-      if (this.options.colorLabels && this.options.color) {
+      if (this.options.colorLabels) {
         const printValue = point.label || point.value || point;
         point.label = this.colorLabel(printValue, color);
       }

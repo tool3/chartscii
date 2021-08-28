@@ -383,3 +383,31 @@ JavaScript (68.3%)  ████████████████████
        Bash (3.3%)  ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
        JSON (0.8%)  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ```
+
+## theme example
+```javascript
+const shellfie = require('shellfie');
+const Chartscii = require('./');
+const style = require('styl3')({theme: 'pastel'});
+
+(async function () {
+  const data = [];
+  const keys = Object.values(style.colors.pastel);
+  for (let i = 0; i < keys.length; i++) {
+    const color = keys[i];
+    data.push({ value: i + 1, label: `label ${i}`, color });
+  }
+  const chart = new Chartscii(data, {
+    theme: 'lush',
+    label: style.pink`*LUSH THEME*`,
+    percentage: true,
+    colorLabels: true,
+    width: 50,
+  });
+  await shellfie(chart.create(), { name: 'chart', viewport: {height: 300} });
+})();
+```
+
+<img src="./shellfies/chart.png" />
+
+[![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)  

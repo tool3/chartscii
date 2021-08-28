@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const Chartscii = require('./index');
 const snap = require('snaptdout');
-const colors = require('styl3')({ theme: 'pastel' });
+const {colors} = require('styl3')({ theme: 'pastel' });
 
 describe('chartscii tests', () => {
     let data, chart;
@@ -65,7 +65,7 @@ describe('examples', () => {
     });
     it('should support color per line', async () => {
         const data = [];
-        const colorz = Object.values(colors.colors.pastel).filter(i => i !== 'reset' && typeof i === "string" );
+        const colorz = Object.values(colors.pastel);
         for (let i = 0; i < colorz.length; i++) {
             const color = colorz[i];
             data.push({ value: i + 1, label: `label ${i}`, color});
