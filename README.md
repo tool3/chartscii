@@ -89,13 +89,13 @@ displays a unique color if provided in data array. (e.g `{ value: 3, color: 'red
 a value for the bar chart
 
 ### color (string)
-a color to paint the bar, and label if `colorLabel: true`   
+a color to paint the bar (colors label as well if `colorLabel: true`)   
 color should correspond to the [supported colors](#supported-colors)
 
 ## chart options
 
 ### label (string)
-a label for the chart. display in color if `color: true`   
+a label for the chart.
 
 ### width (number)
 the width of the chart, scales values accordingly   

@@ -73,4 +73,12 @@ describe('examples', () => {
         const chart = new Chartscii(data)
         await snap(chart.create(), 'colorful chart')
     });
+    it('should support labeless chart', async () => {
+        const data = [];
+        for (let i = 0; i < 20; i++) {
+            data.push(i + 1);
+        }
+        const chart = new Chartscii(data)
+        await snap(chart.create(), 'labeless chart')
+    });
 });
