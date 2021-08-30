@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/tool3/chartscii.svg?branch=master)](https://travis-ci.org/tool3/chartscii) ![lint](https://github.com/tool3/chartscii/workflows/lint/badge.svg)   
 simple ascii bar charts
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">
+<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg"/>
 
 * command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli)
 * typescript usage [typescript](#typescript-usage-example)
@@ -41,7 +41,7 @@ console.log(chart.create());
 ```
 
 outputs:
-<img width="1000" src="https://tool3.github.io/chartscii/img/example.png">   
+<img width="1000" src="https://tool3.github.io/chartscii/img/example.png"/>   
 
 you can customize the acsii character for the bar chart using the `char` option. for example:   
 ```js
@@ -58,7 +58,7 @@ console.log(chart.create());
 ```
 
 outputs:   
-<img width="1000" src="https://tool3.github.io/chartscii/img/example_char.png">   
+<img width="1000" src="https://tool3.github.io/chartscii/img/example_char.png"/>   
 
 ## typescript usage example
 example usage in typescript:   
@@ -81,12 +81,10 @@ console.log(chart.create());
 ```
 
 ### label (string)
-a label for the data point   
-display in color if `color: true`  
-displays a unique color if provided in data array. (e.g `{ value: 3, color: 'red' }`)
+a label for the data point.
 
 ### value (number)
-a value for the bar chart
+a value for a bar in a chart.
 
 ### color (string)
 a color to paint the bar (colors label as well if `colorLabel: true`)   
@@ -120,7 +118,7 @@ recommended: `░`
 
 ### color (string)
 color bars in chart and label if provided.     
-see [supported colors](#supported-colors)
+see [colors](#colors)
 
 ### percentage (boolean)
 show percentage of each bar, using the highest value in the provided data array   
@@ -134,23 +132,33 @@ default `false`
 don't print chart ascii structure
 default `false`
 
-## supported colors
-these are the currently supported colors for `chartscii`, provided as string in the data object (e.g `{ value: 3, color: 'green' }`)
- - green
+## color
+this lib uses `styl3`, which has built in themes, the string you input in the color property of the chart or of a data point, will change depending on the theme.
+defaults to `pastel`.   
+these are the currently supported colors, provided as string in the data object (e.g `{ value: 3, color: 'green' }`) or for the entire chart as an option.
  - red
+ - green
+ - yellow
+ - blue
+ - purple
  - pink
  - cyan
- - blue
- - yellow
+ - orange
 
  > NOTE: you can also provide a string formatted color: '\x1b[32;1m'
  > see: https://misc.flogisoft.com/bash/tip_colors_and_formatting
 
+### themed charts
+<img src="./shellfies/default.png" />
+<img src="./shellfies/standard.png" />
+<img src="./shellfies/pastel.png" />
+<img src="./shellfies/lush.png" />
+<img src="./shellfies/beach.png" />
 # Examples
 ## intro example
 intro example, using no labels (value of bar is the default label)   
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg">   
+<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg"/>   
 
 ```js
 const Chartscii = require('chartscii');
@@ -196,7 +204,7 @@ setInterval(() => createAsciiCharts(), 500);
 
 ## conditional colors example
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/conditional_colors.svg">   
+<img width="1000" src="https://tool3.github.io/chartscii/img/conditional_colors.svg"/>   
 
 ```js
 const Chartscii = require('../index');
@@ -238,7 +246,7 @@ setInterval(() => createAsciiCharts(), 500);
 ## fancy example
 fancy example, using labels with colors   
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/fancy.svg">   
+<img width="1000" src="https://tool3.github.io/chartscii/img/fancy.svg"/>   
 
 ```js
 const Chartscii = require('chartscii');
@@ -286,7 +294,7 @@ setInterval(() => createAsciiCharts(), 500);
 ## percentage example
 using percentage, solid color with label colors   
 
-<img width="1000" src="https://tool3.github.io/chartscii/img/percentage.svg">   
+<img width="1000" src="https://tool3.github.io/chartscii/img/percentage.svg"/>   
 
 ```js
 const Chartscii = require('chartscii');

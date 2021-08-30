@@ -9,24 +9,40 @@ class Chartscii {
     this.maxNumeric = 0;
     this.maxCount = 0;
     this.options = this.setOptions(options);
-    this.colors = style({theme: this.options.theme});
+    this.colors = style({ theme: this.options.theme });
     this.width = this.options.width;
     this.data = this.sortData(data, this.options.reverse);
     this.createGraphAxis();
   }
 
-  setOptions(options) {
-    return options
-      ? Object.keys(defaultOptions).reduce((prev, option) => {
-          if (options) {
-            prev[option] =
-              options[option] !== undefined
-                ? options[option]
-                : defaultOptions[option];
-            return prev;
-          }
-        }, {})
-      : defaultOptions;
+  defaultOption(option) {
+    if (defaultOptions[option].default) {
+      return defaultOptions[option].value;
+    } else {
+      return false;
+    }
+  }
+
+  setOptions(options = {}) {
+    const config = Object.keys(defaultOptions).reduce((acc, key) => {
+      acc[key] =
+        typeof defaultOptions[key] === 'object'
+          ? this.defaultOption(key)
+          : defaultOptions[key];
+      return acc;
+    }, {});
+
+    return Object.keys(options).reduce((acc, option) => {
+      if (
+        typeof options[option] === 'boolean' &&
+        typeof acc[option] === 'string'
+      ) {
+        return acc;
+      } else {
+        acc[option] = options[option];
+      }
+      return acc;
+    }, config);
   }
 
   sortData(data, reverse) {
@@ -41,12 +57,15 @@ class Chartscii {
 
   getTotal() {
     let total = 0;
-    return total || function(data) { 
-        return data.reduce((a, p) => { 
-        a += p.value === 0 || p.value ? p.value : p
-        return a;
-      }, total);
-    }
+    return (
+      total ||
+      function (data) {
+        return data.reduce((a, p) => {
+          a += p.value === 0 || p.value ? p.value : p;
+          return a;
+        }, total);
+      }
+    );
   }
 
   getPercentageData(value, label = undefined) {
@@ -71,9 +90,17 @@ class Chartscii {
   }
 
   colorify(txt, color) {
-      const colour = color ? (this.colors.colors[color] || color) : (this.colors.colors[this.options.color] ||
-      this.options.color);
-    return `${colour}${txt || ''}${this.colors.colors.reset}`;
+    if (color) {
+      if (color.includes('#')) {
+        return this.colors.hex(color)`${txt}`;
+      } else if (color.match(/[0-9]/)) {
+        return this.colors.ansi(color)`${txt}`;
+      } else if (Array.isArray(color)) {
+        return this.colors.rgb(...color)`${txt}`;
+      } else {
+        return this.colors[color]`${txt}`;
+      }
+    }
   }
 
   createGraphAxis() {
@@ -83,11 +110,11 @@ class Chartscii {
     }, 0);
     this.maxSpace = this.maxLabelLength > 0 ? this.maxLabelLength : 1;
 
-    const lines = this.data.map(point => this.line(point));
+    const lines = this.data.map((point) => this.line(point));
 
     for (const point of lines) {
       const value = point.value || point;
-
+      
       if (!point.label) {
         const space = this.maxLabelLength - point.labelColorLess;
         let char = this.options.naked
@@ -100,7 +127,8 @@ class Chartscii {
                 this.options.structure.noLabelChar
               }`;
         }
-        this.chart.push({ key: char, value: value });
+        const color = point.color || this.options.color;
+        this.chart.push({ key: char, value: value, color });
       } else {
         const space =
           this.maxLabelLength - (point.labelColorLess || point.label.length);
@@ -161,7 +189,7 @@ class Chartscii {
         point.label = this.colorLabel(printValue, color);
       }
 
-      return { value: point.value, label: point.label, labelColorLess };
+      return { value: point.value, label: point.label, labelColorLess, color };
     }
   }
 
@@ -200,7 +228,7 @@ class Chartscii {
       ? `${' '.repeat(this.maxLabelLength + 1)}${
           this.options.structure.leftCorner
         }`
-      : `${' '.repeat(this.maxLabelLength - 2)}${
+      : `${' '.repeat(this.maxLabelLength > 1 ? this.maxLabelLength - 1 : this.maxLabelLength)}${
           this.options.structure.leftCorner
         }`;
 
@@ -220,6 +248,7 @@ class Chartscii {
         ? this.options.fill.repeat(scaledMaxNumeric - scaledValue)
         : '';
       const color = point.color || this.options.color;
+      
       asciiGraph = color
         ? `${point.key}${this.colorify(
             `${this.options.char.repeat(scaledValue)}${fill}`,
@@ -235,7 +264,7 @@ class Chartscii {
       const chart = `${space}\n${asciiGraph}`;
       asciiGraph = this.options.color
         ? `${this.colorify(this.options.label, this.options.color)}${
-            this.colors.reset
+            this.colors.colors.reset
           }${chart}`
         : `${this.options.label}${chart}`;
     }
