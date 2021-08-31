@@ -14,5 +14,6 @@ jobs:
         with:
           node-version: 12
       - run: |
+          echo $TERM
           yarn
           yarn test
