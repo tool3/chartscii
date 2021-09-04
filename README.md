@@ -1,5 +1,7 @@
 <img src="./shellfies/logo.png"/>
 
+[![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)  
+
 * command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli)
 * typescript usage [typescript](#typescript-usage-example)
 
