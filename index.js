@@ -15,8 +15,8 @@ class Chartscii {
     this.createGraphAxis();
   }
 
-  defaultOption(option) {
-    if (defaultOptions[option].default) {
+  defaultOption(option, options) {
+    if (defaultOptions[option].default || options[option]) {
       return defaultOptions[option].value;
     } else {
       return false;
@@ -27,7 +27,7 @@ class Chartscii {
     const config = Object.keys(defaultOptions).reduce((acc, key) => {
       acc[key] =
         typeof defaultOptions[key] === 'object'
-          ? this.defaultOption(key)
+          ? this.defaultOption(key, options)
           : defaultOptions[key];
       return acc;
     }, {});
@@ -232,17 +232,13 @@ class Chartscii {
           this.options.structure.leftCorner
         }`;
 
-    for (let x = 0; x < this.width / 2; x++) {
-      asciiGraph = this.options.naked
-        ? ''
-        : `${asciiGraph}${this.options.structure.x}`;
-    }
+    asciiGraph = asciiGraph + this.options.structure.x.repeat((this.width / 2));
 
     this.chart.map((point) => {
       const graphValue = point.value;
 
       const scaledValue = this.getScaledValue(graphValue);
-      const scaledMaxNumeric = Math.round(this.width);
+      const scaledMaxNumeric = this.width;
 
       const fill = this.options.fill
         ? this.options.fill.repeat(scaledMaxNumeric - scaledValue)

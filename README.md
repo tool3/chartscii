@@ -1,8 +1,4 @@
-# chartscii
-[![Build Status](https://travis-ci.org/tool3/chartscii.svg?branch=master)](https://travis-ci.org/tool3/chartscii)   
-simple ascii bar charts
-
-<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg"/>
+<img src="./shellfies/logo.png"/>
 
 * command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli)
 * typescript usage [typescript](#typescript-usage-example)
@@ -24,41 +20,39 @@ const Chartscii = require('chartscii');
 const data = [];
 
 for (let i = 1; i <= 20; i++) {
-    data.push(Math.floor(Math.random() * 1000) + 1);
+    data.push(Math.floor(Math.random() * 100) + 1);
 }
 
 // create chart
 const chart = new Chartscii(data, {
     label: 'Example Chart',
-    width: 500,
+    theme: 'lush',
+    width: 50,
     sort: true,
     reverse: true,
     color: 'pink'
 });
-
-//print chart
-console.log(chart.create());
+console.log(chart.create(), 'example')
 ```
 
 outputs:
-<img width="1000" src="https://tool3.github.io/chartscii/img/example.png"/>   
+<img width="1000" src="./shellfies/example.png"/>   
 
 you can customize the acsii character for the bar chart using the `char` option. for example:   
 ```js
 const chart = new Chartscii(data, {
     label: 'Example Chart',
-    width: 500,
+    theme: 'pastel',
+    width: 50,
     char: '■',
     sort: true,
     reverse: true,
     color: 'green'
 });
-
-console.log(chart.create());
 ```
 
 outputs:   
-<img width="1000" src="https://tool3.github.io/chartscii/img/example_char.png"/>   
+<img width="1000" src="./shellfies/char.png"/>   
 
 ## typescript usage example
 example usage in typescript:   
@@ -154,6 +148,8 @@ these are the currently supported colors, provided as string in the data object 
 <img src="./shellfies/pastel.png" />
 <img src="./shellfies/lush.png" />
 <img src="./shellfies/beach.png" />
+
+<!--
 # Examples
 ## intro example
 intro example, using no labels (value of bar is the default label)   
@@ -419,3 +415,5 @@ const style = require('styl3')({theme: 'pastel'});
 <img src="./shellfies/chart.png" />
 
 [![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)  
+!-->
+
