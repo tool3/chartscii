@@ -522,9 +522,9 @@ strip-json-comments@3.1.1:
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
 styl3@^1.2.4:
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/styl3/-/styl3-1.2.4.tgz#e7f74082e78f38df2003ff0c6b6f83b1dc83694a"
-  integrity sha512-tNF39+eRorXhkvW+nrGic9xUVXPQaw+q+Q4I143xlbiGcBwaWdnf6WUhsDYRd0CR19y/uNAg5uWd+GXHSn51bg==
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/styl3/-/styl3-1.3.0.tgz#4c05c23d5712bc0f86722cda4238d5dd9efec0b1"
+  integrity sha512-FGSmIb5b9MmBeQZhf1Mv75SmEbAn8Nm08TG2FN5typX3S8pNI5i97kRiy62g6SPvtJ6zdfXk7Xi7PW2u5PRrFg==
 
 supports-color@8.1.1:
   version "8.1.1"
