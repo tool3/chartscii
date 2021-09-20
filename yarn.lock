@@ -480,10 +480,10 @@ serialize-javascript@6.0.0:
   dependencies:
     randombytes "^2.1.0"
 
-snaptdout@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/snaptdout/-/snaptdout-1.5.0.tgz#aaab0b33ee29694d5fbaa050236d9af28ff957b7"
-  integrity sha512-YBua4ev+xyYNKFztL64JwWil39xUFmkRoel3PS8OJH+5aUYU2HHFhrxbJoGvXhroGWnW9uuLR7Msn4JkOsT2Nw==
+snaptdout@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/snaptdout/-/snaptdout-2.0.0.tgz#6f8490ba0899f1ce32e0e5a84eac384528f13088"
+  integrity sha512-L6XLtt9t4LTVjpHMUqrFu6LAhZl2rUftCDFvbW0oPfkBlK6uRE9XZVRFJU5IwhArxKMHJ3RDqKfl+iXGURpyPQ==
 
 "string-width@^1.0.2 || 2":
   version "2.1.1"
