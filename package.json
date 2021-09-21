@@ -28,7 +28,7 @@
     "chai": "^4.2.0",
     "husky": "^7.0.2",
     "mocha": "^9.1.0",
-    "snaptdout": "^1.5.0"
+    "snaptdout": "^2.1.0"
   },
   "husky": {
     "hooks": {
