@@ -95,9 +95,7 @@ class Chartscii {
   formatLabelessLine(point, value) {
     const space = this.maxLabelLength - point.labelColorLess;
     if (this.options.labels !== false) {
-      return this.options.naked
-        ? `${' '.repeat(space)}${value}  `
-        : `${' '.repeat(space)}${value} ${this.options.structure.y}`;
+      return this.formatLine(space, value);
     }
 
     return this.options.naked
@@ -108,9 +106,13 @@ class Chartscii {
 
   formatLabelLine(point) {
     const space = this.maxLabelLength - (point.labelColorLess || point.label.length);
+    return this.formatLine(space, point.label);
+  }
+
+  formatLine(space, value) {
     return this.options.naked
-      ? `${' '.repeat(space)}${point.label}  `
-      : `${' '.repeat(space)}${point.label} ${this.options.structure.y}`;
+      ? `${' '.repeat(space)}${value}  `
+      : `${' '.repeat(space)}${value} ${this.options.structure.y}`;
   }
 
   line(point) {
@@ -201,38 +203,26 @@ class Chartscii {
 
   create() {
     let asciiGraph = this.options.labels
-      ? `${' '.repeat(this.maxLabelLength + 1)}${this.options.structure.leftCorner}`
-      : `${' '.repeat(this.maxLabelLength > 1 ? this.maxLabelLength - 1 : this.maxLabelLength)}${this.options.structure.leftCorner}`;
+      ? ' '.repeat(this.maxLabelLength + 1) + this.options.structure.leftCorner
+      : ' '.repeat(this.maxLabelLength > 1 ? this.maxLabelLength - 1 : this.maxLabelLength) + this.options.structure.leftCorner;
 
     asciiGraph = asciiGraph + this.options.structure.x.repeat((this.width / 2));
 
-    this.chart.map((point) => {
-      const graphValue = point.value;
-
-      const scaledValue = this.getScaledValue(graphValue);
-      const scaledMaxNumeric = this.width;
-
-      const fill = this.options.fill
-        ? this.options.fill.repeat(scaledMaxNumeric - scaledValue)
-        : '';
+    for (const point of this.chart) {
       const color = point.color || this.options.color;
+      const scaledValue = this.getScaledValue(point.value);
+      const fill = this.options.fill ? this.options.fill.repeat(this.width - scaledValue) : '';
 
       asciiGraph = color
-        ? `${point.key}${this.colorify(
-          `${this.options.char.repeat(scaledValue)}${fill}`,
-          color
-        )}\n${asciiGraph}`
-        : `${point.key}${this.options.char.repeat(
-          scaledValue
-        )}${fill}\n${asciiGraph}`;
-    });
+        ? `${point.key}${this.colorify(`${this.options.char.repeat(scaledValue)}${fill}`, color)}\n${asciiGraph}`
+        : `${point.key}${this.options.char.repeat(scaledValue)}${fill}\n${asciiGraph}`;
+    }
 
     if (this.options.label) {
       const space = ' '.repeat(this.maxSpace + 1);
       const chart = `${space}\n${asciiGraph}`;
       asciiGraph = this.options.color
-        ? `${this.colorify(this.options.label, this.options.color)}${this.colors.colors.reset
-        }${chart}`
+        ? `${this.colorify(this.options.label, this.options.color)}${this.colors.colors.reset}${chart}`
         : `${this.options.label}${chart}`;
     }
 
