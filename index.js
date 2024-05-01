@@ -68,7 +68,7 @@ class Chartscii {
   }
 
   createGraphAxis() {
-    this.measures.space = this.measures.label > 0 ? this.measures.label : 1;
+    this.measures.space = this.measures.label || 1;
 
     const lines = this.data.map((point) => this.line(point));
 
