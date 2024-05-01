@@ -5,11 +5,7 @@ const { getPointValue } = require('./utils');
 class Chartscii {
   constructor(data, options) {
     this.chart = [];
-    this.maxSpace = 1;
-    // this.maxLabelLength = 0;
-    // this.maxNumeric = 0;
-    // this.maxCount = 0;
-    this.measures = { numeric: 0, count: 0, label: 0 }
+    this.measures = { numeric: 0, count: 0, label: 0, space: 1 }
     this.options = this.setOptions(options);
     this.colors = style({ theme: this.options.theme });
     this.width = this.options.width;
@@ -48,13 +44,13 @@ class Chartscii {
   }
 
   updateMaxLabelLength(label) {
-    return label.length >= this.maxLabelLength
+    return label.length >= this.measures.label
       ? label.length
-      : this.maxLabelLength;
+      : this.measures.label;
   }
 
   updateMaxNumeric(value) {
-    return value >= this.maxNumeric ? value : this.maxNumeric;
+    return value >= this.measures.numeric ? value : this.measures.numeric;
   }
 
   colorify(txt, color) {
@@ -72,8 +68,7 @@ class Chartscii {
   }
 
   createGraphAxis() {
-    this.maxCount += this.getTotal(this.data);
-    this.maxSpace = this.maxLabelLength > 0 ? this.maxLabelLength : 1;
+    this.measures.space = this.measures.label > 0 ? this.measures.label : 1;
 
     const lines = this.data.map((point) => this.line(point));
 
@@ -94,7 +89,7 @@ class Chartscii {
   }
 
   formatLabelessLine(point, value) {
-    const space = this.maxLabelLength - point.labelColorLess;
+    const space = this.measures.label - point.labelColorLess;
     if (this.options.labels !== false) {
       return this.formatLine(space, value);
     }
@@ -106,7 +101,7 @@ class Chartscii {
   }
 
   formatLabelLine(point) {
-    const space = this.maxLabelLength - (point.labelColorLess || point.label.length);
+    const space = this.measures.label - (point.labelColorLess || point.label.length);
     return this.formatLine(space, point.label);
   }
 
@@ -121,7 +116,7 @@ class Chartscii {
     const rawValue = getPointValue(point);
     const value = rawValue === 0 ? rawValue.toString() : rawValue
 
-    this.maxNumeric = this.updateMaxNumeric(rawValue);
+    this.measures.numeric = this.updateMaxNumeric(rawValue);
 
     if (label) {
       return this.makeLabelPoint(point)
@@ -136,13 +131,13 @@ class Chartscii {
     const color = point.color || this.options.color;
     const label = point.label;
 
-    this.maxLabelLength = this.updateMaxLabelLength(point.label);
+    this.measures.label = this.updateMaxLabelLength(point.label);
     point.labelColorLess = point.label.length;
 
     if (this.options.percentage) {
       point.label = this.getPercentageData(value, label);
       point.labelColorLess = point.label.length;
-      this.maxLabelLength = this.updateMaxLabelLength(point.label);
+      this.measures.label = this.updateMaxLabelLength(point.label);
     }
 
     if (this.options.colorLabels) {
@@ -157,11 +152,11 @@ class Chartscii {
     const value = getPointValue(point);
 
     let labelColorLess = value.toString().length;
-    this.maxLabelLength = this.updateMaxLabelLength(value.toString());
+    this.measures.label = this.updateMaxLabelLength(value.toString());
 
     if (this.options.percentage) {
       point.label = this.getPercentageData(value);
-      this.maxLabelLength = this.updateMaxLabelLength(point.label);
+      this.measures.label = this.updateMaxLabelLength(point.label);
       labelColorLess = point.label.length;
     }
 
@@ -188,23 +183,23 @@ class Chartscii {
   }
 
   makeSpace() {
-    if (this.maxSpace === 2) {
-      return ' '.repeat(this.maxSpace + 1);
+    if (this.measures.space === 2) {
+      return ' '.repeat(this.measures.space + 1);
     }
-    if (this.maxSpace % 2 === 0) {
-      return ' '.repeat(this.maxSpace);
-    } else if (this.maxSpace % 3 === 0) {
-      return this.maxSpace === 3 ? ' ' : ' '.repeat(this.maxSpace - 7);
-    } else if (this.maxSpace < 2) {
-      return ' '.repeat(this.maxSpace + 1);
+    if (this.measures.space % 2 === 0) {
+      return ' '.repeat(this.measures.space);
+    } else if (this.measures.space % 3 === 0) {
+      return this.measures.space === 3 ? ' ' : ' '.repeat(this.measures.space - 7);
+    } else if (this.measures.space < 2) {
+      return ' '.repeat(this.measures.space + 1);
     } else {
-      return ' '.repeat(this.maxSpace - 3);
+      return ' '.repeat(this.measures.space - 3);
     }
   }
 
   makeChartLabel() {
     if (this.options.label) {
-      const space = ' '.repeat(this.maxSpace + 1);
+      const space = ' '.repeat(this.measures.space + 1);
       return this.options.color
         ? `${this.colorify(this.options.label, this.options.color)}${this.colors.colors.reset}${space}`
         : `${this.options.label}${space}`;
@@ -215,8 +210,8 @@ class Chartscii {
 
   makeChartBottom() {
     const base = this.options.labels
-      ? ' '.repeat(this.maxLabelLength + 1) + this.options.structure.leftCorner
-      : ' '.repeat(this.maxLabelLength > 1 ? this.maxLabelLength - 1 : this.maxLabelLength) + this.options.structure.leftCorner;
+      ? ' '.repeat(this.measures.label + 1) + this.options.structure.leftCorner
+      : ' '.repeat(this.measures.label > 1 ? this.measures.label - 1 : this.measures.label) + this.options.structure.leftCorner;
 
     return base + this.options.structure.x.repeat((this.width / 2))
   }
@@ -246,7 +241,7 @@ class Chartscii {
 
 
   getScaledValue(value) {
-    return Math.round((value / this.maxNumeric) * this.width);
+    return Math.round((value / this.measures.numeric) * this.width);
   }
 
   get() {
