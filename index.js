@@ -201,33 +201,48 @@ class Chartscii {
     }
   }
 
-  create() {
-    let asciiGraph = this.options.labels
+  makeChartLabel() {
+    if (this.options.label) {
+      const space = ' '.repeat(this.maxSpace + 1);
+      return this.options.color
+        ? `${this.colorify(this.options.label, this.options.color)}${this.colors.colors.reset}${space}`
+        : `${this.options.label}${space}`;
+    }
+
+    return '';
+  }
+
+  makeChartBottom() {
+    const base = this.options.labels
       ? ' '.repeat(this.maxLabelLength + 1) + this.options.structure.leftCorner
       : ' '.repeat(this.maxLabelLength > 1 ? this.maxLabelLength - 1 : this.maxLabelLength) + this.options.structure.leftCorner;
 
-    asciiGraph = asciiGraph + this.options.structure.x.repeat((this.width / 2));
+    return base + this.options.structure.x.repeat((this.width / 2))
+  }
+
+  create() {
+    const asciiChart = [];
 
     for (const point of this.chart) {
       const color = point.color || this.options.color;
       const scaledValue = this.getScaledValue(point.value);
       const fill = this.options.fill ? this.options.fill.repeat(this.width - scaledValue) : '';
+      const line = color
+        ? `${point.key}${this.colorify(`${this.options.char.repeat(scaledValue)}${fill}`, color)}`
+        : `${point.key}${this.options.char.repeat(scaledValue)}${fill}`
 
-      asciiGraph = color
-        ? `${point.key}${this.colorify(`${this.options.char.repeat(scaledValue)}${fill}`, color)}\n${asciiGraph}`
-        : `${point.key}${this.options.char.repeat(scaledValue)}${fill}\n${asciiGraph}`;
+      asciiChart.push(line);
     }
 
     if (this.options.label) {
-      const space = ' '.repeat(this.maxSpace + 1);
-      const chart = `${space}\n${asciiGraph}`;
-      asciiGraph = this.options.color
-        ? `${this.colorify(this.options.label, this.options.color)}${this.colors.colors.reset}${chart}`
-        : `${this.options.label}${chart}`;
+      asciiChart.push(this.makeChartLabel());
     }
 
-    return asciiGraph;
+    asciiChart.push(this.makeChartBottom())
+    return asciiChart.join('\n');
   }
+
+
 
   getScaledValue(value) {
     return Math.round((value / this.maxNumeric) * this.width);

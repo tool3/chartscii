@@ -3,23 +3,23 @@ const expect = chai.expect;
 const Chartscii = require('./index');
 const snap = require('snaptdout');
 const colors = [
-    'red',
-    'green',
-    'yellow',
-    'blue',
-    'purple',
-    'pink',
-    'cyan',
-    'orange',
-  ];
+  'red',
+  'green',
+  'yellow',
+  'blue',
+  'purple',
+  'pink',
+  'cyan',
+  'orange',
+];
 
 function generateChartData() {
-    const data = [];
-    for (let i = 0; i < colors.length; i++) {
-     const color = colors[i];
-      data.push({ value: i + 1, label: color, color });
-    }
-    return data;
+  const data = [];
+  for (let i = 0; i < colors.length; i++) {
+    const color = colors[i];
+    data.push({ value: i + 1, label: color, color });
+  }
+  return data;
 }
 
 describe('chartscii tests', () => {
@@ -91,13 +91,13 @@ describe('examples', () => {
     });
     await snap(chart.create(), 'percentage');
   });
-  
+
   it('should support labeless chart', async () => {
     const data = [];
     for (let i = 0; i < 20; i++) {
       data.push(i + 1);
     }
-    const chart = new Chartscii(data, {labels: false});
+    const chart = new Chartscii(data, { labels: false });
     await snap(chart.create(), 'labeless chart');
   });
 
@@ -107,7 +107,7 @@ describe('examples', () => {
       const color = colors[i];
       data.push({ value: i + 1, color });
     }
-    const chart = new Chartscii(data, {labels: false});
+    const chart = new Chartscii(data, { labels: false });
     await snap(chart.create(), 'labeless color chart');
   });
 
@@ -133,7 +133,7 @@ describe('examples', () => {
   });
   it('should support default theme', async () => {
     const data = generateChartData();
-    const chart = new Chartscii(data, {colorLabels: true});
+    const chart = new Chartscii(data, { colorLabels: true });
     await snap(chart.create(), 'default theme');
   });
 
