@@ -6,24 +6,15 @@ module.exports = {
   color: '',
   label: '',
   labels: true,
-  char: {
-    value: '█',
-    default: true
-  },
-  fill: {
-    value: '░',
-    default: false
-  },
+  char: '█',
+  // fill: '░',
   naked: false,
   width: 100,
   theme: '',
   structure: {
-    value: {
-      y: '╢',
-      x: '══',
-      leftCorner: '╚',
-      noLabelChar: '║'
-    },
-    default: true
-  }
+    y: '╢',
+    x: '══',
+    leftCorner: '╚',
+    noLabelChar: '║'
+  },
 };
