@@ -7,7 +7,6 @@ module.exports = {
   label: '',
   labels: true,
   char: '█',
-  // fill: '░',
   naked: false,
   width: 100,
   theme: '',
@@ -18,3 +17,5 @@ module.exports = {
     noLabelChar: '║'
   },
 };
+
+// fill: '░',

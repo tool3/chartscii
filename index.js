@@ -1,14 +1,15 @@
 const style = require('styl3');
-const defaultOptions = require('./consts/defaultOptions');
+const defaultOptions = require('./config/config');
 const { getPointValue } = require('./utils');
 
 class Chartscii {
   constructor(data, options) {
     this.chart = [];
     this.maxSpace = 1;
-    this.maxLabelLength = 0;
-    this.maxNumeric = 0;
-    this.maxCount = 0;
+    // this.maxLabelLength = 0;
+    // this.maxNumeric = 0;
+    // this.maxCount = 0;
+    this.measures = { numeric: 0, count: 0, label: 0 }
     this.options = this.setOptions(options);
     this.colors = style({ theme: this.options.theme });
     this.width = this.options.width;
