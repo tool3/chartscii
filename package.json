@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "mocha index.test.js",
+    "test:ts": "mocha -r ts-node/register main.test.ts",
     "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" "
   },
   "keywords": [
@@ -25,11 +26,15 @@
   "author": "Tal Hayut",
   "license": "MIT",
   "devDependencies": {
+    "@types/chai": "4.3.14",
+    "@types/mocha": "10.0.6",
     "chai": "4.2.0",
     "husky": "8.0.3",
     "mocha": "^10.0.0",
     "shellfie": "^1.3.1",
-    "snaptdout": "^2.1.0"
+    "snaptdout": "^2.1.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.4.5"
   },
   "husky": {
     "hooks": {

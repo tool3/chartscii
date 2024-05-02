@@ -3,7 +3,7 @@ module.exports = {
   colorLabels: false,
   sort: false,
   reverse: false,
-  color: '',
+  color: undefined,
   label: '',
   labels: true,
   char: '█',

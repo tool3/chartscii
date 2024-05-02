@@ -1,6 +1,6 @@
 const style = require('styl3');
 const defaultOptions = require('./config/config');
-const { getPointValue } = require('./utils');
+const { getPointValue, getPointLabel, padLine } = require('./utils');
 
 class Chartscii {
   constructor(data, options) {
@@ -33,14 +33,18 @@ class Chartscii {
   }
 
   getPercentageData(value, label = undefined) {
-    const total = this.getTotal(this.data);
-    const avg = value / total;
-    const percentage = `${(avg * 100).toFixed(1)}%`;
-    return `${label || value} (${percentage})`;
+    if (this.options.percentage) {
+      const total = this.getTotal(this.data);
+      const avg = value / total;
+      const percentage = `${(avg * 100).toFixed(1)}%`;
+      return `${label || value} (${percentage})`;
+    } else {
+      return label || value.toString();
+    }
   }
 
   colorLabel(label, color) {
-    return label.toString().replace(label, this.colorify(label, color));
+    return color ? label.toString().replace(label, this.colorify(label, color)) : label;
   }
 
   updateMaxLabelLength(label) {
@@ -126,6 +130,63 @@ class Chartscii {
 
   }
 
+
+  verticalChart() {
+    const maxHeight = Math.max(...this.data.map(d => this.getScaledValue(getPointValue(d))));
+    const labelWidths = this.data.map(point => point.labelColorLess);
+    const maxLabelWidth = Math.max(...labelWidths);
+    const barWidth = this.options.barWidth || maxLabelWidth;
+    const verticalChart = Array(maxHeight + 1).fill('').map(() => Array(this.data.length).fill(' ').map(() => ' '.repeat(maxLabelWidth)));
+    const spaces = [];
+
+    this.data.forEach((point, index) => {
+      const value = this.getScaledValue(getPointValue(point));
+      const height = Math.round((value / maxHeight) * maxHeight);
+      const percentageLabel = point.label;
+
+      const padding = Math.floor((maxLabelWidth - barWidth) / 2);
+      const label = percentageLabel.padEnd(maxLabelWidth, ' ');
+
+      for (let i = 0; i < maxHeight; i++) {
+        if (i < maxHeight - height) {
+          if (this.options.fill) {
+            const coloredFillChar = this.options.color ? this.colorify(this.options.fill, this.options.color) : this.options.fill;
+            verticalChart[i][index] = padLine(padding, coloredFillChar.repeat(barWidth));
+          }
+        } else {
+          const unevenPadding = barWidth % 2 === 0 ? 1 : 0; 
+          const coloredChar = this.options.color ? this.colorify(this.options.char, this.options.color) : this.options.char;
+          verticalChart[i][index] = ' '.repeat(padding + unevenPadding) + coloredChar.repeat(barWidth) + ' '.repeat(padding)
+        }
+      }
+      const labelSpace = Math.floor(maxLabelWidth - this.stripAnsi(label).length);
+      const labelPadding = this.options.colorLabels && labelSpace > 0 ? ' '.repeat(labelSpace) : ''
+      verticalChart[maxHeight][index] = label + labelPadding;
+      spaces.push(label + labelPadding)
+    });
+
+    const chart = verticalChart.map(row => {
+      if (!this.options.naked) {
+        return this.options.structure.y + ' ' + row.join(' ')
+      }
+      return row.join(' ')
+    })
+
+    if (!this.options.naked) {
+      const removeSpace = this.options.percentage ? 7 : 3;
+      const width = (this.stripAnsi(spaces[0]).length - removeSpace) * this.data.length;
+      chart.push([this.makeVerticalChartBottom(width)])
+    }
+
+    chart.unshift([this.makeChartLabel()])
+    return chart.join('\n');
+  }
+
+  stripAnsi(str) {
+    return str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+  }
+
+
   makeLabelPoint(point) {
     const value = typeof point === 'object' ? point.value : point;
     const color = point.color || this.options.color;
@@ -201,8 +262,8 @@ class Chartscii {
     if (this.options.label) {
       const space = ' '.repeat(this.measures.space + 1);
       return this.options.color
-        ? `${this.colorify(this.options.label, this.options.color)}${this.colors.colors.reset}${space}`
-        : `${this.options.label}${space}`;
+        ? this.colorify(this.options.label, this.options.color) + this.colors.colors.reset + space
+        : this.options.label + space;
     }
 
     return '';
@@ -216,22 +277,34 @@ class Chartscii {
     return base + this.options.structure.x.repeat((this.width / 2))
   }
 
+  makeVerticalChartBottom(width = this.width) {
+    const base = this.options.labels
+      ? this.options.structure.leftCorner.repeat(1)
+      : ' '.repeat(this.measures.label > 1 ? this.measures.label - 1 : this.measures.label) + this.options.structure.leftCorner;
+
+    return base + this.options.structure.x.repeat(width)
+  }
+
   create() {
     const asciiChart = [];
+
+    if (this.options.orientation === 'vertical')  {
+      return this.verticalChart();
+    } 
+
+    if (this.options.label) {
+      asciiChart.push(this.makeChartLabel());
+    }
 
     for (const point of this.chart) {
       const color = point.color || this.options.color;
       const scaledValue = this.getScaledValue(point.value);
       const fill = this.options.fill ? this.options.fill.repeat(this.width - scaledValue) : '';
       const line = color
-        ? `${point.key}${this.colorify(`${this.options.char.repeat(scaledValue)}${fill}`, color)}`
-        : `${point.key}${this.options.char.repeat(scaledValue)}${fill}`
+        ? point.key + this.colorify(this.options.char.repeat(scaledValue) + fill, color)
+        : point.key + this.options.char.repeat(scaledValue) + fill
 
       asciiChart.push(line);
-    }
-
-    if (this.options.label) {
-      asciiChart.push(this.makeChartLabel());
     }
 
     asciiChart.push(this.makeChartBottom())
