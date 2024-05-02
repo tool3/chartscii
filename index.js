@@ -9,6 +9,7 @@ class Chartscii {
     this.options = this.setOptions(options);
     this.colors = style({ theme: this.options.theme });
     this.width = this.options.width;
+    this.height = this.options.height;
     this.data = this.sortData(data, this.options.reverse);
     this.createGraphAxis();
   }
@@ -132,7 +133,7 @@ class Chartscii {
 
 
   verticalChart() {
-    const maxHeight = Math.max(...this.data.map(d => this.getScaledValue(getPointValue(d))));
+    const maxHeight = Math.max(...this.data.map(d => this.getScaledVerticalValue(getPointValue(d))));
     const labelWidths = this.data.map(point => point.labelColorLess);
     const maxLabelWidth = Math.max(...labelWidths);
     const barWidth = this.options.barWidth || maxLabelWidth;
@@ -140,28 +141,30 @@ class Chartscii {
     const spaces = [];
 
     this.data.forEach((point, index) => {
-      const value = this.getScaledValue(getPointValue(point));
+      const value = this.getScaledVerticalValue(getPointValue(point));
       const height = Math.round((value / maxHeight) * maxHeight);
       const percentageLabel = point.label;
 
       const padding = Math.floor((maxLabelWidth - barWidth) / 2);
-      const label = percentageLabel.padEnd(maxLabelWidth, ' ');
+      const scaledWidth = Math.round((this.options.width / this.data.length) / 10);
+      const label = percentageLabel.padEnd(maxLabelWidth + scaledWidth, ' ');
 
       for (let i = 0; i < maxHeight; i++) {
         if (i < maxHeight - height) {
           if (this.options.fill) {
             const coloredFillChar = this.options.color ? this.colorify(this.options.fill, this.options.color) : this.options.fill;
-            verticalChart[i][index] = padLine(padding, coloredFillChar.repeat(barWidth));
+            verticalChart[i][index] = padLine(padding + scaledWidth, coloredFillChar.repeat(barWidth));
+          } else {
+            verticalChart[i][index] = padLine(padding + scaledWidth, ' '.repeat(barWidth));
           }
         } else {
-          const unevenPadding = barWidth % 2 === 0 ? 1 : 0; 
           const coloredChar = this.options.color ? this.colorify(this.options.char, this.options.color) : this.options.char;
-          verticalChart[i][index] = ' '.repeat(padding + unevenPadding) + coloredChar.repeat(barWidth) + ' '.repeat(padding)
+          verticalChart[i][index] = ' '.repeat(padding + scaledWidth) + coloredChar.repeat(barWidth) + ' '.repeat(padding + scaledWidth)
         }
       }
       const labelSpace = Math.floor(maxLabelWidth - this.stripAnsi(label).length);
       const labelPadding = this.options.colorLabels && labelSpace > 0 ? ' '.repeat(labelSpace) : ''
-      verticalChart[maxHeight][index] = label + labelPadding;
+      verticalChart[maxHeight][index] = ' '.repeat(scaledWidth) + label + labelPadding;
       spaces.push(label + labelPadding)
     });
 
@@ -288,9 +291,9 @@ class Chartscii {
   create() {
     const asciiChart = [];
 
-    if (this.options.orientation === 'vertical')  {
+    if (this.options.orientation === 'vertical') {
       return this.verticalChart();
-    } 
+    }
 
     if (this.options.label) {
       asciiChart.push(this.makeChartLabel());
@@ -315,6 +318,10 @@ class Chartscii {
 
   getScaledValue(value) {
     return Math.round((value / this.measures.numeric) * this.width);
+  }
+
+  getScaledVerticalValue(value) {
+    return Math.round((value / this.measures.numeric) * (this.height / 10));
   }
 
   get() {

@@ -11,17 +11,18 @@ for (let i = 1; i <= 10; i++) {
 // create chart
 const chart = new Chartscii(data, {
     // label: 'Example Chart',
-    width: 50,
+    width: 100,
+    height: 100,
     sort: false,
     reverse: false,
-    // fill: '░',
+    fill: '░',
     char: '█',
     color: 'red',
     label: 'THANKS',
     colorLabels: false,
     percentage: false,
     labels: true,
-    barWidth: 2,
+    barWidth: 3,
     naked: false,
     orientation: 'vertical'
 });

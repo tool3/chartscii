@@ -9,6 +9,7 @@ module.exports = {
   char: '█',
   naked: false,
   width: 100,
+  height: 50,
   theme: '',
   structure: {
     y: '╢',
