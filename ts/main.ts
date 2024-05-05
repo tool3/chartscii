@@ -190,21 +190,6 @@ class Chartscii {
         return sorted;
     }
 
-    makeSpace() {
-        if (this.measures.space === 2) {
-            return ' '.repeat(this.measures.space + 1);
-        }
-        if (this.measures.space % 2 === 0) {
-            return ' '.repeat(this.measures.space);
-        } else if (this.measures.space % 3 === 0) {
-            return this.measures.space === 3 ? ' ' : ' '.repeat(this.measures.space - 7);
-        } else if (this.measures.space < 2) {
-            return ' '.repeat(this.measures.space + 1);
-        } else {
-            return ' '.repeat(this.measures.space - 3);
-        }
-    }
-
     makeChartLabel() {
         if (this.options.label) {
             const space = ' '.repeat(this.measures.space + 1);

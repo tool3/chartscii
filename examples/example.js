@@ -14,12 +14,14 @@ const chart = new Chartscii(data, {
     width: 100,
     sort: false,
     reverse: false,
-    fill: '░',
+    // fill: '░',
     char: '█',
     color: 'green',
     colorLabels: true,
     percentage: true,
     labels: true,
+    barWidth: 2,
+    orientation: 'vertical',
     // naked: true
 });
 

@@ -133,20 +133,20 @@ class Chartscii {
 
 
   verticalChart() {
-    const maxHeight = Math.max(...this.data.map(d => this.getScaledVerticalValue(getPointValue(d))));
-    const labelWidths = this.data.map(point => point.labelColorLess);
+    const maxHeight = Math.max(...this.chart.map(d => this.getScaledVerticalValue(getPointValue(d))));
+    const labelWidths = this.chart.map(point => point.labelColorLess);
     const maxLabelWidth = Math.max(...labelWidths);
     const barWidth = this.options.barWidth || maxLabelWidth;
-    const verticalChart = Array(maxHeight + 1).fill('').map(() => Array(this.data.length).fill(' ').map(() => ' '.repeat(maxLabelWidth)));
-    const spaces = [];
+    const verticalSpace = this.options.labels ? 1 : 0;
+    const verticalChart = Array(maxHeight + verticalSpace).fill('').map(() => Array(this.chart.length).fill(' ').map(() => ' '.repeat(maxLabelWidth)));
+    const padding = Math.floor((maxLabelWidth - barWidth) / 2);
+    const scaledWidth = Math.round((this.options.width / this.chart.length) / 10);
+    const space = [];
 
-    this.data.forEach((point, index) => {
+    this.chart.forEach((point, index) => {
       const value = this.getScaledVerticalValue(getPointValue(point));
       const height = Math.round((value / maxHeight) * maxHeight);
-      const percentageLabel = point.label;
-
-      const padding = Math.floor((maxLabelWidth - barWidth) / 2);
-      const scaledWidth = Math.round((this.options.width / this.data.length) / 10);
+      const percentageLabel = getPointLabel(point);
       const label = percentageLabel.padEnd(maxLabelWidth + scaledWidth, ' ');
 
       for (let i = 0; i < maxHeight; i++) {
@@ -160,12 +160,14 @@ class Chartscii {
         } else {
           const coloredChar = this.options.color ? this.colorify(this.options.char, this.options.color) : this.options.char;
           verticalChart[i][index] = ' '.repeat(padding + scaledWidth) + coloredChar.repeat(barWidth) + ' '.repeat(padding + scaledWidth)
+          space.push((padding + scaledWidth));
         }
       }
-      const labelSpace = Math.floor(maxLabelWidth - this.stripAnsi(label).length);
-      const labelPadding = this.options.colorLabels && labelSpace > 0 ? ' '.repeat(labelSpace) : ''
-      verticalChart[maxHeight][index] = ' '.repeat(scaledWidth) + label + labelPadding;
-      spaces.push(label + labelPadding)
+      if (this.options.labels) {
+        const diff = point.labelColorLess % 2 === 0 ? 1 : 0; 
+        const space = Math.floor((padding + scaledWidth + diff) / 2);
+        verticalChart[maxHeight][index] = ' '.repeat(space) + label + ' '.repeat(space)
+      }
     });
 
     const chart = verticalChart.map(row => {
@@ -176,9 +178,9 @@ class Chartscii {
     })
 
     if (!this.options.naked) {
-      const removeSpace = this.options.percentage ? 7 : 3;
-      const width = (this.stripAnsi(spaces[0]).length - removeSpace) * this.data.length;
-      chart.push([this.makeVerticalChartBottom(width)])
+      const width = Math.abs(((barWidth - 1) * this.chart.length) - (this.chart.length * 3));
+      console.log({ width, scaledWidth, padding, barWidth });
+      chart.push([this.makeVerticalChartBottom(width + (padding * scaledWidth))])
     }
 
     chart.unshift([this.makeChartLabel()])
@@ -218,13 +220,13 @@ class Chartscii {
     let labelColorLess = value.toString().length;
     this.measures.label = this.updateMaxLabelLength(value.toString());
 
-    if (this.options.percentage) {
+    if (this.options.percentage && this.options.labels) {
       point.label = this.getPercentageData(value);
       this.measures.label = this.updateMaxLabelLength(point.label);
       labelColorLess = point.label.length;
     }
 
-    if (this.options.colorLabels) {
+    if (this.options.colorLabels && this.options.labels) {
       const printValue = point.label || value;
       point.label = this.colorLabel(printValue, color);
     }
@@ -246,21 +248,6 @@ class Chartscii {
     return sorted;
   }
 
-  makeSpace() {
-    if (this.measures.space === 2) {
-      return ' '.repeat(this.measures.space + 1);
-    }
-    if (this.measures.space % 2 === 0) {
-      return ' '.repeat(this.measures.space);
-    } else if (this.measures.space % 3 === 0) {
-      return this.measures.space === 3 ? ' ' : ' '.repeat(this.measures.space - 7);
-    } else if (this.measures.space < 2) {
-      return ' '.repeat(this.measures.space + 1);
-    } else {
-      return ' '.repeat(this.measures.space - 3);
-    }
-  }
-
   makeChartLabel() {
     if (this.options.label) {
       const space = ' '.repeat(this.measures.space + 1);
@@ -275,15 +262,13 @@ class Chartscii {
   makeChartBottom() {
     const base = this.options.labels
       ? ' '.repeat(this.measures.label + 1) + this.options.structure.leftCorner
-      : ' '.repeat(this.measures.label > 1 ? this.measures.label - 1 : this.measures.label) + this.options.structure.leftCorner;
+      : ' '.repeat(this.measures.label > 1 ? this.measures.label - 2 : this.measures.label) + this.options.structure.leftCorner;
 
     return base + this.options.structure.x.repeat((this.width / 2))
   }
 
   makeVerticalChartBottom(width = this.width) {
-    const base = this.options.labels
-      ? this.options.structure.leftCorner.repeat(1)
-      : ' '.repeat(this.measures.label > 1 ? this.measures.label - 1 : this.measures.label) + this.options.structure.leftCorner;
+    const base = this.options.structure.leftCorner.repeat(1)
 
     return base + this.options.structure.x.repeat(width)
   }
@@ -332,3 +317,18 @@ class Chartscii {
 module.exports = Chartscii;
 
 
+// data processing
+// data formatting
+// chart creation
+// chart formatting
+// chart output
+
+// data processing
+ // map each data point to an internal type (Point)
+ // scale the data according to width and height
+// data formatting
+  // format each data point to a string (color, label, percentage)
+// chart creation
+  // create the chart based on width and height
+// chart formatting
+  // format the chart based on options
