@@ -24,20 +24,32 @@ class HorizontalChartFormatter implements ChartDataFormatter {
         }
     }
 
+    reset(text: string) {
+        return this.colors.reset(text);
+    }
+
+    formatStructure(structChar: string, color?: string) {
+        const colored = color || this.options.color;
+        return this.colors.colors.reset + structChar + this.colors.colors[colored];
+    }
+
     formatBottom() {
-        const space = ' '.repeat(this.options.max.label + 1);
+        const space = ' '.repeat(this.options.max.label);
         return space + this.options.structure.leftCorner + this.options.structure.x.repeat(this.options.width);
     }
 
 
-    scaleBar(size: number, bar: string) {
+    scaleBar(size: number, bar: string, point: ChartPoint) {
         const barHeight = this.options.height / size;
-        const space =  ' '.repeat(this.options.max.label + 2);
+
+        const space = point.label.length + (this.options.max.label - point.label.length);
+        const padding = ' '.repeat(space);
         const bars = [];
 
         for (let i = 0; i < barHeight; i++) {
-            const padding = i === 0 ? '' : space;
-            bars.push(padding + bar)
+            const char = this.formatStructure(this.options.structure.noLabelChar, point.color);
+            const scaled = i !== 0 ? padding + char : '';
+            bars.push(scaled + bar)
         }
 
         return bars.join('\n');
@@ -52,47 +64,50 @@ class HorizontalChartFormatter implements ChartDataFormatter {
         return '';
     }
 
-    formatBar(point: ChartPoint, size: number) {
+    formatBar(point: ChartPoint, size: number, label: string) {
         const value = this.options.char?.repeat(point.scaled) + this.formatFill(point);
-        const bar = this.scaleBar(size, value);
+        const bar = this.scaleBar(size, value, point);
 
         return point.color ? this.colorify(bar, point.color) : value;
-    }
+    } 
 
     formatPercentage(point: ChartPoint) {
         if (this.options.percentage) {
-            return ` (${point.percentage.toFixed(2)}%)`
+            return `(${point.percentage.toFixed(2)}%)`
         }
 
         return '';
     }
 
-    formatLabelSpace(point: ChartPoint) {
+    formatLabelSpace(label: string) {
         if (this.options.max?.label) {
-            const space = this.options.max.label - (point.label.length);
+            const space = this.options.max.label - (label.length);
             return ' '.repeat(space);
         }
 
         return '';
     }
 
-    formatLabel(point: ChartPoint) {
+    formatLabel(point: ChartPoint, key: string) {
         const percentage = this.formatPercentage(point);
-        const space = this.formatLabelSpace(point);
-        const label = this.options.labels ? `${space}${point.label}${percentage}` : '';
-        return this.options.colorLabels ? this.colorify(label, this.options.color) : label;
+        const label = percentage ? `${point.label} ${percentage}` : point.label;
+
+        const space = this.formatLabelSpace(label);
+
+        const value = this.options.labels ? `${label}${space}${this.formatStructure(key)}` : '';
+
+        return [this.options.colorLabels ? this.colorify(value, this.options.color) : value, label];
     }
 
     formatLine(_key: string, point: ChartPoint, chart: ChartData) {
-        const value = this.formatBar(point, chart.size);
-        const label = this.formatLabel(point);
-        const key = this.options.structure.y;
+        const [label, unformatted] = this.formatLabel(point, this.options.structure.y);
+        const value = this.formatBar(point, chart.size, unformatted);
 
         if (this.options.labels) {
-            return `${this.safeSpace(label)}${key}${value}`;
+            return `${label}${value}`;
         }
 
-        return `${key}${value}`;
+        return `${value}`;
     }
 
     format(chart: ChartData) {
