@@ -43,7 +43,7 @@ class ChartProcessor implements ChartDataProcessor {
             return avg * 100;
         }
 
-        return undefined;
+        return 0;
     }
 
     scale(value: number) {

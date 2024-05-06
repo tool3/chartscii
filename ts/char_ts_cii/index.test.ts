@@ -25,20 +25,20 @@ function generateChartData() {
 describe('chartscii tests', () => {
     let data, chart: any;
 
-    // beforeEach(() => {
-    //     data = [...Array(10).keys()];
-    //     chart = new Chartscii(data);
-    // });
+    beforeEach(() => {
+        data = [...Array(10).keys()];
+        chart = new Chartscii(data);
+    });
 
-    // it('should initialize chart array with all values', () => {
-    //     const result = chart.get();
-    //     expect(result.length).to.equal(10);
-    // });
+    it('should initialize chart array with all values', () => {
+        const result = [...chart.chart.values()];
+        expect(result.length).to.equal(10);
+    });
 
-    // it('should support 0 values', () => {
-    //     const result = chart.get();
-    //     expect(result[0]).to.include({ value: '0' });
-    // });
+    it('should support 0 values', () => {
+        const result = [...chart.chart.values()][0]
+        expect(result).to.deep.equal({ value: 0, color: undefined, label: '0', scaled: 0, percentage: 0 });
+    });
 
     it('should support { value }', () => {
         const data = [...Array(10).keys()].map((key) => {
