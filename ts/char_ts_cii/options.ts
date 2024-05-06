@@ -11,17 +11,19 @@ const options: ChartOptions = {
     char: '█',
     naked: false,
     width: 50,
-    height: 50,
+    height: 10,
     theme: '',
     max: {
         label: 0,
-        value: 0
+        value: 0,
+        scaled: 0
     },
     structure: {
         y: '╢',
         x: '══',
-        leftCorner: '╚',
-        noLabelChar: '║'
+        bottomLeft: '╚',
+        axis: '║',
+        topLeft: '╔'
     },
 }
 

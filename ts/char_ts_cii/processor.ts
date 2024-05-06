@@ -15,16 +15,23 @@ class ChartProcessor implements ChartDataProcessor {
 
     calculateData(data: InputData[]): number {
         const total = this.calculateTotal(data);
-        this.options.max.value = total;
 
         return data.reduce<number>((a, p) => {
             const value = typeof p === "number" ? p : p.value
-            const label = typeof p === "number" ? p.toString() : p.label;
+            const label = typeof p === "number" ? p.toString() : (p.label || p.value.toString());
+
+            this.options.max.value = value >= this.options.max.value ? value : this.options.max.value;
+            
+            const scaledValue = this.scale(value);
+            this.options.max.scaled = scaledValue >= this.options.max.scaled ? scaledValue : this.options.max.scaled;
 
             const percentage = this.percentage(value, total);
             const percentageLength = percentage ? percentage.toFixed(2).length + 5 : 0;
             const potential = this.options.percentage ? label.length + percentageLength : label.length + 1;
-            this.options.max.label = potential > this.options.max.label ? potential : this.options.max.label;
+
+            if (this.options.labels) {
+                this.options.max.label = potential > this.options.max.label ? potential : this.options.max.label;
+            }
 
             return a + value;
         }, 0);
@@ -40,11 +47,7 @@ class ChartProcessor implements ChartDataProcessor {
     }
 
     scale(value: number) {
-        if (this.options.max.value && this.options.width) {
-            return Math.ceil((value / this.options.max.value) * this.options.width);
-        }
-
-        return value;
+        return Math.round((value / this.options.max.value) * this.options.width);
     }
 
     preprocess(data: InputData[]): { processed: InputData[], key: string, total: number } {
@@ -65,7 +68,7 @@ class ChartProcessor implements ChartDataProcessor {
             const { color = this.options.color, label, value } = typeof point === "number" ? { value: point, label: point.toString() } : point;
             const scaledValue = this.scale(value);
             const formattedPoint = {
-                label,
+                label: label || value.toString(),
                 value,
                 color,
                 scaled: scaledValue,
@@ -78,11 +81,15 @@ class ChartProcessor implements ChartDataProcessor {
     }
 
     sort(data: InputData[]): InputData[] {
-        return data.sort((a, b) => {
-            const first = typeof a === "number" ? a : a.value;
-            const second = typeof b === "number" ? b : b.value;
-            return first - second;
-        });
+        if (this.options.sort) {
+            return data.sort((a, b) => {
+                const first = typeof a === "number" ? a : a.value;
+                const second = typeof b === "number" ? b : b.value;
+                return first - second;
+            });
+        }
+
+        return data;
     }
 }
 

@@ -9,7 +9,7 @@ class Chartscii {
     private asciiChart: string;
 
     constructor(data: InputData[], options?: ChartOptions) {
-        const config = { ...defaultOptions, ...options };
+        const config = { ...defaultOptions, ...options, ...{ max: { label: 0, value: 0, scaled: 0 } } };
         const processor = new ChartProcessor(config);
         const [chart, processedOptions] = processor.process(data);
 

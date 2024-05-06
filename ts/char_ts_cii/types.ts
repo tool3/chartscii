@@ -22,13 +22,15 @@ export type ChartOptions = {
     max?: {
         label: number;
         value: number;
+        scaled: number;
     },
     orientation?: 'vertical' | 'horizontal';
     structure?: {
         y: string;
         x: string;
-        leftCorner: string;
-        noLabelChar: string;
+        bottomLeft: string;
+        topLeft: string;
+        axis: string;
     },
 }
 

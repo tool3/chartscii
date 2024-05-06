@@ -1,0 +1,20 @@
+{
+  "name": "char_ts_cii",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "mocha -r ts-node/register index.test.ts --timeout 50000",
+    "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" "
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/mocha": "10.0.6",
+    "mocha": "10.4.0",
+    "snaptdout": "2.1.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.4.5"
+  }
+}
