@@ -13,9 +13,10 @@ const colors = [
 const data = [];
 for (let i = 0; i < colors.length; i++) {
     const color = colors[i];
-    data.push({ value: i + 1, color, label: `label ${i}` });
+    data.push({ value: i + 1, color, label: `label ${i}${i}` });
 }
 const chart1 = new Chartscii(data, {
+    colorLabels: true,
     labels: false,
     width: 100,
     height: 10,
@@ -24,10 +25,11 @@ const chart1 = new Chartscii(data, {
 });
 console.log(chart1.create());
 const chart2 = new Chartscii(data, {
-    labels: false,
+    colorLabels: true,
     width: 100,
-    height: 10,
+    height: 20,
     barWidth: 5,
+    color: 'green',
     // fill: '░',
     orientation: 'vertical'
 });

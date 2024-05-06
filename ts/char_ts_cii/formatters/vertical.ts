@@ -14,9 +14,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
 
     public format(): string {
         const maxHeight = this.getMaxHeight();
-
         const barWidth = this.options.barWidth || this.getMaxLabelWidth() || 1;
-        const verticalSpace = this.options.labels ? 1 : 0;
 
         const avg = Math.round(this.options.width / this.chart.length);
         const median = Math.floor(avg - barWidth);
@@ -27,7 +25,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
 
         const diff = padding ? (avg - padding - barWidth) : 0;
 
-        const verticalChart = this.initializeVerticalChart(maxHeight, padding, verticalSpace);
+        const verticalChart = this.initializeVerticalChart(maxHeight, padding);
 
         this.populateChart(verticalChart, maxHeight, padding + diff, scaledWidth, barWidth);
         return this.composeFinalChart(verticalChart, barWidth, padding, diff);
@@ -60,8 +58,8 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         return 0;
     }
 
-    private initializeVerticalChart(maxHeight: number, padding: number, verticalSpace: number): string[][] {
-        return Array(maxHeight + verticalSpace).fill('').map(() => Array(this.chart.length).fill('').map(() => ' '.repeat(padding)));
+    private initializeVerticalChart(maxHeight: number, padding: number): string[][] {
+        return Array(maxHeight).fill('').map(() => Array(this.chart.length).fill('').map(() => ' '.repeat(padding)));
     }
 
     private populateChart(verticalChart: string[][], maxHeight: number, padding: number, scaledWidth: number, barWidth: number): void {
@@ -109,15 +107,32 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         }
     }
 
-    private getLabel(maxLabelWidth: number, padding: number, scaledWidth: number, point: ChartPoint): string {
-        const label = point.label.padEnd(maxLabelWidth + scaledWidth, ' ');
-        return ' '.repeat(padding + scaledWidth) + label + ' '.repeat(padding + scaledWidth);
+    private formatLabel(label: string, color?: string) {
+        if (this.options.colorLabels) {
+            const coloredLabel = (color || this.options.color) ? this.colorify(label, color) : label;
+            return coloredLabel;
+        }
+
+        return label;
+    }
+
+    private formatLabels(padding: number, diff: number, barWidth: number) {
+        const formatted: string[] = [];
+        const widthDiff = Math.floor((this.options.width) / this.chart.length);
+
+        this.chart.forEach((point, i) => {
+            const pad = (padding + diff) - point.label.length + (barWidth - 1);
+            const startPad = ''
+            formatted.push(' '.repeat(1) + this.formatLabel(point.label, point.color) + ' '.repeat(pad));
+        })
+
+        return formatted.join('');
     }
 
     private composeFinalChart(verticalChart: string[][], barWidth: number, padding: number, avg: number): string {
         const chart = verticalChart.map(row => {
             if (!this.options.naked) {
-                return this.options.structure.axis + ' ' + row.join('')
+                return this.options.structure.axis + row.join('')
             }
             return row.join('')
         })
@@ -125,6 +140,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         if (!this.options.naked) {
             chart.unshift(this.makeChartLabel());
             chart.push(this.makeVerticalChartBottom(barWidth, padding, avg, verticalChart[verticalChart.length - 1]));
+            chart.push(this.formatLabels(padding, avg, barWidth));
         }
         return chart.join('\n');
     }
@@ -134,14 +150,15 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
     }
 
     private makeVerticalChartBottom(barWidth: number, padding: number, avg: number, lastRow: string[]): string {
-        return this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width / 2);
+        const width = this.options.width / 2;
+        const exceeding = barWidth * this.chart.length > this.options.width;
+        const excess = (barWidth * this.chart.length) - this.options.width;
+
+        const extra = (excess - barWidth) / 2;
+        
+        const pad = exceeding ? width + extra + (extra / 2) : width;
+        return this.options.structure.bottomLeft + this.options.structure.x.repeat(pad + 1);
     }
 }
 
 export default VerticalChartFormatter;
-
-
-// width: 20
-// barWidth: 2
-// median: 10
-// padding: 4
