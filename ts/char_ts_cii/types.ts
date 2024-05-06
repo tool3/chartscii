@@ -19,6 +19,7 @@ export type ChartOptions = {
     width?: number;
     height?: number;
     theme?: string;
+    barWidth?: number;
     max?: {
         label: number;
         value: number;
@@ -58,11 +59,13 @@ export interface ChartDataProcessor {
     sort(data: InputData[]): InputData[];
 }
 
-export interface ChartDataFormatter {
+export interface HorizontalChartDataFormatter {
     format(chart: ChartData): string;
 }
 
-
+export interface VerticalChartDataFormatter {
+    format(...any: any): string;
+}
 
 
 

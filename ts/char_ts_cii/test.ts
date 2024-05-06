@@ -13,11 +13,26 @@ const colors = [
 const data = [];
 for (let i = 0; i < colors.length; i++) {
     const color = colors[i];
-    data.push({ value: i + 1, color });
+    data.push({ value: i + 1, color, label: `label ${i}` });
 }
-const chart = new Chartscii(data, { labels: false, width: 100, height: 15 });
+const chart1 = new Chartscii(data, {
+    labels: false,
+    width: 100,
+    height: 10,
+    barWidth: 1,
+    // orientation: 'vertical'
+});
+console.log(chart1.create());
+const chart2 = new Chartscii(data, {
+    labels: false,
+    width: 100,
+    height: 10,
+    barWidth: 5,
+    // fill: '░',
+    orientation: 'vertical'
+});
 
-console.log(chart.create());
+console.log(chart2.create());
 
 // const data = Array(10).fill(null).map((_, i) => ({ label: `label ${i}`, value: i }))
 // const chart = new Chartscii(data,

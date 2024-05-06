@@ -1,7 +1,8 @@
-import HorizontalChartFormatter from './formatter';
-import ChartProcessor from './processor';
+import HorizontalChartFormatter from './formatters/horizontal';
+import ChartProcessor from './processor/processor';
 import defaultOptions from './options';
 import { InputData, ChartOptions, ChartData } from './types';
+import VerticalChartFormatter from './formatters/vertical';
 
 
 class Chartscii {
@@ -14,8 +15,8 @@ class Chartscii {
         const [chart, processedOptions] = processor.process(data);
 
         this.chart = chart;
-        const formatter = new HorizontalChartFormatter(processedOptions);
-        this.asciiChart = formatter.format(this.chart);
+        const chartFormatter = config.orientation === 'vertical' ? new VerticalChartFormatter(chart, processedOptions) : new HorizontalChartFormatter(processedOptions)
+        this.asciiChart = chartFormatter.format(this.chart);
     }
 
     create() {

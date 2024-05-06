@@ -13,6 +13,7 @@ const options: ChartOptions = {
     width: 50,
     height: 10,
     theme: '',
+    barWidth: 1,
     max: {
         label: 0,
         value: 0,

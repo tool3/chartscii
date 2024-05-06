@@ -1,4 +1,4 @@
-import { ChartDataProcessor, InputData, ChartOptions, ChartData } from './types';
+import { ChartDataProcessor, InputData, ChartOptions, ChartData } from '../types';
 
 class ChartProcessor implements ChartDataProcessor {
     private options: ChartOptions;
@@ -47,7 +47,8 @@ class ChartProcessor implements ChartDataProcessor {
     }
 
     scale(value: number) {
-        return Math.round((value / this.options.max.value) * this.options.width);
+        const size = this.options.orientation === 'vertical' ? this.options.height : this.options.width;
+        return Math.round((value / this.options.max.value) * size);
     }
 
     preprocess(data: InputData[]): { processed: InputData[], key: string, total: number } {

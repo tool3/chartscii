@@ -1,7 +1,7 @@
-import { ChartDataFormatter, ChartOptions, ChartData, ChartPoint } from './types';
+import { HorizontalChartDataFormatter, ChartOptions, ChartData, ChartPoint } from '../types';
 import style from 'styl3';
 
-class HorizontalChartFormatter implements ChartDataFormatter {
+class HorizontalChartFormatter implements HorizontalChartDataFormatter {
     private options: ChartOptions
     private colors: Record<string, any>;
 
@@ -26,10 +26,6 @@ class HorizontalChartFormatter implements ChartDataFormatter {
 
     pad(space: number) {
         return ' '.repeat(space)
-    }
-
-    reset(text: string) {
-        return this.colors.reset(text);
     }
 
 
