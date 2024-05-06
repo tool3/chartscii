@@ -15,10 +15,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
     public format(): string {
         const maxHeight = this.getMaxHeight();
         const barWidth = this.options.barWidth || this.getMaxLabelWidth() || 1;
-
         const avg = Math.round(this.options.width / this.chart.length);
-        const median = Math.floor(avg - barWidth);
-        const scaledWidth = Math.floor(median / barWidth);
 
         const space = Math.round((avg - barWidth) / 2);
         const padding = space > 0 ? space : 0;
@@ -27,7 +24,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
 
         const verticalChart = this.initializeVerticalChart(maxHeight, padding);
 
-        this.populateChart(verticalChart, maxHeight, padding + diff, scaledWidth, barWidth);
+        this.populateChart(verticalChart, maxHeight, padding + diff, barWidth);
         return this.composeFinalChart(verticalChart, barWidth, padding, diff);
     }
 
@@ -62,7 +59,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         return Array(maxHeight).fill('').map(() => Array(this.chart.length).fill('').map(() => ' '.repeat(padding)));
     }
 
-    private populateChart(verticalChart: string[][], maxHeight: number, padding: number, scaledWidth: number, barWidth: number): void {
+    private populateChart(verticalChart: string[][], maxHeight: number, padding: number, barWidth: number): void {
         this.chart.forEach((point, index) => {
             const value = point.scaled;
             const height = Math.round((value / maxHeight) * maxHeight);
@@ -80,11 +77,6 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
                     verticalChart[i][index] = bars;
                 }
             }
-
-            // if (this.options.labels) {
-            //     const label = this.getLabel(maxLabelWidth, padding, scaledWidth, point);
-            //     verticalChart[maxHeight][index] = label;
-            // }
         });
     }
 
@@ -139,7 +131,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
 
         if (!this.options.naked) {
             chart.unshift(this.makeChartLabel());
-            chart.push(this.makeVerticalChartBottom(barWidth, padding, avg, verticalChart[verticalChart.length - 1]));
+            chart.push(this.makeVerticalChartBottom(barWidth));
             chart.push(this.formatLabels(padding, avg, barWidth));
         }
         return chart.join('\n');
@@ -149,9 +141,9 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         return this.options.label;
     }
 
-    private makeVerticalChartBottom(barWidth: number, padding: number, avg: number, lastRow: string[]): string {
+    private makeVerticalChartBottom(barWidth: number): string {
         const width = this.options.width / 2;
-        const exceeding = barWidth * this.chart.length > this.options.width;
+        const exceeding = (barWidth * this.chart.length) > this.options.width;
         const excess = (barWidth * this.chart.length) - this.options.width;
 
         const extra = (excess - barWidth) / 2;
