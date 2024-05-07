@@ -127,6 +127,7 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private makeVerticalChartBottom(barWidth: number, padding: number): string {
+        const isPercentage = this.options.percentage ? 1 : 0;
         const width = (barWidth + padding) * this.chart.length;
 
         return this.options.structure.bottomLeft + this.options.structure.x.repeat(width);

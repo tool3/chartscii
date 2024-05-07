@@ -114,7 +114,7 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     formatBottom() {
-        const addOne = this.options.labels ? 1 : 0;
+        const addOne = this.options.labels && !this.options.percentage ? 1 : 0;
         const space = this.pad(this.options.max.label + addOne);
         return space + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.max.scaled);
     }

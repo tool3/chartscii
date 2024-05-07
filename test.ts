@@ -1,114 +1,37 @@
-import Chartscii from '.';
-const colors = [
+import Chartscii from './chartscii';
+
+let color = '';
+
+const colors = ['green',
     'red',
-    'green',
-    'yellow',
-    'blue',
-    'purple',
-    'pink',
     'cyan',
-    'orange',
-    'purple',
     'pink',
+    'blue',
+    'yellow'
 ];
 
-const data = [];
-for (let i = 0; i < colors.length; i++) {
-    const color = colors[i];
-    data.push({ value: i + 1, color, label: color });
-}
-const chart1 = new Chartscii(data, {
-    colorLabels: true,
-    labels: false,
-    // width: 100,
-    // height: 10,
-    // barWidth: 1,
-    // width: process.stdout.columns - 1,
-    // orientation: 'vertical'
-});
-console.log(chart1.create());
-
-// const chart2 = new Chartscii(data, {
-//     colorLabels: true,
-//     // width: 100,
-//     // height: 20,
-//     // barWidth: 2,
-//     // padding: 2, 
-//     color: 'green',
-//     // percentage: true,
-//     // fill: '░',
-//     orientation: 'vertical'
-// });
-const chart2 = new Chartscii(data, { barWidth: 2, width: 100, colorLabels: true, orientation: 'vertical' });
-
-console.log(chart2.create());
-
-// const data = Array(10).fill(null).map((_, i) => ({ label: `label ${i}`, value: i }))
-// const chart = new Chartscii(data,
-//     {
-//         color: 'green',
-//         width: 50,
-//         height: 10,
-//         fill: '░',
-//         sort: false,
-//         percentage: true,
-//         colorLabels: true
-//     }
-// );
-// console.log(chart.create());
-// const data = [];
-// let count = 0;
-
-// for (let i = 1; i <= 20; i++) {
-//     const value = Math.floor(Math.random() * 1000) + 1;
-//     data.push({ value, label: `label ${count++}`, color: value > 200 ? 'green' : 'red' });
-// }
-
-// // create chart
-// const chart = new Chartscii(data, {
-//     label: 'Conditional Colors',
-//     color: 'green',
-//     width: 50,
-//     sort: false,
-//     reverse: false,
-//     char: '■',
-//     colorLabels: true,
-//     percentage: true,
-//     labels: true
-// });
-
-// console.log(chart.create())
-
-
-// let color = '';
-
-// const colors = ['green',
-//     'red',
-//     'cyan',
-//     'pink',
-//     'blue',
-//     'yellow'
-// ];
-
 // generate random chart data
-// const data = [];
-// let count = 0;
+const data = [];
+let count = 0;
 
-// for (let i = 1; i <= 20; i++) {
+for (let i = 1; i <= 20; i++) {
 
-//     color = colors[Math.floor(Math.random() * colors.length)];
-//     data.push({ value: Math.floor(Math.random() * 1000) + 1, color, label: `${count++}` });
-// }
+    color = colors[Math.floor(Math.random() * colors.length)];
+    data.push({ value: Math.floor(Math.random() * 1000) + 1, color, label: `${count++}` });
+}
 
-// // create chart
-// const chart = new Chartscii(data, {
-//     label: 'Example Chart',
-//     width: 50,
-//     percentage: true,
-//     reverse: true,
-//     color: color,
-//     char: '═',
-//     colorLabels: true
-// });
 
-// console.log(chart.create());
+const chart = new Chartscii(data, {
+    label: 'Example Chart',
+    width: 100,
+    percentage: true,
+    reverse: true,
+    color: color,
+    char: '═',
+    padding: 2,
+    barWidth: 2,
+    colorLabels: true,
+    orientation: 'vertical'
+});
+
+console.log(chart.create());
