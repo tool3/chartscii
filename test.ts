@@ -20,18 +20,16 @@ for (let i = 1; i <= 20; i++) {
     data.push({ value: Math.floor(Math.random() * 1000) + 1, color, label: `${count++}` });
 }
 
-
 const chart = new Chartscii(data, {
     label: 'Example Chart',
     width: 100,
-    percentage: true,
+    // percentage: true,
     reverse: true,
     color: color,
-    char: '═',
     padding: 2,
-    barWidth: 2,
+    // barWidth: 2,
     colorLabels: true,
-    orientation: 'vertical'
+    fill: '+',
+    // orientation: 'vertical'
 });
-
 console.log(chart.create());

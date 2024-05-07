@@ -40,7 +40,7 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     formatFill(point: ChartPoint) {
         if (this.options.fill) {
-            const diff = (this.options.width * 2) - point.scaled;
+            const diff = this.options.width - point.scaled;
             return this.options.fill.repeat(diff);
         }
 
@@ -116,6 +116,7 @@ class HorizontalChartFormatter extends ChartFormatter {
     formatBottom() {
         const addOne = this.options.labels && !this.options.percentage ? 1 : 0;
         const space = this.pad(this.options.max.label + addOne);
+        console.log(this.options.width);
         return space + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.max.scaled);
     }
 

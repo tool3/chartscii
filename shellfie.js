@@ -24,13 +24,17 @@ for (let i = 1; i <= 20; i++) {
 // create chart
 const chart = new Chartscii(data, {
     label: 'Example Chart',
-    width: 100,
-    percentage: true,
+    width: 50,
+    // percentage: true,
     reverse: true,
     color: color,
-    char: '═',
-    colorLabels: true
+    padding: 2,
+    barWidth: 2,
+    colorLabels: true,
+    fill: '+',
+    // orientation: 'vertical'
 });
+
 console.log('a');
 (async () => {
     try {
