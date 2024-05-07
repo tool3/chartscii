@@ -8,28 +8,34 @@ const colors = [
     'pink',
     'cyan',
     'orange',
+    'purple',
+    'pink',
 ];
 
 const data = [];
 for (let i = 0; i < colors.length; i++) {
     const color = colors[i];
-    data.push({ value: i + 1, color, label: `label ${i}${i}` });
+    data.push({ value: i + 1, color, label: color });
 }
 const chart1 = new Chartscii(data, {
     colorLabels: true,
     labels: false,
     width: 100,
     height: 10,
-    barWidth: 1,
+    // barWidth: 1,
+    // width: process.stdout.columns - 1,
     // orientation: 'vertical'
 });
 console.log(chart1.create());
+
 const chart2 = new Chartscii(data, {
     colorLabels: true,
-    width: 100,
-    height: 20,
-    barWidth: 5,
+    // width: 100,
+    // height: 20,
+    // barWidth: 2,
+    // padding: 2, 
     color: 'green',
+    // percentage: true,
     // fill: '░',
     orientation: 'vertical'
 });

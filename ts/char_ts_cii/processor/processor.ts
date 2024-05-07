@@ -1,8 +1,12 @@
 import { ChartDataProcessor, InputData, ChartOptions, ChartData } from '../types';
+import ChartValidator from '../validator/validator';
 
 class ChartProcessor implements ChartDataProcessor {
     private options: ChartOptions;
+    private validator: ChartValidator;
+
     constructor(options: ChartOptions) {
+        this.validator = new ChartValidator(options);
         this.options = options;
     }
 
@@ -21,13 +25,13 @@ class ChartProcessor implements ChartDataProcessor {
             const label = typeof p === "number" ? p.toString() : (p.label || p.value.toString());
 
             this.options.max.value = value >= this.options.max.value ? value : this.options.max.value;
-            
+
             const scaledValue = this.scale(value);
             this.options.max.scaled = scaledValue >= this.options.max.scaled ? scaledValue : this.options.max.scaled;
 
             const percentage = this.percentage(value, total);
             const percentageLength = percentage ? percentage.toFixed(2).length + 5 : 0;
-            const potential = this.options.percentage ? label.length + percentageLength : label.length + 1;
+            const potential = this.options.percentage ? label.length + percentageLength : label.length;
 
             if (this.options.labels) {
                 this.options.max.label = potential > this.options.max.label ? potential : this.options.max.label;
@@ -59,10 +63,10 @@ class ChartProcessor implements ChartDataProcessor {
     }
 
     process(data: InputData[]): [ChartData, ChartOptions] {
-        if (!Array.isArray(data)) throw new Error("Input data must be an array");
-        if (typeof data[0] === "string") throw new Error("Input values must be numbers");
-
         const { processed, total } = this.preprocess(data);
+
+        this.validator.validate(data);
+
         const chartData = new Map();
 
         processed.forEach((point, i) => {

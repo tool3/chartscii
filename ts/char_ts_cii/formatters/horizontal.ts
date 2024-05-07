@@ -71,7 +71,8 @@ class HorizontalChartFormatter implements HorizontalChartDataFormatter {
 
     formatLabelSpace(label: string) {
         if (this.options.max.label) {
-            const space = this.options.max.label - (label.length);
+            const addOne = this.options.labels && !this.options.percentage ? 1 : 0;
+            const space = this.options.max.label - (label.length) + addOne;
             return this.pad(space)
         }
 
@@ -127,8 +128,9 @@ class HorizontalChartFormatter implements HorizontalChartDataFormatter {
     }
 
     formatBottom() {
-        const space = this.pad(this.options.max.label);
-        return space + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.max.scaled / 2);
+        const addOne = this.options.labels ? 1 : 0;
+        const space = this.pad(this.options.max.label + addOne);
+        return space + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.max.scaled);
     }
 
 }

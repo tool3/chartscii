@@ -71,6 +71,7 @@ describe('chartscii tests', () => {
 });
 
 describe('examples', () => {
+
     it('should match example', async () => {
         const data = [];
         for (let i = 0; i < 20; i++) {
@@ -79,6 +80,7 @@ describe('examples', () => {
         const chart = new Chartscii(data, { color: 'pink', colorLabels: true });
         await snap(chart.create(), 'chart');
     });
+
     it('should support percentage', async () => {
         const data = [];
         for (let i = 0; i < 20; i++) {
@@ -122,16 +124,19 @@ describe('examples', () => {
         const chart = new Chartscii(data, { theme: 'lush', colorLabels: true });
         await snap(chart.create(), 'lush theme');
     });
+
     it('should support standard theme', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { theme: 'standard', colorLabels: true });
         await snap(chart.create(), 'standard theme');
     });
+
     it('should support beach theme', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { theme: 'beach', colorLabels: true });
         await snap(chart.create(), 'beach theme');
     });
+
     it('should support default theme', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { colorLabels: true });
@@ -139,3 +144,84 @@ describe('examples', () => {
     });
 
 });
+
+describe('vertical', () => {
+
+    it('should support vertical orientation', async () => {
+        const data = [];
+        for (let i = 0; i < 10; i++) {
+            data.push({ value: i + 1, label: `label ${i}` });
+        }
+        const chart = new Chartscii(data, { width: 100, color: 'pink', colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'vertical');
+    });
+
+    it('should support barWidth', async () => {
+        const data = [];
+        for (let i = 0; i < 10; i++) {
+            data.push({ value: i + 1, label: `label ${i}` });
+        }
+        const chart = new Chartscii(data, { width: 100, barWidth: 5, color: 'green', colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'barWidth');
+    });
+
+    it('should support color per bar and label', async () => {
+        const data = [];
+        for (let i = 0; i < 10; i++) {
+            data.push({ value: i + 1, label: `label ${i}`, color: colors[i] });
+        }
+        const chart = new Chartscii(data, { width: 100, barWidth: 5, colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'vertical colors');
+    });
+
+    it('should support labeless vertical chart', async () => {
+        const data = [];
+        for (let i = 0; i < 20; i++) {
+            data.push(i + 1);
+        }
+        const chart = new Chartscii(data, { labels: false, orientation: 'vertical' });
+
+        await snap(chart.create(), 'labeless vertical chart');
+    });
+
+    it('should support labeless colorful chart', async () => {
+        const data = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color });
+        }
+        const chart = new Chartscii(data, { labels: false, orientation: 'vertical' });
+        await snap(chart.create(), 'labeless color vertical chart');
+    });
+
+    it('should support pastel theme', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { theme: 'pastel', barWidth: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'pastel theme vertical');
+    });
+
+    it('should support lush theme', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { theme: 'lush', barWidth: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'lush theme vertical');
+    });
+
+    it('should support standard theme', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { theme: 'standard', barWidth: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'standard theme vertical');
+    });
+
+    it('should support beach theme', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { theme: 'beach', barWidth: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'beach theme vertical');
+    });
+
+    it('should support default theme', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { barWidth: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'default theme vertical');
+    });
+});
+

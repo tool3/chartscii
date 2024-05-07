@@ -13,7 +13,7 @@ const options: ChartOptions = {
     width: 50,
     height: 10,
     theme: '',
-    barWidth: 1,
+    // barWidth: 1,
     max: {
         label: 0,
         value: 0,
@@ -21,7 +21,7 @@ const options: ChartOptions = {
     },
     structure: {
         y: '╢',
-        x: '══',
+        x: '═',
         bottomLeft: '╚',
         axis: '║',
         topLeft: '╔'

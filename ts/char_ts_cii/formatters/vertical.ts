@@ -1,6 +1,5 @@
 import { VerticalChartDataFormatter, ChartOptions, ChartData, ChartPoint } from '../types';
 import style from 'styl3';
-
 class VerticalChartFormatter implements VerticalChartDataFormatter {
     private chart: ChartPoint[];
     private options: ChartOptions;
@@ -14,18 +13,18 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
 
     public format(): string {
         const maxHeight = this.getMaxHeight();
-        const barWidth = this.options.barWidth || this.getMaxLabelWidth() || 1;
-        const avg = Math.round(this.options.width / this.chart.length);
+        const barWidth = this.options.barWidth || Math.floor(this.options.width / this.chart.length) || 1;
 
-        const space = Math.round((avg - barWidth) / 2);
-        const padding = space > 0 ? space : 0;
+        const totalBarsWidth = this.chart.length * barWidth;
+        const diffWidth = this.options.width - totalBarsWidth;
+        const defaultPadding = Math.round(diffWidth / this.chart.length);
 
-        const diff = padding ? (avg - padding - barWidth) : 0;
+        const padding = this.options.padding || defaultPadding
 
         const verticalChart = this.initializeVerticalChart(maxHeight, padding);
 
-        this.populateChart(verticalChart, maxHeight, padding + diff, barWidth);
-        return this.composeFinalChart(verticalChart, barWidth, padding, diff);
+        this.populateChart(verticalChart, maxHeight, padding, barWidth);
+        return this.composeFinalChart(verticalChart, barWidth, padding);
     }
 
     colorify(txt: string, color?: string) {
@@ -48,8 +47,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
 
     private getMaxLabelWidth(): number {
         if (this.options.labels) {
-            const labelWidths = this.chart.map(point => point.label.length);
-            return Math.max(...labelWidths);
+            return this.options.max.label;
         }
 
         return 0;
@@ -71,13 +69,21 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
                 const fill = this.formatFill(barWidth, padding, color);
                 const fills = this.options.fill ? fill : spaces;
 
-                if (i < maxHeight - height) {
+                if (i + 1 < maxHeight - height) {
                     verticalChart[i][index] = fills;
                 } else {
                     verticalChart[i][index] = bars;
                 }
             }
         });
+    }
+
+    private formatPercentage(point: ChartPoint) {
+        if (this.options.percentage) {
+            return `(${point.percentage.toFixed(2)}%)`
+        }
+
+        return '';
     }
 
     private formatSpace(barWidth: number, padding: number): string {
@@ -99,40 +105,39 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         }
     }
 
-    private formatLabel(label: string, color?: string) {
+    private formatLabel(point: ChartPoint) {
+        const label = point.percentage ? `${point.label} ${this.formatPercentage(point)}` : point.label;
         if (this.options.colorLabels) {
-            const coloredLabel = (color || this.options.color) ? this.colorify(label, color) : label;
+            const coloredLabel = (point.color || this.options.color) ? this.colorify(label, point.color) : label;
             return coloredLabel;
         }
 
         return label;
     }
 
-    private formatLabels(padding: number, diff: number, barWidth: number) {
+    private formatLabels(verticalChart: string[][], barWidth: number, padding: number) {
         const formatted: string[] = [];
-        const widthDiff = Math.floor((this.options.width) / this.chart.length);
-
         this.chart.forEach((point, i) => {
-            const pad = (padding + diff) - point.label.length + (barWidth - 1);
-            const startPad = ''
-            formatted.push(' '.repeat(1) + this.formatLabel(point.label, point.color) + ' '.repeat(pad));
+            const pad = Math.abs((padding + barWidth) - point.label.length);
+            const padStart = i === 0 ? Math.floor(padding / 2) + 1 : 0;
+            formatted.push(' '.repeat(padStart) + this.formatLabel(point) + ' '.repeat(pad));
         })
 
         return formatted.join('');
     }
 
-    private composeFinalChart(verticalChart: string[][], barWidth: number, padding: number, avg: number): string {
+    private composeFinalChart(verticalChart: string[][], barWidth: number, padding: number): string {
         const chart = verticalChart.map(row => {
             if (!this.options.naked) {
-                return this.options.structure.axis + row.join('')
+                return this.options.structure.axis + ' '.repeat(padding / 2) + row.join('')
             }
             return row.join('')
         })
 
         if (!this.options.naked) {
             chart.unshift(this.makeChartLabel());
-            chart.push(this.makeVerticalChartBottom(barWidth));
-            chart.push(this.formatLabels(padding, avg, barWidth));
+            chart.push(this.makeVerticalChartBottom(verticalChart, barWidth, padding));
+            chart.push(this.formatLabels(verticalChart, barWidth, padding));
         }
         return chart.join('\n');
     }
@@ -141,16 +146,20 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         return this.options.label;
     }
 
-    private makeVerticalChartBottom(barWidth: number): string {
-        const width = this.options.width / 2;
-        const exceeding = (barWidth * this.chart.length) > this.options.width;
-        const excess = (barWidth * this.chart.length) - this.options.width;
+    private stripAnsi(str: string) {
+        // const ansiRegex = /[\u001b\u009b][[(][()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><v]/g;
+        const ansiRegex = /[\u001b\u009b]\[[0-9;]*[mGKHfJABCDsu]/g;
+        return str.replace(ansiRegex, '');
+    }
 
-        const extra = (excess - barWidth) / 2;
-        
-        const pad = exceeding ? width + extra + (extra / 2) : width;
-        return this.options.structure.bottomLeft + this.options.structure.x.repeat(pad + 1);
+    private makeVerticalChartBottom(verticalChart: string[][], barWidth: number, padding: number): string {
+        const width = (barWidth + padding) * this.chart.length;
+
+        return this.options.structure.bottomLeft + this.options.structure.x.repeat(width);
     }
 }
 
 export default VerticalChartFormatter;
+
+// CURRENTLY UNSUPPORTED
+// PERCENTAGE

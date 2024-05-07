@@ -20,6 +20,7 @@ export type ChartOptions = {
     height?: number;
     theme?: string;
     barWidth?: number;
+    padding?: number;
     max?: {
         label: number;
         value: number;
