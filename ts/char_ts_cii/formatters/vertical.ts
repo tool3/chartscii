@@ -118,9 +118,10 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
     private formatLabels(verticalChart: string[][], barWidth: number, padding: number) {
         const formatted: string[] = [];
         this.chart.forEach((point, i) => {
-            const pad = Math.abs((padding + barWidth) - point.label.length);
-            const padStart = i === 0 ? Math.floor(padding / 2) + 1 : 0;
-            formatted.push(' '.repeat(padStart) + this.formatLabel(point) + ' '.repeat(pad));
+            const diff = barWidth > point.label.length ? barWidth - point.label.length : point.label.length - barWidth;
+            const padLeft = i === 0 ? Math.floor(padding / 2) + 1 : 0;
+            const padRight = Math.abs((padding +barWidth) - point.label.length);
+            formatted.push(' '.repeat(padLeft) + this.formatLabel(point) + ' '.repeat(padRight));
         })
 
         return formatted.join('');

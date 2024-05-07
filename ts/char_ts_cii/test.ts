@@ -20,8 +20,8 @@ for (let i = 0; i < colors.length; i++) {
 const chart1 = new Chartscii(data, {
     colorLabels: true,
     labels: false,
-    width: 100,
-    height: 10,
+    // width: 100,
+    // height: 10,
     // barWidth: 1,
     // width: process.stdout.columns - 1,
     // orientation: 'vertical'

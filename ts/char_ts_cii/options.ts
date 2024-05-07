@@ -10,7 +10,7 @@ const options: ChartOptions = {
     labels: true,
     char: '█',
     naked: false,
-    width: 50,
+    width: 100,
     height: 10,
     theme: '',
     // barWidth: 1,
