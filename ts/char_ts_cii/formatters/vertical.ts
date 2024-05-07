@@ -1,14 +1,15 @@
-import { VerticalChartDataFormatter, ChartOptions, ChartData, ChartPoint } from '../types';
+import { ChartOptions, ChartData, ChartPoint } from '../types';
 import style from 'styl3';
-class VerticalChartFormatter implements VerticalChartDataFormatter {
+import ChartFormatter from './formatter';
+
+class VerticalChartFormatter extends ChartFormatter {
     private chart: ChartPoint[];
     private options: ChartOptions;
-    private colors: Record<string, any>;
 
     constructor(chart: ChartData, options: ChartOptions) {
+        super(options);
         this.chart = [...chart.values()]
         this.options = options;
-        this.colors = style({ theme: this.options.theme });
     }
 
     public format(): string {
@@ -21,43 +22,21 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
 
         const padding = this.options.padding || defaultPadding
 
-        const verticalChart = this.initializeVerticalChart(maxHeight, padding);
+        const verticalChart = this.buildVerticalChart(maxHeight, padding);
 
-        this.populateChart(verticalChart, maxHeight, padding, barWidth);
+        this.formatChart(verticalChart, maxHeight, padding, barWidth);
         return this.composeFinalChart(verticalChart, barWidth, padding);
-    }
-
-    colorify(txt: string, color?: string) {
-        if (color) {
-            if (color.includes('#')) {
-                return this.colors.hex(color)`${txt}`;
-            } else if (color.match(/[0-9]/)) {
-                return this.colors.ansi(color)`${txt}`;
-            } else if (Array.isArray(color)) {
-                return this.colors.rgb(...color)`${txt}`;
-            } else {
-                return this.colors[color]`${txt}`;
-            }
-        }
     }
 
     private getMaxHeight(): number {
         return this.options.max.scaled;
     }
 
-    private getMaxLabelWidth(): number {
-        if (this.options.labels) {
-            return this.options.max.label;
-        }
-
-        return 0;
-    }
-
-    private initializeVerticalChart(maxHeight: number, padding: number): string[][] {
+    private buildVerticalChart(maxHeight: number, padding: number): string[][] {
         return Array(maxHeight).fill('').map(() => Array(this.chart.length).fill('').map(() => ' '.repeat(padding)));
     }
 
-    private populateChart(verticalChart: string[][], maxHeight: number, padding: number, barWidth: number): void {
+    private formatChart(verticalChart: string[][], maxHeight: number, padding: number, barWidth: number): void {
         this.chart.forEach((point, index) => {
             const value = point.scaled;
             const height = Math.round((value / maxHeight) * maxHeight);
@@ -115,12 +94,12 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         return label;
     }
 
-    private formatLabels(verticalChart: string[][], barWidth: number, padding: number) {
+    private formatLabels(barWidth: number, padding: number) {
         const formatted: string[] = [];
         this.chart.forEach((point, i) => {
-            const diff = barWidth > point.label.length ? barWidth - point.label.length : point.label.length - barWidth;
             const padLeft = i === 0 ? Math.floor(padding / 2) + 1 : 0;
-            const padRight = Math.abs((padding +barWidth) - point.label.length);
+            const padRight = Math.abs((padding + barWidth) - point.label.length);
+
             formatted.push(' '.repeat(padLeft) + this.formatLabel(point) + ' '.repeat(padRight));
         })
 
@@ -137,8 +116,8 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
 
         if (!this.options.naked) {
             chart.unshift(this.makeChartLabel());
-            chart.push(this.makeVerticalChartBottom(verticalChart, barWidth, padding));
-            chart.push(this.formatLabels(verticalChart, barWidth, padding));
+            chart.push(this.makeVerticalChartBottom(barWidth, padding));
+            chart.push(this.formatLabels(barWidth, padding));
         }
         return chart.join('\n');
     }
@@ -147,13 +126,7 @@ class VerticalChartFormatter implements VerticalChartDataFormatter {
         return this.options.label;
     }
 
-    private stripAnsi(str: string) {
-        // const ansiRegex = /[\u001b\u009b][[(][()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><v]/g;
-        const ansiRegex = /[\u001b\u009b]\[[0-9;]*[mGKHfJABCDsu]/g;
-        return str.replace(ansiRegex, '');
-    }
-
-    private makeVerticalChartBottom(verticalChart: string[][], barWidth: number, padding: number): string {
+    private makeVerticalChartBottom(barWidth: number, padding: number): string {
         const width = (barWidth + padding) * this.chart.length;
 
         return this.options.structure.bottomLeft + this.options.structure.x.repeat(width);

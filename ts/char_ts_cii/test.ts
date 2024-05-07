@@ -28,17 +28,18 @@ const chart1 = new Chartscii(data, {
 });
 console.log(chart1.create());
 
-const chart2 = new Chartscii(data, {
-    colorLabels: true,
-    // width: 100,
-    // height: 20,
-    // barWidth: 2,
-    // padding: 2, 
-    color: 'green',
-    // percentage: true,
-    // fill: '░',
-    orientation: 'vertical'
-});
+// const chart2 = new Chartscii(data, {
+//     colorLabels: true,
+//     // width: 100,
+//     // height: 20,
+//     // barWidth: 2,
+//     // padding: 2, 
+//     color: 'green',
+//     // percentage: true,
+//     // fill: '░',
+//     orientation: 'vertical'
+// });
+const chart2 = new Chartscii(data, { barWidth: 2, width: 100, colorLabels: true, orientation: 'vertical' });
 
 console.log(chart2.create());
 

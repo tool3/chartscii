@@ -1,27 +1,13 @@
-import { HorizontalChartDataFormatter, ChartOptions, ChartData, ChartPoint } from '../types';
+import { ChartOptions, ChartData, ChartPoint } from '../types';
 import style from 'styl3';
+import ChartFormatter from './formatter';
 
-class HorizontalChartFormatter implements HorizontalChartDataFormatter {
+class HorizontalChartFormatter extends ChartFormatter {
     private options: ChartOptions
-    private colors: Record<string, any>;
 
     constructor(options: ChartOptions) {
+        super(options);
         this.options = options;
-        this.colors = style({ theme: this.options.theme });
-    }
-
-    colorify(txt: string, color?: string) {
-        if (color) {
-            if (color.includes('#')) {
-                return this.colors.hex(color)`${txt}`;
-            } else if (color.match(/[0-9]/)) {
-                return this.colors.ansi(color)`${txt}`;
-            } else if (Array.isArray(color)) {
-                return this.colors.rgb(...color)`${txt}`;
-            } else {
-                return this.colors[color]`${txt}`;
-            }
-        }
     }
 
     pad(space: number) {

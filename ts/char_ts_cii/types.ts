@@ -60,14 +60,4 @@ export interface ChartDataProcessor {
     sort(data: InputData[]): InputData[];
 }
 
-export interface HorizontalChartDataFormatter {
-    format(chart: ChartData): string;
-}
-
-export interface VerticalChartDataFormatter {
-    format(...any: any): string;
-}
-
-
-
 export type ChartOutput = Map<string, string>;
