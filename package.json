@@ -19,6 +19,9 @@
     "ascii",
     "chart"
   ],
+  "files": [
+    "dist"
+  ],
   "author": "Tal Hayut",
   "license": "MIT",
   "devDependencies": {
