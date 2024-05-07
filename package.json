@@ -2,7 +2,8 @@
   "name": "chartscii",
   "version": "next",
   "description": "awesome ascii charts",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "typings": "./dist/types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/tool3/chartscii"
@@ -18,14 +19,8 @@
     "ascii",
     "chart"
   ],
-  "files": [
-    "index.js",
-    "index.d.ts",
-    "consts"
-  ],
   "author": "Tal Hayut",
   "license": "MIT",
-  "typings": "./dist/types/index.d.ts",
   "devDependencies": {
     "@types/chai": "4.3.14",
     "@types/mocha": "10.0.6",
