@@ -1,6 +1,6 @@
 {
   "name": "chartscii",
-  "version": "1.3.2",
+  "version": "2.0.0",
   "description": "awesome ascii charts",
   "main": "index.js",
   "repository": {
@@ -8,8 +8,8 @@
     "url": "https://github.com/tool3/chartscii"
   },
   "scripts": {
-    "test": "mocha index.test.js",
-    "test:ts": "mocha -r ts-node/register main.test.ts",
+    "build": "tsc",
+    "test": "mocha -r ts-node/register index.test.ts",
     "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" "
   },
   "keywords": [
@@ -29,17 +29,11 @@
     "@types/chai": "4.3.14",
     "@types/mocha": "10.0.6",
     "chai": "4.2.0",
-    "husky": "8.0.3",
     "mocha": "^10.0.0",
     "shellfie": "^1.3.1",
     "snaptdout": "^2.1.0",
     "ts-node": "10.9.2",
     "typescript": "5.4.5"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm test"
-    }
   },
   "dependencies": {
     "styl3": "^1.2.4"
