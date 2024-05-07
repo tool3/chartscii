@@ -1,7 +1,7 @@
 import HorizontalChartFormatter from './formatters/horizontal';
 import ChartProcessor from './processor/processor';
 import defaultOptions from './options';
-import { InputData, ChartOptions, ChartData } from './types';
+import { InputData, ChartOptions, ChartData } from './types/types';
 import VerticalChartFormatter from './formatters/vertical';
 
 

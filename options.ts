@@ -1,4 +1,4 @@
-import { ChartOptions } from './types';
+import { ChartOptions } from './types/types';
 
 const options: ChartOptions = {
     percentage: false,

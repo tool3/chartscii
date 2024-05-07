@@ -12,6 +12,9 @@
     "noImplicitAny": true,
     "removeComments": true,
     "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
     "types": ["@types/mocha", "@types/node"]
-  }
+  },
+  "exclude": ["examples", "shellfies"]
 }

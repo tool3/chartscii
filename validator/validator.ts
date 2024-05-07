@@ -1,4 +1,4 @@
-import { ChartData, ChartOptions, InputData } from '../types';
+import { ChartData, ChartOptions, InputData } from '../types/types';
 
 class ChartValidator {
     private options: ChartOptions;

@@ -1,8 +1,15 @@
-export type Measures = {
-    numeric: number;
-    count: number;
+export type Max = {
     label: number;
-    space: number;
+    value: number;
+    scaled: number;
+}
+
+export type Structure = {
+    y: string;
+    x: string;
+    bottomLeft: string;
+    topLeft: string;
+    axis: string;
 }
 
 export type ChartOptions = {
@@ -21,29 +28,16 @@ export type ChartOptions = {
     theme?: string;
     barWidth?: number;
     padding?: number;
-    max?: {
-        label: number;
-        value: number;
-        scaled: number;
-    },
+    max?: Max;
     orientation?: 'vertical' | 'horizontal';
-    structure?: {
-        y: string;
-        x: string;
-        bottomLeft: string;
-        topLeft: string;
-        axis: string;
-    },
+    structure?: Structure;
 }
 
-// process
 export type InputPoint = {
     value: number;
     color?: string;
     label?: string;
 }
-
-export type InputData = InputPoint | number;
 
 export type ChartPoint = {
     label: string;
@@ -53,11 +47,6 @@ export type ChartPoint = {
     percentage: number;
 }
 
+export type InputData = InputPoint | number;
 export type ChartData = Map<string, ChartPoint>
-
-export interface ChartDataProcessor {
-    process(data: InputData[]): [ChartData, ChartOptions];
-    sort(data: InputData[]): InputData[];
-}
-
-export type ChartOutput = Map<string, string>;
+export type ChartOutput = Map<string, string>

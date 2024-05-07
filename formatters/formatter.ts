@@ -1,5 +1,5 @@
 import style from 'styl3';
-import { ChartOptions } from '../types';
+import { ChartOptions } from '../types/types';
 
 abstract class ChartFormatter {
     colors: Record<string, any>;

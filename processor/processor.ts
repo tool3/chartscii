@@ -1,7 +1,7 @@
-import { ChartDataProcessor, InputData, ChartOptions, ChartData } from '../types';
+import { InputData, ChartOptions, ChartData } from '../types/types';
 import ChartValidator from '../validator/validator';
 
-class ChartProcessor implements ChartDataProcessor {
+class ChartProcessor {
     private options: ChartOptions;
     private validator: ChartValidator;
 

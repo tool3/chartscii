@@ -1,6 +1,6 @@
 {
   "name": "chartscii",
-  "version": "2.0.0",
+  "version": "next",
   "description": "awesome ascii charts",
   "main": "index.js",
   "repository": {
@@ -25,6 +25,7 @@
   ],
   "author": "Tal Hayut",
   "license": "MIT",
+  "typings": "./dist/types/index.d.ts",
   "devDependencies": {
     "@types/chai": "4.3.14",
     "@types/mocha": "10.0.6",

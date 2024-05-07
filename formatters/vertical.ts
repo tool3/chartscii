@@ -1,4 +1,4 @@
-import { ChartOptions, ChartData, ChartPoint } from '../types';
+import { ChartOptions, ChartData, ChartPoint } from '../types/types';
 import style from 'styl3';
 import ChartFormatter from './formatter';
 
