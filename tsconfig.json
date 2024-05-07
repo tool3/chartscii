@@ -10,11 +10,8 @@
     "moduleResolution": "node",
     "allowJs": true,
     "noImplicitAny": true,
-    "removeComments": true,
-    "sourceMap": true,
     "declaration": true,
-    "declarationDir": "./dist/types",
     "types": ["@types/mocha", "@types/node"]
   },
-  "exclude": ["examples", "shellfies"]
+  "exclude": ["examples", "shellfies", "dist", "node_modules", "*.test.ts"]
 }
