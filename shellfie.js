@@ -21,19 +21,18 @@ for (let i = 1; i <= 20; i++) {
     data.push({ value: Math.floor(Math.random() * 1000) + 1, color, label: `${count++}` });
 }
 
-// create chart
 const chart = new Chartscii(data, {
     label: 'Example Chart',
-    width: 50,
     // percentage: true,
     reverse: true,
     color: color,
     padding: 2,
     barWidth: 2,
     colorLabels: true,
-    fill: '+',
-    // orientation: 'vertical'
+    theme: 'pastel',
+    orientation: 'vertical'
 });
+
 
 console.log('a');
 (async () => {
@@ -42,15 +41,10 @@ console.log('a');
         console.log(data);
         await shellfie(data, {
             name: 'chartscii',
-            style: {
-                fontSize: 1,
-                fontWeight: 'bold',
-                fontFamily: 'Fira Code'
-            },
             viewport: {
-                width: 920,
-                height: 800
-            }
+                width: 1080,
+                height: 600
+            },
         });
     } catch (error) {
         console.log(error);

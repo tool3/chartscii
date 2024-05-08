@@ -1,7 +1,8 @@
 import chai from 'chai';
 const expect = chai.expect;
-import Chartscii from '.';
+import Chartscii from './chartscii';
 import snap from 'snaptdout';
+import { InputData } from './dist/types/types';
 const colors = [
     'red',
     'green',
@@ -14,7 +15,7 @@ const colors = [
 ];
 
 function generateChartData() {
-    const data = [];
+    const data: InputData[] = [];
     for (let i = 0; i < colors.length; i++) {
         const color = colors[i];
         data.push({ value: i + 1, label: color, color });
@@ -73,7 +74,7 @@ describe('chartscii tests', () => {
 describe('examples', () => {
 
     it('should match example', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < 20; i++) {
             data.push({ value: i + 1, label: `label ${i}` });
         }
@@ -82,7 +83,7 @@ describe('examples', () => {
     });
 
     it('should support percentage', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < 20; i++) {
             data.push({ value: i + 1, label: `label ${i}` });
         }
@@ -95,7 +96,7 @@ describe('examples', () => {
     });
 
     it('should support labeless chart', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < 20; i++) {
             data.push(i + 1);
         }
@@ -104,13 +105,34 @@ describe('examples', () => {
     });
 
     it('should support labeless colorful chart', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < colors.length; i++) {
             const color = colors[i];
             data.push({ value: i + 1, color });
         }
         const chart = new Chartscii(data, { labels: false });
         await snap(chart.create(), 'labeless color chart');
+    });
+
+    it('should support fill', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color, label: `label ${i}` });
+        }
+        const chart = new Chartscii(data, { fill: '░', colorLabels: true });
+
+        await snap(chart.create(), 'fill');
+    });
+
+    it('should support emoji character', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color });
+        }
+        const chart = new Chartscii(data, { char: '🧨' });
+        await snap(chart.create(), 'emojis');
     });
 
     it('should support pastel theme', async () => {
@@ -148,7 +170,7 @@ describe('examples', () => {
 describe('vertical', () => {
 
     it('should support vertical orientation', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < 10; i++) {
             data.push({ value: i + 1, label: `label ${i}` });
         }
@@ -157,7 +179,7 @@ describe('vertical', () => {
     });
 
     it('should support barWidth', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < 10; i++) {
             data.push({ value: i + 1, label: `label ${i}` });
         }
@@ -166,7 +188,7 @@ describe('vertical', () => {
     });
 
     it('should support color per bar and label', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < 10; i++) {
             data.push({ value: i + 1, label: `label ${i}`, color: colors[i] });
         }
@@ -175,7 +197,7 @@ describe('vertical', () => {
     });
 
     it('should support labeless vertical chart', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < 20; i++) {
             data.push(i + 1);
         }
@@ -185,13 +207,36 @@ describe('vertical', () => {
     });
 
     it('should support labeless colorful chart', async () => {
-        const data = [];
+        const data: InputData[] = [];
         for (let i = 0; i < colors.length; i++) {
             const color = colors[i];
             data.push({ value: i + 1, color });
         }
         const chart = new Chartscii(data, { labels: false, orientation: 'vertical' });
         await snap(chart.create(), 'labeless color vertical chart');
+    });
+
+    it('should support vertical fill', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color, label: `label ${i}` });
+        }
+        const chart = new Chartscii(data, { fill: '░', colorLabels: true, orientation: 'vertical' });
+
+        await snap(chart.create(), 'vertical fill');
+    });
+
+    it.skip('should support vertical emoji character', async () => {
+        const data: InputData[] = [];
+        console.log(colors.length);
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i, color });
+        }
+        const chart = new Chartscii(data, { char: '🌏', barWidth: 2, orientation: 'vertical' });
+        console.log(chart.create());
+        await snap(chart.create(), 'vertical emojis');
     });
 
     it('should support pastel theme', async () => {

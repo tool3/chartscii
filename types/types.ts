@@ -20,7 +20,7 @@ export type ChartOptions = {
     naked?: boolean;
     labels?: boolean;
     color?: string;
-    label?: string;
+    title?: string;
     char?: string;
     fill?: string;
     width?: number;

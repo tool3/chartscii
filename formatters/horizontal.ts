@@ -17,14 +17,14 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     scaleBar(size: number, bar: string, point: ChartPoint) {
         const barHeight = Math.round(this.options.height / size);
-        const space = point.label.length + (this.options.max.label - point.label.length);
+        const space = point.label.length + 1 + (this.options.max.label - point.label.length);
         const padding = this.pad(space);
         const bars = [];
 
         for (let i = 0; i < barHeight; i++) {
             const char = this.formatStructure(this.options.structure.axis, point.color);
-            const scaled = i !== 0 ? padding + char : '';
-            bars.push(scaled + bar)
+            const pad = i !== 0 ? padding + char : '';
+            bars.push(pad + bar)
         }
 
         return bars.join('\n');
@@ -38,10 +38,19 @@ class HorizontalChartFormatter extends ChartFormatter {
         return this.colors.colors.reset + structChar;
     }
 
+    formatBar(point: ChartPoint, size: number) {
+        const repeat = Math.floor(point.scaled / this.options.char.length)
+        const value = this.options.char?.repeat(repeat) + this.formatFill(point);
+        const bar = this.scaleBar(size, value, point);
+
+        return point.color ? this.colorify(bar, point.color) : value;
+    }
+
     formatFill(point: ChartPoint) {
         if (this.options.fill) {
-            const diff = this.options.width - point.scaled;
-            return this.options.fill.repeat(diff);
+            const diff = (this.options.max.scaled - point.scaled);
+
+            return this.options.fill.repeat(diff / this.options.fill.length);
         }
 
         return '';
@@ -76,7 +85,7 @@ class HorizontalChartFormatter extends ChartFormatter {
     format(chart: ChartData) {
         const output = [];
 
-        output.push(this.formatChartLabel(this.options.label));
+        output.push(this.formatChartLabel(this.options.title));
 
         for (const [key, point] of chart) {
             const line = this.formatLine(key, point, chart);
@@ -106,17 +115,9 @@ class HorizontalChartFormatter extends ChartFormatter {
         return this.options.colorLabels ? this.colorify(value, color) : value;
     }
 
-    formatBar(point: ChartPoint, size: number) {
-        const value = this.options.char?.repeat(point.scaled) + this.formatFill(point);
-        const bar = this.scaleBar(size, value, point);
-
-        return point.color ? this.colorify(bar, point.color) : value;
-    }
-
     formatBottom() {
         const addOne = this.options.labels && !this.options.percentage ? 1 : 0;
         const space = this.pad(this.options.max.label + addOne);
-        console.log(this.options.width);
         return space + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.max.scaled);
     }
 

@@ -1,5 +1,4 @@
 import { ChartOptions, ChartData, ChartPoint } from '../types/types';
-import style from 'styl3';
 import ChartFormatter from './formatter';
 
 class VerticalChartFormatter extends ChartFormatter {
@@ -14,13 +13,14 @@ class VerticalChartFormatter extends ChartFormatter {
 
     public format(): string {
         const maxHeight = this.getMaxHeight();
-        const barWidth = this.options.barWidth || Math.floor(this.options.width / this.chart.length) || 1;
+        const charWidth = this.options.char.length;
+        const barWidth = this.options.barWidth || Math.floor((this.options.width / this.chart.length) / charWidth) || 1;
 
-        const totalBarsWidth = this.chart.length * barWidth;
+        const totalBarsWidth = this.chart.length * barWidth * charWidth;
         const diffWidth = this.options.width - totalBarsWidth;
-        const defaultPadding = Math.round(diffWidth / this.chart.length);
+        const defaultPadding = Math.round((diffWidth / this.chart.length) / charWidth);
 
-        const padding = this.options.padding || defaultPadding
+        const padding = (this.options.padding || defaultPadding) * charWidth;
 
         const verticalChart = this.buildVerticalChart(maxHeight, padding);
 
@@ -57,6 +57,33 @@ class VerticalChartFormatter extends ChartFormatter {
         });
     }
 
+    private isEmoji(character: string) {
+        const emojiRegex = /\p{Emoji}/u;
+        return emojiRegex.test(character);
+    }
+
+    private formatEmojiPadding(length: number, padding: number, barWidth: number) {
+        const width = this.chart.length * barWidth;
+        const diff = this.chart.length * (barWidth * length);
+        const uneven = Math.floor((diff - width) / this.chart.length);
+
+        if (length === barWidth) {
+            return Math.floor((padding - barWidth) / 2) - length;
+        } else if (length < barWidth) {
+            return length - uneven;
+        } else if (length > barWidth) {
+            return Math.floor((padding - length) / 2);
+        }
+    }
+
+    private formatCharPadding(length: number, barWidth: number, padding: number, isEmoji: boolean) {
+        if (isEmoji) {
+            return this.formatEmojiPadding(length, padding, barWidth);
+        }
+
+        return 0;
+    }
+
     private formatPercentage(point: ChartPoint) {
         if (this.options.percentage) {
             return `(${point.percentage.toFixed(2)}%)`
@@ -66,20 +93,25 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatSpace(barWidth: number, padding: number): string {
-        const character = ' ';
-        return character.repeat(barWidth) + ' '.repeat(padding);
+        const character = ' '.repeat(this.options.char.length);
+        const pad = padding - (barWidth / character.length) + barWidth;
+     
+        return character.repeat(barWidth) + ' '.repeat(padding / character.length);
     }
 
     private formatBar(barWidth: number, padding: number, color: string): string {
         const character = this.options.char;
-        const value = character.repeat(barWidth) + ' '.repeat(padding);
+        const pad = padding - (barWidth / character.length) + barWidth;
+
+        const value = character.repeat(barWidth) + ' '.repeat(padding / character.length);
         return color ? this.colorify(value, color) : value;
     }
 
     private formatFill(barWidth: number, padding: number, color: string): string {
         const character = this.options.fill;
-        if (this.options.fill) {
-            const value = character.repeat(barWidth) + ' '.repeat(padding);
+        if (character) {
+            // const pad = padding - (barWidth / character.length) + barWidth;
+            const value = character.repeat(barWidth) + ' '.repeat(padding / character.length);
             return color ? this.colorify(value, color) : value;
         }
     }
@@ -115,19 +147,18 @@ class VerticalChartFormatter extends ChartFormatter {
         })
 
         if (!this.options.naked) {
-            chart.unshift(this.makeChartLabel());
-            chart.push(this.makeVerticalChartBottom(barWidth, padding));
+            chart.unshift(this.formatChartTitle());
+            chart.push(this.formatBottom(barWidth, padding));
             chart.push(this.formatLabels(barWidth, padding));
         }
         return chart.join('\n');
     }
 
-    private makeChartLabel(): string {
-        return this.options.label;
+    private formatChartTitle(): string {
+        return this.options.title;
     }
 
-    private makeVerticalChartBottom(barWidth: number, padding: number): string {
-        const isPercentage = this.options.percentage ? 1 : 0;
+    private formatBottom(barWidth: number, padding: number): string {
         const width = (barWidth + padding) * this.chart.length;
 
         return this.options.structure.bottomLeft + this.options.structure.x.repeat(width);
