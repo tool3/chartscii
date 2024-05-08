@@ -227,6 +227,17 @@ describe('vertical', () => {
         await snap(chart.create(), 'vertical fill');
     });
 
+    it('should support padding', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color, label: `label ${i}` });
+        }
+        const chart = new Chartscii(data, { fill: '░', padding: 4, colorLabels: true, orientation: 'vertical' });
+
+        await snap(chart.create(), 'padding');
+    });
+
     it('should support vertical emoji character', async () => {
         const data: InputData[] = [];
         

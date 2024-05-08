@@ -41,7 +41,7 @@ for (let i = 0; i < 10; i++) {
     data.push({ value: i + 1, color });
 }
 const barWidth = 2;
-const orientation = 'vertical'
+const orientation = 'horizontal'
 // const chart = new Chartscii(data, { char: '+', fill: '🔥', barWidth, orientation });
 // const chart1 = new Chartscii(data, { char: '🔥', fill: '+', barWidth, orientation });
 // const chart2 = new Chartscii(data, { char: '🔥', fill: '🚀', barWidth, orientation });
@@ -49,7 +49,7 @@ const orientation = 'vertical'
 // const chart4 = new Chartscii(data, {  barWidth, orientation });
 // const chart5 = new Chartscii(data, { char: '+', barWidth, orientation });
 // const chart6 = new Chartscii(data, { fill: '░', barWidth, orientation });
-const chart7 = new Chartscii(data, { char: '🔥', barWidth, orientation });
+const chart7 = new Chartscii(data, {  barWidth, orientation });
 // console.log(chart.create());
 // console.log(chart1.create());
 // console.log(chart2.create());
