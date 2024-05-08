@@ -42,20 +42,22 @@ for (let i = 0; i < 10; i++) {
 }
 const barWidth = 2;
 const orientation = 'vertical'
-const chart = new Chartscii(data, { char: '+', fill: '🔥', barWidth, orientation });
-const chart1 = new Chartscii(data, { char: '🔥', fill: '+', barWidth, orientation });
-const chart2 = new Chartscii(data, { char: '🔥', fill: '🚀', barWidth, orientation });
-const chart3 = new Chartscii(data, { fill: '🔥', barWidth, orientation });
-const chart4 = new Chartscii(data, {  barWidth, orientation });
-const chart5 = new Chartscii(data, { char: '+', barWidth, orientation });
-const chart6 = new Chartscii(data, { fill: '░', barWidth, orientation });
-console.log(chart.create());
-console.log(chart1.create());
-console.log(chart2.create());
-console.log(chart3.create());
-console.log(chart4.create());
-console.log(chart5.create());
-console.log(chart6.create());
+// const chart = new Chartscii(data, { char: '+', fill: '🔥', barWidth, orientation });
+// const chart1 = new Chartscii(data, { char: '🔥', fill: '+', barWidth, orientation });
+// const chart2 = new Chartscii(data, { char: '🔥', fill: '🚀', barWidth, orientation });
+// const chart3 = new Chartscii(data, { fill: '🔥', barWidth, orientation });
+// const chart4 = new Chartscii(data, {  barWidth, orientation });
+// const chart5 = new Chartscii(data, { char: '+', barWidth, orientation });
+// const chart6 = new Chartscii(data, { fill: '░', barWidth, orientation });
+const chart7 = new Chartscii(data, { char: '🔥', barWidth, orientation });
+// console.log(chart.create());
+// console.log(chart1.create());
+// console.log(chart2.create());
+// console.log(chart3.create());
+// console.log(chart4.create());
+// console.log(chart5.create());
+// console.log(chart6.create());
+console.log(chart7.create());
 // emoji char with regular fill
 // emoji char with emoji fill
 // regular char with emoji fill

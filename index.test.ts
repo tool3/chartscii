@@ -227,15 +227,14 @@ describe('vertical', () => {
         await snap(chart.create(), 'vertical fill');
     });
 
-    it.skip('should support vertical emoji character', async () => {
+    it('should support vertical emoji character', async () => {
         const data: InputData[] = [];
-        console.log(colors.length);
+        
         for (let i = 0; i < colors.length; i++) {
             const color = colors[i];
             data.push({ value: i, color });
         }
         const chart = new Chartscii(data, { char: '🌏', barWidth: 2, orientation: 'vertical' });
-        console.log(chart.create());
         await snap(chart.create(), 'vertical emojis');
     });
 

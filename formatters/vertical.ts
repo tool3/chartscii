@@ -62,26 +62,8 @@ class VerticalChartFormatter extends ChartFormatter {
         return emojiRegex.test(character);
     }
 
-    private formatEmojiPadding(length: number, padding: number, barWidth: number) {
-        const width = this.chart.length * barWidth;
-        const diff = this.chart.length * (barWidth * length);
-        const uneven = Math.floor((diff - width) / this.chart.length);
-
-        if (length === barWidth) {
-            return Math.floor((padding - barWidth) / 2) - length;
-        } else if (length < barWidth) {
-            return length - uneven;
-        } else if (length > barWidth) {
-            return Math.floor((padding - length) / 2);
-        }
-    }
-
-    private formatCharPadding(length: number, barWidth: number, padding: number, isEmoji: boolean) {
-        if (isEmoji) {
-            return this.formatEmojiPadding(length, padding, barWidth);
-        }
-
-        return 0;
+    private isCharsEmoji() {
+        return this.isEmoji(this.options.char) || this.isEmoji(this.options.fill || '');
     }
 
     private formatPercentage(point: ChartPoint) {
@@ -93,25 +75,26 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatSpace(barWidth: number, padding: number): string {
-        const character = ' '.repeat(this.options.char.length);
-        const pad = padding - (barWidth / character.length) + barWidth;
-     
+        const character = ' ';
+
         return character.repeat(barWidth) + ' '.repeat(padding / character.length);
     }
 
     private formatBar(barWidth: number, padding: number, color: string): string {
         const character = this.options.char;
-        const pad = padding - (barWidth / character.length) + barWidth;
+        const space = this.isEmoji(character) ? character.length : 0;
+        const pad = Math.abs(padding - space);
 
-        const value = character.repeat(barWidth) + ' '.repeat(padding / character.length);
+        const value = character.repeat(barWidth) + ' '.repeat(pad);
         return color ? this.colorify(value, color) : value;
     }
 
     private formatFill(barWidth: number, padding: number, color: string): string {
         const character = this.options.fill;
         if (character) {
-            // const pad = padding - (barWidth / character.length) + barWidth;
-            const value = character.repeat(barWidth) + ' '.repeat(padding / character.length);
+            const space = this.isEmoji(character) ? barWidth : 0;
+            const pad = Math.abs(padding - space);
+            const value = character.repeat(barWidth) + ' '.repeat(pad);
             return color ? this.colorify(value, color) : value;
         }
     }

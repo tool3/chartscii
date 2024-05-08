@@ -18,11 +18,11 @@ let count = 0;
 for (let i = 1; i <= 20; i++) {
 
     color = colors[Math.floor(Math.random() * colors.length)];
-    data.push({ value: Math.floor(Math.random() * 1000) + 1, color, label: `${count++}` });
+    data.push({ value: Math.floor(Math.random() * 1000) + 1, color, label: `${++count}` });
 }
 
 const chart = new Chartscii(data, {
-    label: 'Example Chart',
+    // label: 'Example Chart',
     // percentage: true,
     reverse: true,
     color: color,
@@ -34,16 +34,15 @@ const chart = new Chartscii(data, {
 });
 
 
-console.log('a');
 (async () => {
     try {
         const data = chart.create();
         console.log(data);
         await shellfie(data, {
-            name: 'chartscii',
+            name: 'chartscii_emoji',
             viewport: {
-                width: 1080,
-                height: 600
+                width: 780,
+                height: 400
             },
         });
     } catch (error) {
