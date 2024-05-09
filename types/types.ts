@@ -26,7 +26,7 @@ export type ChartOptions = {
     width?: number;
     height?: number;
     theme?: string;
-    barWidth?: number;
+    barSize?: number;
     padding?: number;
     max?: Max;
     orientation?: 'vertical' | 'horizontal';

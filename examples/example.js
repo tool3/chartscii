@@ -20,7 +20,7 @@ const chart = new Chartscii(data, {
     colorLabels: true,
     percentage: true,
     labels: true,
-    barWidth: 2,
+    barSize: 2,
     orientation: 'vertical',
     // naked: true
 });

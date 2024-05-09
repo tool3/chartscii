@@ -1,5 +1,4 @@
 import { ChartOptions, ChartData, ChartPoint } from '../types/types';
-import style from 'styl3';
 import ChartFormatter from './formatter';
 
 class HorizontalChartFormatter extends ChartFormatter {
@@ -14,36 +13,43 @@ class HorizontalChartFormatter extends ChartFormatter {
         return ' '.repeat(space)
     }
 
-
-    scaleBar(size: number, bar: string, point: ChartPoint) {
-        const barHeight = Math.round(this.options.height / size);
-        const space = point.label.length + 1 + (this.options.max.label - point.label.length);
-        const padding = this.pad(space);
-        const bars = [];
-
-        for (let i = 0; i < barHeight; i++) {
-            const char = this.formatStructure(this.options.structure.axis, point.color);
-            const pad = i !== 0 ? padding + char : '';
-            bars.push(pad + bar)
-        }
-
-        return bars.join('\n');
-    }
-
     formatStructure(structChar: string, color?: string) {
-        const colored = color || this.options.color;
-        if (colored) {
-            return this.colors.colors.reset + structChar + this.colors.colors[colored];
+        const colorful = color || this.options.color;
+        if (colorful) {
+            const string = this.colorify(structChar, colorful);
+            const [color, reset] = string.split(structChar);
+            return reset + structChar + color;
         }
         return this.colors.colors.reset + structChar;
     }
 
-    formatBar(point: ChartPoint, size: number) {
+    formatBar(point: ChartPoint, barHeight: number, padding: number) {
         const repeat = Math.floor(point.scaled / this.options.char.length)
+        const color = point.color || this.options.color;
         const value = this.options.char?.repeat(repeat) + this.formatFill(point);
-        const bar = this.scaleBar(size, value, point);
+        const bar = this.scaleBar(value, point, barHeight, padding);
 
-        return point.color ? this.colorify(bar, point.color) : value;
+        return point.color ? this.colorify(bar, color) : bar;
+    }
+
+
+    scaleBar(bar: string, point: ChartPoint, barHeight: number, padding: number) {
+        const space = point.label.length + 1 + (this.options.max.label - point.label.length);
+        const linePad = this.pad(space);
+        const bars = [];
+
+        for (let i = 0; i < barHeight; i++) {
+            const char = this.formatStructure(this.options.structure.axis, point.color);
+            const pad = i !== 0 ? linePad + char : '';
+            bars.push(pad + bar)
+        }
+
+        for (let i = 0; i < padding; i++) {
+            const char = this.formatStructure(this.options.structure.axis, point.color);
+            bars.push(linePad + char);
+        }
+
+        return bars.join('\n');
     }
 
     formatFill(point: ChartPoint) {
@@ -82,24 +88,38 @@ class HorizontalChartFormatter extends ChartFormatter {
         return label;
     }
 
+    formatChartScale(chart: ChartData) {
+        const hasPadding = this.options.padding !== undefined;
+        const chartPadding = hasPadding ? this.options.padding : 0;
+        const defaultPadding = Math.floor((this.options.height - chartPadding) / chart.size);
+        const barHeight = this.options.barSize || defaultPadding || 1;
+        const padding = hasPadding ? chartPadding : defaultPadding;
+
+        return { padding, barHeight };
+    }
+
     format(chart: ChartData) {
         const output = [];
 
         output.push(this.formatChartLabel(this.options.title));
 
-        for (const [key, point] of chart) {
-            const line = this.formatLine(key, point, chart);
+        const { barHeight, padding } = this.formatChartScale(chart);
+
+        chart.forEach((point, i) => {
+            const line = this.formatLine(point, barHeight, padding, Number(i) === chart.size - 1);
+
             output.push(line);
-        }
+        })
 
         output.push(this.formatBottom())
 
         return output.join('\n');
     }
 
-    formatLine(_key: string, point: ChartPoint, chart: ChartData) {
+    formatLine(point: ChartPoint, barHeight: number, padding: number, isLast: boolean) {
         const label = this.formatLabel(point, this.options.structure.y);
-        const value = this.formatBar(point, chart.size);
+        const value = this.formatBar(point, barHeight, isLast ? 0 : padding);
+
 
         return `${label}${value}`;
     }

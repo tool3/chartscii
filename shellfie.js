@@ -27,7 +27,7 @@ const chart = new Chartscii(data, {
     reverse: true,
     color: color,
     padding: 2,
-    barWidth: 2,
+    barSize: 2,
     colorLabels: true,
     theme: 'pastel',
     orientation: 'vertical'

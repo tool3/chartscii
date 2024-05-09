@@ -12,6 +12,8 @@ const options: ChartOptions = {
     naked: false,
     width: 100,
     height: 10,
+    padding: 0,
+    orientation: 'horizontal',
     theme: '',
     max: {
         label: 0,
