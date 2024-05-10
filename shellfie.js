@@ -15,22 +15,22 @@ const colors = ['green',
 const data = [];
 let count = 0;
 
-for (let i = 1; i <= 20; i++) {
+for (let i = 1; i <= 10; i++) {
 
     color = colors[Math.floor(Math.random() * colors.length)];
     data.push({ value: Math.floor(Math.random() * 1000) + 1, color, label: `${++count}` });
 }
 
 const chart = new Chartscii(data, {
-    // label: 'Example Chart',
-    // percentage: true,
     reverse: true,
     color: color,
-    padding: 2,
-    barSize: 2,
+    title: 'Emoji chart',
+    // barSize: 2,
+    width: 50,
+    fill: '░',
     colorLabels: true,
     theme: 'pastel',
-    orientation: 'vertical'
+    // orientation: 'vertical'
 });
 
 
@@ -40,8 +40,9 @@ const chart = new Chartscii(data, {
         console.log(data);
         await shellfie(data, {
             name: 'chartscii_emoji',
+            mode: 'raw',
             viewport: {
-                width: 780,
+                width: 800,
                 height: 400
             },
         });

@@ -9,10 +9,10 @@ const colors = [
     'pink',
     'blue',
     'yellow',
-    // '#cb4be6',
-    // '#a962b9',
-    // '#540ea6',
-    // '#85d324',
+    '#cb4be6',
+    '#a962b9',
+    '#540ea6',
+    '#85d324',
     // '#f1050c',
     // '#e19889',
     // '#db3fd1',
@@ -49,7 +49,7 @@ let count = 0;
 
 for (let i = 0; i < 10; i++) {
     const color = colors[i];
-    data.push({ value: i + 1, color, label: `l ${i}` });
+    data.push({ value: i + 1, color, label: `fire ${i}` });
 }
 const barSize = 2;
 const orientation = 'horizontal'
@@ -62,8 +62,17 @@ const orientation = 'horizontal'
 // const chart6 = new Chartscii(data, { fill: '░', barSize, orientation });
 // const chart1 = new Chartscii(data, { orientation, width: 100, fill: '░', title: 'Emojis', labels: false, });
 const chart2 = new Chartscii(data, { orientation: 'vertical', width: 150, height: 20, title: 'Emojis', char: '🚀', padding: 0, colorLabels: true, percentage: true });
-const chart3 = new Chartscii(data, { color: 'pink', padding: 5,  colorLabels: true, orientation: 'vertical', percentage: true });
-const chart4 = new Chartscii(data, { color: 'pink', barSize: 2, padding: 5,  colorLabels: true, orientation: 'vertical',   });
+const chart3 = new Chartscii(data, { color: 'pink', padding: 5, colorLabels: true, orientation: 'vertical', percentage: true });
+const chart4 = new Chartscii(data, {
+    reverse: true,
+    color: color,
+    padding: 2,
+    barSize: 2,
+    char: '🔥',
+    colorLabels: true,
+    theme: 'pastel',
+    orientation: 'vertical'
+});
 // console.log(chart.create());
 // console.log(chart1.create());
 // console.log(chart2.create());
