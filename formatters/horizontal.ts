@@ -13,6 +13,10 @@ class HorizontalChartFormatter extends ChartFormatter {
         return ' '.repeat(space)
     }
 
+    offsetPercentage() {
+        return this.options.labels && !this.options.percentage ? 1 : 0;
+    }
+
     formatStructure(structChar: string, color?: string) {
         const colorful = color || this.options.color;
         if (colorful) {
@@ -35,18 +39,20 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     scaleBar(bar: string, point: ChartPoint, barHeight: number, padding: number) {
         const space = point.label.length + 1 + (this.options.max.label - point.label.length);
-        const linePad = this.pad(space);
+        const isPercentage = this.options.percentage ? 1 : 0;
         const bars = [];
 
         for (let i = 0; i < barHeight; i++) {
             const char = this.formatStructure(this.options.structure.axis, point.color);
-            const pad = i !== 0 ? linePad + char : '';
+            const labels = this.options.labels ? 0 : 1;
+            const pad = i !== 0 ? this.pad(space - isPercentage - labels) + char : '';
             bars.push(pad + bar)
         }
 
         for (let i = 0; i < padding; i++) {
             const char = this.formatStructure(this.options.structure.axis, point.color);
-            bars.push(linePad + char);
+            const pad = this.options.labels ? this.pad(space - isPercentage) : '';
+            bars.push(pad + char);
         }
 
         return bars.join('\n');
@@ -72,7 +78,7 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     formatLabelSpace(label: string) {
         if (this.options.max.label) {
-            const addOne = this.options.labels && !this.options.percentage ? 1 : 0;
+            const addOne = this.offsetPercentage();
             const space = this.options.max.label - (label.length) + addOne;
             return this.pad(space)
         }
@@ -100,13 +106,13 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     format(chart: ChartData) {
         const output = [];
-
         output.push(this.formatChartLabel(this.options.title));
-
+        
         const { barHeight, padding } = this.formatChartScale(chart);
 
         chart.forEach((point, i) => {
-            const line = this.formatLine(point, barHeight, padding, Number(i) === chart.size - 1);
+            const isLast = Number(i) === chart.size - 1;
+            const line = this.formatLine(point, barHeight, padding, isLast);
 
             output.push(line);
         })
@@ -136,9 +142,10 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     formatBottom() {
-        const addOne = this.options.labels && !this.options.percentage ? 1 : 0;
+        const addOne = this.offsetPercentage();
         const space = this.pad(this.options.max.label + addOne);
-        return space + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.max.scaled);
+        
+        return space + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width);
     }
 
 }

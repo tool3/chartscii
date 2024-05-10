@@ -60,7 +60,8 @@ const orientation = 'horizontal'
 // const chart4 = new Chartscii(data, {  barSize, orientation });
 // const chart5 = new Chartscii(data, { char: '+', barSize, orientation });
 // const chart6 = new Chartscii(data, { fill: '░', barSize, orientation });
-const chart7 = new Chartscii(data, { orientation, width: 100, fill: '░', title: 'Emojis' });
+const chart1 = new Chartscii(data, { orientation, width: 100, fill: '░', title: 'Emojis', labels: false, });
+const chart2 = new Chartscii(data, { orientation: 'vertical', width: 150, height: 20, fill: '░', title: 'Emojis', barSize: 4});
 // console.log(chart.create());
 // console.log(chart1.create());
 // console.log(chart2.create());
@@ -68,7 +69,8 @@ const chart7 = new Chartscii(data, { orientation, width: 100, fill: '░', title
 // console.log(chart4.create());
 // console.log(chart5.create());
 // console.log(chart6.create());
-console.log(chart7.create());
+console.log(chart1.create());
+console.log(chart2.create());
 // emoji char with regular fill
 // emoji char with emoji fill
 // regular char with emoji fill

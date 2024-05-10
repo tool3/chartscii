@@ -20,6 +20,8 @@ abstract class ChartFormatter {
                 return this.colors[color]`${txt}`;
             }
         }
+
+        return txt;
     }
 }
 
