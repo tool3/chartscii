@@ -13,7 +13,7 @@ class VerticalChartFormatter extends ChartFormatter {
 
     public format(): string {
         const maxHeight = this.getMaxHeight();
-        const { barWidth, padding } = this.formatChartPadding(this.chart.length);
+        const { barWidth, padding } = this.formatChartScale(this.chart.length);
 
         const verticalChart = this.buildVerticalChart(maxHeight, padding);
 
@@ -21,16 +21,16 @@ class VerticalChartFormatter extends ChartFormatter {
         return this.composeFinalChart(verticalChart, barWidth, padding);
     }
 
-    private formatChartPadding(length: number) {
+    private formatChartScale(length: number) {
         const charWidth = this.options.char.length;
         const defaultBarSize = this.options.barSize || 1;
         const calculatedBarWidth = Math.floor((this.options.width / (defaultBarSize * length)) / charWidth) || 1;
         const barSize = this.options.barSize === undefined ? calculatedBarWidth : this.options.barSize;
 
-        const calculatedPadding = Math.floor(this.options.width / this.chart.length / charWidth);
+        const calculatedPadding = Math.round((this.options.width / this.chart.length) / charWidth);
         const defaultPadding = calculatedPadding <= barSize ? 0 : calculatedPadding - barSize;
         const padding = this.options.padding || defaultPadding;
-        
+
         const barWidth = barSize;
 
         return { padding, barWidth }
@@ -38,6 +38,40 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private getMaxHeight(): number {
         return this.options.max.scaled;
+    }
+
+    private isLongChar(): boolean {
+        return this.options.char.length > 1;
+    }
+
+    private isFillLonger(): boolean {
+        const length = this.options.fill?.length || 0;
+        return length && (length > this.options.char.length);
+    }
+
+    private getFillChar(): string {
+        const { fill, char } = this.getCharLengths();
+        return fill > 0 && fill < char ? this.options.fill.repeat(char) : this.options.fill;
+    }
+
+    private getCharLengths() {
+        const char = this.options.char.length;
+        const fill = this.options.fill?.length || 0;
+        return { char, fill }
+    }
+    private getScaledBarSize(barSize: number): number {
+        const { char, fill } = this.getCharLengths();
+
+        if (fill > 1 && char > 1) {
+            return barSize;
+        }
+
+        if (this.isFillLonger()) {
+            return barSize / fill;
+        }
+
+
+        return barSize;
     }
 
     private buildVerticalChart(maxHeight: number, padding: number): string[][] {
@@ -51,15 +85,13 @@ class VerticalChartFormatter extends ChartFormatter {
             const color = point.color;
 
             for (let i = 0; i < maxHeight; i++) {
-                const isFirst = index === 0;
-
                 if (i < maxHeight - height) {
                     const spaces = this.formatSpace(barSize, padding);
-                    const fill = this.formatFill(barSize, padding, color, isFirst);
+                    const fill = this.formatFill(barSize, padding, color);
                     const fills = this.options.fill ? fill : spaces;
                     verticalChart[i][index] = fills;
                 } else {
-                    const bars = this.formatBar(barSize, padding, color, isFirst);
+                    const bars = this.formatBar(barSize, padding, color);
                     verticalChart[i][index] = bars;
                 }
             }
@@ -76,19 +108,23 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private formatSpace(barSize: number, padding: number): string {
         const character = ' ';
-        return character.repeat(padding) + character.repeat(barSize) + character.repeat(padding);
+        const isOdd = this.isLongChar() ? barSize * this.options.char.length : barSize;
+        return character.repeat(isOdd) + character.repeat(padding);
     }
 
-    private formatBar(barSize: number, padding: number, color: string, isFirst: boolean): string {
+    private formatBar(barSize: number, padding: number, color: string): string {
         const character = this.options.char;
-        const value = character.repeat(barSize) + ' '.repeat(padding);
+        const barWidth = this.isFillLonger() ? barSize : this.getScaledBarSize(barSize);
+        const value = character.repeat(barWidth) + ' '.repeat(padding);
         return color ? this.colorify(value, color) : value;
     }
 
-    private formatFill(barSize: number, padding: number, color: string, isLast: boolean): string {
-        const character = this.options.fill;
+    private formatFill(barSize: number, padding: number, color: string): string {
+        const character = this.getFillChar();
+
         if (character) {
-            const value = character.repeat(barSize) + ' '.repeat(padding);
+            const barWidth = this.getScaledBarSize(barSize);
+            const value = character.repeat(barWidth) + ' '.repeat(padding);
             return color ? this.colorify(value, color) : value;
         }
     }
@@ -98,18 +134,22 @@ class VerticalChartFormatter extends ChartFormatter {
         if (this.options.colorLabels) {
             const color = point.color || this.options.color;
             const coloredLabel = color ? this.colorify(label, color) : label;
-            return coloredLabel;
+            return [coloredLabel, label];
         }
 
-        return label;
+        return [label, label];
     }
 
     private formatLabels(barSize: number, padding: number) {
         const formatted: string[] = [];
         this.chart.forEach((point, i) => {
-            const rightPad = barSize + padding - point.label.length;
-            const isFirst = i === 0 ? 1 : 0;    
-            formatted.push(' '.repeat(isFirst) + this.formatLabel(point) + ' '.repeat(rightPad));
+            if (this.options.labels) {
+                const [formattedLabel, label] = this.formatLabel(point);
+                const barWidth = this.isLongChar() ? barSize * this.options.char.length + padding : barSize + padding;
+                const rightPad = Math.abs(barWidth - label.length);
+                const isFirst = i === 0 ? 1 : 0;
+                formatted.push(' '.repeat(isFirst) + formattedLabel + ' '.repeat(rightPad));
+            }
         })
 
         return formatted.join('');
@@ -136,7 +176,8 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatBottom(barSize: number, padding: number): string {
-        const width = ((barSize + padding) * this.chart.length) - padding;
+        const charLength = this.isLongChar() ? this.options.char.length : 1;
+        const width = ((barSize * charLength + padding) * this.chart.length) - padding;
 
         return this.options.structure.bottomLeft + this.options.structure.x.repeat(width);
     }

@@ -49,7 +49,7 @@ let count = 0;
 
 for (let i = 0; i < 10; i++) {
     const color = colors[i];
-    data.push({ value: i + 1, color });
+    data.push({ value: i + 1, color, label: `l ${i}` });
 }
 const barSize = 2;
 const orientation = 'horizontal'
@@ -60,8 +60,10 @@ const orientation = 'horizontal'
 // const chart4 = new Chartscii(data, {  barSize, orientation });
 // const chart5 = new Chartscii(data, { char: '+', barSize, orientation });
 // const chart6 = new Chartscii(data, { fill: '░', barSize, orientation });
-const chart1 = new Chartscii(data, { orientation, width: 100, fill: '░', title: 'Emojis', labels: false, });
-const chart2 = new Chartscii(data, { orientation: 'vertical', width: 150, height: 20, fill: '░', title: 'Emojis', barSize: 4});
+// const chart1 = new Chartscii(data, { orientation, width: 100, fill: '░', title: 'Emojis', labels: false, });
+const chart2 = new Chartscii(data, { orientation: 'vertical', width: 150, height: 20, title: 'Emojis', char: '🚀', padding: 0, colorLabels: true, percentage: true });
+const chart3 = new Chartscii(data, { color: 'pink', padding: 5,  colorLabels: true, orientation: 'vertical', percentage: true });
+const chart4 = new Chartscii(data, { color: 'pink', barSize: 2, padding: 5,  colorLabels: true, orientation: 'vertical',   });
 // console.log(chart.create());
 // console.log(chart1.create());
 // console.log(chart2.create());
@@ -69,8 +71,10 @@ const chart2 = new Chartscii(data, { orientation: 'vertical', width: 150, height
 // console.log(chart4.create());
 // console.log(chart5.create());
 // console.log(chart6.create());
-console.log(chart1.create());
+// console.log(chart1.create());
 console.log(chart2.create());
+console.log(chart3.create());
+console.log(chart4.create());
 // emoji char with regular fill
 // emoji char with emoji fill
 // regular char with emoji fill
