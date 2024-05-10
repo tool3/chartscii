@@ -61,8 +61,8 @@ const orientation = 'horizontal'
 // const chart5 = new Chartscii(data, { char: '+', barSize, orientation });
 // const chart6 = new Chartscii(data, { fill: '░', barSize, orientation });
 // const chart1 = new Chartscii(data, { orientation, width: 100, fill: '░', title: 'Emojis', labels: false, });
-const chart2 = new Chartscii(data, { orientation: 'vertical', width: 150, height: 20, title: 'Emojis', char: '🚀', padding: 0, colorLabels: true, percentage: true });
-const chart3 = new Chartscii(data, { color: 'pink', padding: 5, colorLabels: true, orientation: 'vertical', percentage: true });
+const chart2 = new Chartscii(data, { orientation: 'vertical', title: 'Emojis', char: '🚀', padding: 0, colorLabels: true, percentage: true });
+const chart3 = new Chartscii(data, {  title: 'Emojis', char: '🚀', padding: 0, colorLabels: true, percentage: true });
 const chart4 = new Chartscii(data, {
     reverse: true,
     color: color,

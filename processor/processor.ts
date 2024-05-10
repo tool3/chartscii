@@ -31,10 +31,10 @@ class ChartProcessor {
 
             const percentage = this.percentage(value, total);
             const percentageLength = percentage ? percentage.toFixed(2).length + 5 : 0;
-            const potential = this.options.percentage ? label.length + percentageLength : label.length;
+            const maxPercentageLabel = this.options.percentage ? label.length + percentageLength : label.length;
 
             if (this.options.labels) {
-                this.options.max.label = potential > this.options.max.label ? potential : this.options.max.label;
+                this.options.max.label = maxPercentageLabel > this.options.max.label ? maxPercentageLabel : this.options.max.label;
             }
 
             return a + value;
@@ -59,7 +59,8 @@ class ChartProcessor {
         const sorted = this.sort(data);
         const key = this.options.structure.y;
         const total = this.calculateData(data);
-        return { processed: sorted, key, total }
+        const processed = this.options.reverse ? sorted.reverse() : sorted;
+        return { processed, key, total }
     }
 
     process(data: InputData[]): [ChartData, ChartOptions] {
