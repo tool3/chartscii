@@ -14,6 +14,7 @@ const colors = [
     'orange',
     'purple',
     'pink',
+    'blue'
 ];
 
 function generateChartData() {
@@ -90,7 +91,7 @@ describe('examples', () => {
             data.push({ value: i + 1, label: `label ${i}` });
         }
         const chart = new Chartscii(data, {
-            color: 'pink',
+            color: 'cyan',
             colorLabels: true,
             percentage: true,
         });
@@ -102,7 +103,7 @@ describe('examples', () => {
         for (let i = 0; i < 20; i++) {
             data.push(i + 1);
         }
-        const chart = new Chartscii(data, { labels: false });
+        const chart = new Chartscii(data, { labels: false, padding: 1 });
         await snap(chart.create(), 'labeless chart');
     });
 
