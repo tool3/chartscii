@@ -16,6 +16,7 @@ const colors = [
     'pink',
     'blue'
 ];
+const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '🔥'];
 
 function generateChartData() {
     const data: InputData[] = [];
@@ -202,7 +203,7 @@ describe('examples', () => {
         for (let i = 0; i < 10; i++) {
             data.push({ value: i + 1, label: `~dim~ ${i}`, color: colors[i] });
         }
-        const chart = new Chartscii(data, { barSize: 2, width: 100, colorLabels: true, percentage: true});
+        const chart = new Chartscii(data, { barSize: 2, width: 100, colorLabels: true, percentage: true });
         await snap(chart.create(), 'styl3 formatting');
     });
 });

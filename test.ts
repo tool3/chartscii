@@ -50,10 +50,10 @@ let count = 0;
 //     // orientation: 'vertical'
 // });
 
-
+const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '🔥'];
 for (let i = 0; i < 10; i++) {
     const color = colors[i];
-    data.push({ value: i + 1, color, label: `~fire~ ${i + 1}` });
+    data.push({ value: i + 1, color, label: `${labels[i]}` });
 }
 const barSize = 2;
 const orientation = 'horizontal'
@@ -71,8 +71,9 @@ const chart4 = new Chartscii(data, {
     // reverse: true,
     color: color,
     // padding: 2,
-    barSize: 2,
+    // barSize: 2,
     // char: '🔥',
+    width: 50,
     colorLabels: true,
     theme: 'pastel',
     orientation: 'vertical'
