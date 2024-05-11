@@ -134,17 +134,18 @@ class VerticalChartFormatter extends ChartFormatter {
         if (this.options.colorLabels) {
             const color = point.color || this.options.color;
             const coloredLabel = color ? this.colorify(label, color) : label;
-            return [coloredLabel, label];
+            return coloredLabel;
         }
 
-        return [label, label];
+        return label;
     }
 
     private formatLabels(barSize: number, padding: number) {
         const formatted: string[] = [];
         this.chart.forEach((point, i) => {
             if (this.options.labels) {
-                const [formattedLabel, label] = this.formatLabel(point);
+                const formattedLabel = this.formatLabel(point);
+                const label = this.stripStyle(formattedLabel);
                 const barWidth = this.isLongChar() ? barSize * this.options.char.length + padding : barSize + padding;
                 const rightPad = Math.abs(barWidth - label.length);
                 const isFirst = i === 0 ? 1 : 0;

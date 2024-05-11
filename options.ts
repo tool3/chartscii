@@ -21,8 +21,8 @@ const options: ChartOptions = {
         scaled: 0
     },
     structure: {
-        y: '╢',
         x: '═',
+        y: '╢',
         bottomLeft: '╚',
         axis: '║',
         topLeft: '╔'

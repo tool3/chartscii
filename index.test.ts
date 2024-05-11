@@ -12,6 +12,8 @@ const colors = [
     'pink',
     'cyan',
     'orange',
+    'purple',
+    'pink',
 ];
 
 function generateChartData() {
@@ -194,7 +196,14 @@ describe('examples', () => {
         const chart = new Chartscii(data, { colorLabels: true });
         await snap(chart.create(), 'default theme');
     });
-
+    it('should support styl3 label formatting', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < 10; i++) {
+            data.push({ value: i + 1, label: `~dim~ ${i}`, color: colors[i] });
+        }
+        const chart = new Chartscii(data, { barSize: 2, width: 100, colorLabels: true, percentage: true});
+        await snap(chart.create(), 'styl3 formatting');
+    });
 });
 
 describe('vertical', () => {
@@ -307,6 +316,17 @@ describe('vertical', () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { barSize: 2, width: 100, colorLabels: true, orientation: 'vertical' });
         await snap(chart.create(), 'default theme vertical');
+    });
+
+    it('should support styl3 label formatting', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color, label: `@invert ${i}@` });
+        }
+        const chart = new Chartscii(data, { fill: '░', colorLabels: true, orientation: 'vertical' });
+
+        await snap(chart.create(), 'styl3 formatting vertical');
     });
 });
 

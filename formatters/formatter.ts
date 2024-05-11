@@ -23,6 +23,10 @@ abstract class ChartFormatter {
 
         return txt;
     }
+
+    stripStyle(label: string) {
+        return label.replace(/\x1b\[[0-9;]*m/g, '');
+    }
 }
 
 export default ChartFormatter;

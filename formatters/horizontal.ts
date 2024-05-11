@@ -27,31 +27,31 @@ class HorizontalChartFormatter extends ChartFormatter {
         return this.colors.colors.reset + structChar;
     }
 
-    formatBar(point: ChartPoint, barHeight: number, padding: number) {
+    formatBar(point: ChartPoint, label: string, barHeight: number, padding: number) {
         const repeat = Math.floor(point.scaled / this.options.char.length)
         const color = point.color || this.options.color;
         const value = this.options.char?.repeat(repeat) + this.formatFill(point);
-        const bar = this.scaleBar(value, point, barHeight, padding);
+        const bar = this.scaleBar(value, label, color, barHeight, padding);
 
         return point.color ? this.colorify(bar, color) : bar;
     }
 
 
-    scaleBar(bar: string, point: ChartPoint, barHeight: number, padding: number) {
-        const space = point.label.length + 1 + (this.options.max.label - point.label.length);
-        const isPercentage = this.options.percentage ? 1 : 0;
+    scaleBar(bar: string, label: string, color: string, barHeight: number, padding: number) {
+        const strippedLabel = this.stripStyle(label);
+        const space = strippedLabel.length - 1;
         const bars = [];
 
         for (let i = 0; i < barHeight; i++) {
-            const char = this.formatStructure(this.options.structure.axis, point.color);
-            const labels = this.options.labels ? 0 : 1;
-            const pad = i !== 0 ? this.pad(space - isPercentage - labels) + char : '';
+            const char = this.formatStructure(this.options.structure.axis, color);
+            
+            const pad = i !== 0 ? this.pad(space) + char : '';
             bars.push(pad + bar)
         }
 
         for (let i = 0; i < padding; i++) {
-            const char = this.formatStructure(this.options.structure.axis, point.color);
-            const pad = this.options.labels ? this.pad(space - isPercentage) : '';
+            const char = this.formatStructure(this.options.structure.axis, color);
+            const pad = this.options.labels ? this.pad(space) : '';
             bars.push(pad + char);
         }
 
@@ -107,24 +107,24 @@ class HorizontalChartFormatter extends ChartFormatter {
     format(chart: ChartData) {
         const output = [];
         output.push(this.formatChartLabel(this.options.title));
-        
-        const { barHeight, padding } = this.formatChartScale(chart);
 
+        const { barHeight, padding } = this.formatChartScale(chart);
+        const labels: string[] = [];
         chart.forEach((point, i) => {
             const isLast = Number(i) === chart.size - 1;
             const line = this.formatLine(point, barHeight, padding, isLast);
-
             output.push(line);
+            labels.push(this.formatLabel(point, this.options.structure.y));
         })
 
-        output.push(this.formatBottom())
+        output.push(this.formatBottom(labels))
 
         return output.join('\n');
     }
 
     formatLine(point: ChartPoint, barHeight: number, padding: number, isLast: boolean) {
         const label = this.formatLabel(point, this.options.structure.y);
-        const value = this.formatBar(point, barHeight, isLast ? 0 : padding);
+        const value = this.formatBar(point, label, barHeight, isLast ? 0 : padding);
 
 
         return `${label}${value}`;
@@ -141,11 +141,13 @@ class HorizontalChartFormatter extends ChartFormatter {
         return this.options.colorLabels ? this.colorify(value, color) : value;
     }
 
-    formatBottom() {
-        const addOne = this.offsetPercentage();
-        const space = this.pad(this.options.max.label + addOne);
-        
-        return space + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width);
+    formatBottom(labels: string[]) {
+        const strippedLabels = labels.map(this.stripStyle);
+        const max = Math.max(...strippedLabels.map(label => label.length)) - 1;
+
+
+
+        return this.pad(max) + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width);
     }
 
 }

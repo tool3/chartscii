@@ -88,8 +88,8 @@ color should correspond to the [supported colors](#supported-colors)
 
 ## chart options
 
-### label (string)
-a label for the chart.
+### title (string)
+a title for the chart.
 
 ### width (number)
 the width of the chart, scales values accordingly   
