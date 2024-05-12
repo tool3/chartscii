@@ -59,6 +59,13 @@ class VerticalChartFormatter extends ChartFormatter {
         const fill = this.options.fill?.length || 0;
         return { char, fill }
     }
+
+    private getCharWidth() {
+        return this.isLongChar() ? this.options.char.length : (this.isFillLonger() ? this.options.fill.length : 1);
+    }
+    private getCharDiff() {
+        return this.isLongChar() ? this.options.char.length : (this.isFillLonger() ? this.options.fill.length : 1);
+    }
     private getScaledBarSize(barSize: number): number {
         const { char, fill } = this.getCharLengths();
 
@@ -67,7 +74,7 @@ class VerticalChartFormatter extends ChartFormatter {
         }
 
         if (this.isFillLonger()) {
-            return barSize / fill;
+            return Math.round(barSize / fill);
         }
 
 
@@ -114,7 +121,7 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private formatBar(barSize: number, padding: number, color: string): string {
         const character = this.options.char;
-        const barWidth = this.isFillLonger() ? barSize : this.getScaledBarSize(barSize);
+        const barWidth = this.isFillLonger() ? barSize + (this.options.fill.length - character.length) : this.getScaledBarSize(barSize);
         const value = character.repeat(barWidth) + ' '.repeat(padding);
         return color ? this.colorify(value, color) : value;
     }
@@ -146,7 +153,8 @@ class VerticalChartFormatter extends ChartFormatter {
             if (this.options.labels) {
                 const formattedLabel = this.formatLabel(point);
                 const label = this.stripStyle(formattedLabel);
-                const barWidth = this.isLongChar() ? barSize * this.options.char.length + padding : barSize + padding;
+                const charLength = this.getCharWidth();
+                const barWidth = this.isLongChar() ? barSize * charLength + padding : barSize + padding + Math.floor(charLength / 2);
                 const rightPad = Math.abs(barWidth - label.length);
                 const isFirst = i === 0 ? 1 : 0;
                 formatted.push(' '.repeat(isFirst) + formattedLabel + ' '.repeat(rightPad));
@@ -177,8 +185,9 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatBottom(barSize: number, padding: number): string {
-        const charLength = this.isLongChar() ? this.options.char.length : 1;
-        const width = ((barSize * charLength + padding) * this.chart.length) - padding;
+        const charLength = this.getCharWidth();
+        const barWidth = this.getScaledBarSize(barSize);
+        const width = ((barWidth * charLength + padding) * this.chart.length) - padding;
 
         return this.options.structure.bottomLeft + this.options.structure.x.repeat(width);
     }
