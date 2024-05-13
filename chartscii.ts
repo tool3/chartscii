@@ -1,15 +1,15 @@
 import HorizontalChartFormatter from './formatters/horizontal';
 import ChartProcessor from './processor/processor';
-import defaultOptions from './options';
-import { InputData, ChartOptions, ChartData } from './types/types';
+import Options from './options/options';
+import { InputData, ChartOptions, ChartData, CustomizationOptions } from './types/types';
 import VerticalChartFormatter from './formatters/vertical';
 
 class Chartscii {
     private chart: ChartData;
     private asciiChart: string;
 
-    constructor(data: InputData[], options?: ChartOptions) {
-        const config = { ...defaultOptions, ...options, ...{ max: { label: 0, value: 0, scaled: 0 } } };
+    constructor(data: InputData[], options?: CustomizationOptions) {
+        const config = new Options(options) as ChartOptions;
         const processor = new ChartProcessor(config);
         const [chart, processedOptions] = processor.process(data);
 

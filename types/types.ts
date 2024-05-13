@@ -12,7 +12,7 @@ export type Structure = {
     axis: string;
 }
 
-export type ChartOptions = {
+export type CustomizationOptions = {
     sort?: boolean;
     percentage?: boolean;
     colorLabels?: boolean;
@@ -28,10 +28,11 @@ export type ChartOptions = {
     theme?: string;
     barSize?: number;
     padding?: number;
-    max?: Max;
-    orientation?: 'vertical' | 'horizontal';
+    orientation?: 'horizontal' | 'vertical';
     structure?: Structure;
 }
+
+export type ChartOptions = CustomizationOptions & { max: Max };
 
 export type InputPoint = {
     value: number;

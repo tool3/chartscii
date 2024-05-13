@@ -13,10 +13,10 @@ const colors = [
     'orange',
     'purple',
     'pink',
-    'blue',
-    'pink',
-    'blue',
-    'red',
+    // 'blue',
+    // 'pink',
+    // 'blue',
+    // 'red',
     // '#cb4be6',
     // '#a962b9',
     // '#540ea6',
@@ -82,7 +82,21 @@ const orientation = 'horizontal'
 //     theme: 'pastel',
 //     orientation: 'vertical'
 // });
-const chart5 = new Chartscii(data, { width: 100, color: 'blue',  colorLabels: true, orientation: 'vertical' });
+const chart = new Chartscii(data, {
+    // reverse: true,
+    color: color,
+    // title: 'Emoji chart',
+    barSize: 4,
+    // width: 60,
+    fill: '▓',
+    // char: '▇',
+    // labels: false,
+    // naked: true,
+    padding: 2,
+    colorLabels: true,
+    theme: 'pastel',
+    orientation: 'vertical',
+});
 // console.log(chart.create());
 // console.log(chart1.create());
 // console.log(chart2.create());
@@ -94,7 +108,7 @@ const chart5 = new Chartscii(data, { width: 100, color: 'blue',  colorLabels: tr
 // console.log(chart2.create());
 // console.log(chart3.create());
 // console.log(chart4.create());
-console.log(chart5.create());
+console.log(chart.create());
 // emoji char with regular fill
 // emoji char with emoji fill
 // regular char with emoji fill
