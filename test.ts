@@ -142,7 +142,7 @@ const createAsciiCharts = () => {
     for (let i = 1; i <= 20; i++) {
         // const value = Math.floor(Math.random() * 10) + 1;
         const threshold = i > 2;
-        const label = threshold ? '✓' : 'X';
+        const label = threshold ? '🔥' : 'X';
         // console.log(label);
         data.push({ value: i, label, color: threshold ? 'green' : 'red' });
     }
@@ -154,11 +154,12 @@ const createAsciiCharts = () => {
         width: 100,
         sort: false,
         reverse: false,
+        padding: 2,
         // char: '■',
         colorLabels: true,
         // percentage: true,
         labels: true,
-        // orientation: 'vertical'
+        orientation: 'vertical'
     });
 
     //print chart

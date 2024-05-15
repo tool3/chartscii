@@ -165,3 +165,11 @@ const chart = new Chartscii(data, {
 });
 console.log(chart.create());
 ```
+
+# Unicode issues
+Unfortunately, there are some known issues with specific unicode characters width.   
+This means that some emoji characters render as 2 character widths instead of 1, which is not a problem in itself.   
+The problem is that Javscript determines this length as 1, which creates an issue in the horizontal orientation.    
+If you encounter this issue unfortunately the current solution is to simply use a different emoji.   
+(For example: 🔥 works well but ✅ will result in a misaligned chart).   
+PRs for this problem are more than welcome.   
