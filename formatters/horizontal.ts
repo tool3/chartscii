@@ -77,19 +77,9 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
 
-    charWidth(label: string) {
-        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-        const segments = Array.from(segmenter.segment(label));
-        const normalized = label.normalize();
-
-
-        return (label.length - segments.length);
-    }
-
     formatLabelSpace(label: string) {
         if (this.options.max.label) {
             const addOne = this.offsetPercentage();
-            this.charWidth(label)
             const space = this.options.max.label - label.length + addOne;
             return this.pad(space)
         }
