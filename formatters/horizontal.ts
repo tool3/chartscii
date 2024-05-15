@@ -18,13 +18,17 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     formatStructure(structChar: string, color?: string) {
-        const colorful = color || this.options.color;
-        if (colorful) {
-            const string = this.colorify(structChar, colorful);
-            const [color, reset] = string.split(structChar);
-            return reset + structChar + color;
+        if (!this.options.naked) {
+            const colorful = color || this.options.color;
+            if (colorful) {
+                const string = this.colorify(structChar, colorful);
+                const [color, reset] = string.split(structChar);
+                return reset + structChar + color;
+            }
+            return this.colors.colors.reset + structChar;
         }
-        return this.colors.colors.reset + structChar;
+
+        return '';
     }
 
     formatBar(point: ChartPoint, label: string, barHeight: number, padding: number) {
@@ -143,10 +147,12 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     formatBottom(labels: string[]) {
-        const strippedLabels = labels.map(this.stripStyle);
-        const max = Math.max(...strippedLabels.map(label => label.length - 1));
+        if (!this.options.naked) {
+            const strippedLabels = labels.map(this.stripStyle);
+            const max = Math.max(...strippedLabels.map(label => label.length - 1));
 
-        return this.pad(max) + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width);
+            return this.pad(max) + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width);
+        }
     }
 
 }

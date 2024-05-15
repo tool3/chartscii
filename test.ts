@@ -119,55 +119,41 @@
 import Chartscii from './chartscii';
 import { InputData } from './types/types';
 
+let color = '';
 
-const createAsciiCharts = () => {
-    // generate random chart data
-    const data: InputData[] = [];
+const colors = [
+    'red',
+    'green',
+    'yellow',
+    'blue',
+    'purple',
+    'pink',
+    'cyan',
+    'orange',
+    'white',
+    'marine'
+];
 
-    const emojis = ['aaa', '✅', '🔥', '🧨'];
-    emojis.forEach(label => {
-        // console.log(label);
-        // console.log(label.length);
-        // console.log(label.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug).length);
-        const regex = /\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu;
+// generate random chart data
+const data = [];
+const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '3.0'];
+for (let i = 0; i < labels.length; i++) {
+    const color = colors[i];
+    data.push({ value: 1, color, label: `*${colors[i].toUpperCase()}*` });
+}
+const chart = new Chartscii(data, {
+    // reverse: true,
+    color: color,
+    // title: 'Emoji chart',
+    // barSize: 2,
+    width: 10,
+    // padding: 1,
+    fill: '░',
+    // char: '▓',
+    colorLabels: true,
+    theme: 'default',
+    naked: true,
+    // orientation: 'vertical',
+});
 
-        console.log(label.match(regex));
-        console.log(regex.exec(label));
-
-        // console.log([...new Intl.Segmenter().segment(label)].length)
-        // console.log([...label].length)
-    })
-
-
-    for (let i = 1; i <= 20; i++) {
-        // const value = Math.floor(Math.random() * 10) + 1;
-        const threshold = i > 2;
-        const label = threshold ? '🔥' : 'X';
-        // console.log(label);
-        data.push({ value: i, label, color: threshold ? 'green' : 'red' });
-    }
-
-    // create chart
-    const chart = new Chartscii(data, {
-        title: 'Conditional Colors',
-        // color: 'green',
-        width: 100,
-        sort: false,
-        reverse: false,
-        padding: 2,
-        // char: '■',
-        colorLabels: true,
-        // percentage: true,
-        labels: true,
-        orientation: 'vertical'
-    });
-
-    //print chart
-    // process.stdout.write('\x1Bc');
-    process.stdout.write(`${chart.create()}\n`);
-
-};
-
-
-createAsciiCharts()
-
+console.log(chart.create());

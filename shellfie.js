@@ -13,11 +13,12 @@ const colors = [
     'cyan',
     'orange',
     'white',
+    'marine'
 ];
 
 // generate random chart data
 const data = [];
-const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i'];
+const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '3.0'];
 for (let i = 0; i < labels.length; i++) {
     const color = colors[i];
     data.push({ value: i + 1, color, label: `*${labels[i]}*` });
@@ -42,7 +43,7 @@ const chart = new Chartscii(data, {
         const data = chart.create();
         console.log(data);
         await shellfie(data, {
-            name: './vertical/chartscii_beach_bold',
+            name: './chartscii_main',
             viewport: {
                 width: 582,
                 height: 350
@@ -52,3 +53,6 @@ const chart = new Chartscii(data, {
         console.log(error);
     }
 })();
+
+
+// termtosvg --still-frames --command 'npx ts-node test.ts'
