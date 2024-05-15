@@ -18,9 +18,9 @@ export const defaultOptions: CustomizationOptions = {
     structure: {
         x: '═',
         y: '╢',
-        bottomLeft: '╚',
         axis: '║',
-        topLeft: '╔'
+        topLeft: '╔',
+        bottomLeft: '╚',
     },
 }
 

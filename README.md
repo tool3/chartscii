@@ -102,12 +102,12 @@ const options: ChartOptions = {
   orientation: "horizontal",
   theme: "",
   structure: {
-    x: "═",
-    y: "╢",
-    bottomLeft: "╚",
-    axis: "║",
-    topLeft: "╔"
-  }
+        x: '═',
+        y: '╢',
+        axis: '║',
+        topLeft: '╔',
+        bottomLeft: '╚',
+    },
 };
 ```
 
