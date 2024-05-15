@@ -10,7 +10,8 @@ const createAsciiCharts = () => {
     for (let i = 1; i <= 20; i++) {
         const value = Math.floor(Math.random() * 10) + 1;
         const threshold = value > 2;
-        data.push({ value , label: threshold ? '✅' : '❌', color: threshold ? 'green' : 'red' });
+        const label = threshold ? '✓' : 'X';
+        data.push({ value , label, color: threshold ? 'green' : 'red' });
     }
 
     // create chart
