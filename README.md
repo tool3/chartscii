@@ -2,7 +2,20 @@
 
 [![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)
 
-- command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli)
+for command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli)
+
+# Chartscii 3.0!
+
+Chartscii was rewritten from scratch in TypeScript!
+It includes many new features, improvements and rich formatting capabilities.
+
+# What’s new
+
+✅ Full width and height control.  
+✅ New `padding` and `barSize` options!  
+✅ New `orientation` option! vertical charts are here!  
+✅ New rich styl3 formatting support!   
+✅ New Emoji characters support! [*](#unicode-issues)  
 
 # install
 
