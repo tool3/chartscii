@@ -16,7 +16,8 @@ class Chartscii {
         this.chart = chart;
         const chartFormatter = config.orientation === 'vertical'
             ? new VerticalChartFormatter(chart, processedOptions)
-            : new HorizontalChartFormatter(processedOptions)
+            : new HorizontalChartFormatter(processedOptions);
+
         this.asciiChart = chartFormatter.format(this.chart);
     }
 
