@@ -31,10 +31,12 @@ class ChartProcessor {
 
             const percentage = this.percentage(value, total);
             const percentageLength = percentage ? percentage.toFixed(2).length + 5 : 0;
-            const maxPercentageLabel = this.options.percentage ? label.length + percentageLength : label.length;
+            
+            const maxLabelLength = this.options.percentage ? label.length + percentageLength : label.length;
+            
 
             if (this.options.labels) {
-                this.options.max.label = maxPercentageLabel > this.options.max.label ? maxPercentageLabel : this.options.max.label;
+                this.options.max.label = maxLabelLength > this.options.max.label ? maxLabelLength : this.options.max.label;
             }
 
             return a + value;

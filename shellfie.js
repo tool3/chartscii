@@ -3,7 +3,7 @@ const Chartscii = require('./dist');
 
 let color = '';
 
-const colors = ['green',
+const colors = [
     'red',
     'green',
     'yellow',
@@ -12,16 +12,15 @@ const colors = ['green',
     'pink',
     'cyan',
     'orange',
-    'purple',
-    'pink',
+    'white',
 ];
 
 // generate random chart data
 const data = [];
-const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '🔥'];
+const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i'];
 for (let i = 0; i < labels.length; i++) {
     const color = colors[i];
-    data.push({ value: i + 1, color, label: `%${labels[i]}%` });
+    data.push({ value: i + 1, color, label: `*${labels[i]}*` });
 }
 const chart = new Chartscii(data, {
     // reverse: true,
@@ -29,11 +28,11 @@ const chart = new Chartscii(data, {
     // title: 'Emoji chart',
     // barSize: 2,
     width: 50,
-    padding: 1,
+    // padding: 1,
     fill: '░',
     // char: '▓',
     colorLabels: true,
-    theme: 'lush',
+    theme: 'beach',
     orientation: 'vertical',
 });
 
@@ -43,7 +42,7 @@ const chart = new Chartscii(data, {
         const data = chart.create();
         console.log(data);
         await shellfie(data, {
-            name: 'chartscii_standard_italic',
+            name: './vertical/chartscii_beach_bold',
             viewport: {
                 width: 582,
                 height: 350

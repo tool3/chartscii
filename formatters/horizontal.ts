@@ -44,7 +44,7 @@ class HorizontalChartFormatter extends ChartFormatter {
 
         for (let i = 0; i < barHeight; i++) {
             const char = this.formatStructure(this.options.structure.axis, color);
-            
+
             const pad = i !== 0 ? this.pad(space) + char : '';
             bars.push(pad + bar)
         }
@@ -76,10 +76,21 @@ class HorizontalChartFormatter extends ChartFormatter {
         return '';
     }
 
+
+    charWidth(label: string) {
+        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+        const segments = Array.from(segmenter.segment(label));
+        const normalized = label.normalize();
+
+
+        return (label.length - segments.length);
+    }
+
     formatLabelSpace(label: string) {
         if (this.options.max.label) {
             const addOne = this.offsetPercentage();
-            const space = this.options.max.label - (label.length) + addOne;
+            this.charWidth(label)
+            const space = this.options.max.label - label.length + addOne;
             return this.pad(space)
         }
 
@@ -143,9 +154,7 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     formatBottom(labels: string[]) {
         const strippedLabels = labels.map(this.stripStyle);
-        const max = Math.max(...strippedLabels.map(label => label.length)) - 1;
-
-
+        const max = Math.max(...strippedLabels.map(label => label.length - 1));
 
         return this.pad(max) + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width);
     }

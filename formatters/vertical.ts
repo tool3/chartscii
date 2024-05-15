@@ -171,19 +171,25 @@ class VerticalChartFormatter extends ChartFormatter {
             }
             return row.join('')
         })
-        if (this.options.title) chart.unshift(this.formatChartTitle());
+
+        if (this.options.title) {
+            chart.unshift(this.formatChartTitle());
+        }
+
         if (!this.options.naked) {
             chart.push(this.formatBottom(barSize, padding));
         } else if (this.options.naked && this.options.labels) {
             chart.push('');
         }
+
         if (this.options.labels) chart.push(this.formatLabels(barSize, padding));
 
         return chart.join('\n');
     }
 
     private formatChartTitle(): string {
-        return this.options.title;
+        const color = this.options.color;
+        return this.colorify(this.options.title, color);
     }
 
     private formatBottom(barSize: number, padding: number): string {

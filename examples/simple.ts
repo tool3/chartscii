@@ -1,7 +1,8 @@
-const Chartscii = require('../index');
+import Chartscii from '../chartscii';
+import { InputData } from '../types/types';
 
 // generate random chart data
-const data = [];
+const data: InputData[] = [];
 
 for (let i = 1; i <= 10; i++) {
     data.push(Math.floor(Math.random() * 1000) + 1);
@@ -10,8 +11,8 @@ for (let i = 1; i <= 10; i++) {
 
 // create chart
 const chart = new Chartscii(data, {
-    // label: 'Example Chart',
-    width: 100,
+    title: 'Simple chart',
+    width: 150,
     sort: false,
     reverse: false,
     // fill: '░',
