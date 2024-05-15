@@ -3,27 +3,20 @@ import { InputData } from '../types/types';
 
 // generate random chart data
 const data: InputData[] = [];
-
 for (let i = 1; i <= 10; i++) {
-    data.push(Math.floor(Math.random() * 1000) + 1);
-    // data.push(i)
+    data.push(Math.floor(Math.random() * 10) + 1);
 }
 
 // create chart
 const chart = new Chartscii(data, {
     title: 'Simple chart',
-    width: 150,
-    sort: false,
-    reverse: false,
-    // fill: '░',
+    fill: '░',
     char: '█',
-    color: 'green',
+    color: 'pink',
     colorLabels: true,
-    percentage: true,
     labels: true,
     barSize: 2,
     orientation: 'vertical',
-    // naked: true
 });
 
 //print chart

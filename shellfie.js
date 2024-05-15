@@ -18,7 +18,7 @@ const colors = [
 
 // generate random chart data
 const data = [];
-const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '3.0'];
+const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '3'];
 for (let i = 0; i < labels.length; i++) {
     const color = colors[i];
     data.push({ value: i + 1, color, label: `*${labels[i]}*` });
@@ -41,11 +41,11 @@ const chart = new Chartscii(data, {
 (async () => {
     try {
         const data = chart.create();
-        console.log(data);
+        
         await shellfie(data, {
-            name: './chartscii_main',
+            name: './chartscii_main_v',
             viewport: {
-                width: 582,
+                width: 500,
                 height: 350
             },
         });

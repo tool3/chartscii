@@ -10,7 +10,8 @@ const createAsciiCharts = () => {
         'cyan',
         'pink',
         'blue',
-        'yellow'
+        'yellow',
+        'purple',
     ];
 
     const emojis = [
@@ -21,6 +22,7 @@ const createAsciiCharts = () => {
         '🍇',
         '🍊',
         '👻',
+        '🧨'
     ];
 
     // generate random chart data
@@ -51,4 +53,4 @@ const createAsciiCharts = () => {
 };
 
 
-setInterval(() => createAsciiCharts(), 500);
+setInterval(() => createAsciiCharts(), 300);

@@ -34,5 +34,5 @@ const createAsciiCharts = () => {
 };
 
 
-setInterval(() => createAsciiCharts(), 500);
+setInterval(() => createAsciiCharts(), 200);
 
