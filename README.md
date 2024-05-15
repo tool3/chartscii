@@ -102,12 +102,12 @@ const options: ChartOptions = {
   orientation: "horizontal",
   theme: "",
   structure: {
-        x: '═',
-        y: '╢',
-        axis: '║',
-        topLeft: '╔',
-        bottomLeft: '╚',
-    },
+    x: "═",
+    y: "╢",
+    axis: "║",
+    topLeft: "╔",
+    bottomLeft: "╚"
+  }
 };
 ```
 
@@ -167,14 +167,14 @@ console.log(chart.create());
 ```
 
 # Unicode issues
-Unfortunately, there are some known issues with specific unicode characters width.   
-This means that some emoji/unicode characters renders as 2 characters wide (or more) instead of 1, which is not a problem in itself.   
-The problem is that Javscript determines this length as 1, which creates an issue with label alignment, or drawing the chart bars correctly.   
+
+Unfortunately, there are some known issues with specific unicode characters width.  
+This means that some emoji/unicode characters renders as 2 characters wide (or more) instead of 1, which is not a problem in itself.  
+The problem is that Javscript determines this length as 1, which creates an issue with label alignment, or drawing the chart bars correctly.
 
 > [!WARNING]  
 > If you have issues with label alignment, or the chart bars aren't spaced correctly - you are probably using an emoji/unicode character which produce the wrong width in javascript.
 
-If you encounter this issue unfortunately the current solution is to simply use a different emoji.   
-(For example: 🔥 works well while ✅ will result in a misaligned chart).   
-PRs for this problem are more than welcome.   
-
+If you encounter this issue unfortunately the current solution is to simply use a different emoji.  
+(For example: 🔥 works well while ✅ will result in a misaligned chart).  
+PRs for this problem are more than welcome.
