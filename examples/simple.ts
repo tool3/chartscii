@@ -11,7 +11,7 @@ for (let i = 1; i <= 10; i++) {
 const chart = new Chartscii(data, {
     title: 'Simple chart',
     fill: '░',
-    char: '█',
+    // char: '█',
     color: 'pink',
     colorLabels: true,
     labels: true,
@@ -21,3 +21,4 @@ const chart = new Chartscii(data, {
 
 //print chart
 console.log(chart.create());
+

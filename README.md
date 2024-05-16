@@ -1,4 +1,4 @@
-![](./shellfies/chartscii_main_v.png)
+![](./shellfies/chartscii_main.png)
 
 [![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)
 
@@ -14,8 +14,8 @@ It includes many new features, improvements and rich formatting capabilities.
 ✅ Full width and height control.  
 ✅ New `padding` and `barSize` options!  
 ✅ New `orientation` option! vertical charts are here!  
-✅ New rich styl3 formatting support!   
-✅ New Emoji characters support! [*](#unicode-issues)  
+✅ New rich styl3 formatting support!  
+✅ New Emoji characters support! [\*](#unicode-issues)
 
 # install
 
@@ -34,17 +34,19 @@ import Chartscii from "chartscii";
 
 const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const options = {
-  width: 80,
+  title: "chartscii",
+  width: 50,
   theme: "pastel",
-  color: "red",
-  padding: 2,
+  color: "pink",
   colorLabels: true,
+  barSize: 2,
   orientation: "vertical"
 };
-
 const chart = new Chartscii(data, options);
 console.log(char.create());
 ```
+
+![](./shellfies/chartscii_simple.png)
 
 # Input
 
@@ -68,6 +70,8 @@ const chart = new Chartscii(data);
 console.log(chart.create());
 ```
 
+![](./shellfies//chartscii_dead_simple.png)
+
 ## ChartPoint[]
 
 For maximum flexibility, provide an array of chart points. This will allow you to customize the following properties:
@@ -83,10 +87,12 @@ For maximum flexibility, provide an array of chart points. This will allow you t
 ```tsx
 import Chartscii from 'chartscii';
 
-const data = [{ label: 'label', value: 2, color: 'pink'  }, {...}];
-const chart = new Chartscii(data);
+const data = [{ label: 'label', value: 2, color: 'pink' }, { label: 'label', value: 2, color: 'purple' }, { label: 'label', value: 2, color: 'marine' },];
+const chart = new Chartscii(data, { colorLabels: true });
 console.log(chart.create());
 ```
+![](./shellfies/chartscii_chartpoint.png)
+
 
 # Options
 
@@ -155,7 +161,6 @@ You should check out `styl3` for a full list of customization options.
 ### example
 
 ```tsx
-const data = [];
 const colors = [
   "red",
   "green",
@@ -166,6 +171,8 @@ const colors = [
   "cyan",
   "orange"
 ];
+
+const data = [];
 for (let i = 0; i < colors.length; i++) {
   const color = colors[i];
   data.push({ value: i + 1, color, label: `@invert ${i}@`, theme: "pastel" });
@@ -176,8 +183,36 @@ const chart = new Chartscii(data, {
   colorLabels: true,
   orientation: "vertical"
 });
+
 console.log(chart.create());
 ```
+![](./shellfies/chartscii_styl3.png)
+
+
+# styl3 examples
+here are some examples of a vertical chart using `styl3`'s formatting on the chart labels.    
+
+beach theme with bold labels   
+![](./shellfies/vertical/chartscii_beach_bold.png)
+
+default theme with dim labels   
+![](./shellfies/vertical/chartscii_default_dim.png)
+
+lush theme with strikedout labels   
+![](./shellfies/vertical/chartscii_lush_strikeout.png)
+
+lush theme with underlined labels   
+![](./shellfies/vertical/chartscii_lush_underline.png)
+
+pastel theme with inverted labels   
+![](./shellfies/vertical/chartscii_pastel_invert.png)
+
+pastel theme with multiple formatting applied to labels   
+![](./shellfies/vertical/chartscii_pastel_multi.png)
+
+standard theme with italic labels   
+![](./shellfies/vertical/chartscii_standard_italic.png)
+
 
 # Unicode issues
 
