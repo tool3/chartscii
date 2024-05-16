@@ -63,9 +63,7 @@ class VerticalChartFormatter extends ChartFormatter {
     private getCharWidth() {
         return this.isLongChar() ? this.options.char.length : (this.isFillLonger() ? this.options.fill.length : 1);
     }
-    private getCharDiff() {
-        return this.isLongChar() ? this.options.char.length : (this.isFillLonger() ? this.options.fill.length : 1);
-    }
+    
     private getScaledBarSize(barSize: number): number {
         const { char, fill } = this.getCharLengths();
 

@@ -190,28 +190,40 @@ console.log(chart.create());
 
 
 # styl3 examples
-here are some examples of a vertical chart using `styl3`'s formatting on the chart labels.    
+here are some examples of some charts using `styl3`'s formatting on the chart labels.    
 
-beach theme with bold labels   
-![](./shellfies/vertical/chartscii_beach_bold.png)
+## vertical
+beach theme with italic and bold labels with a bar size of 2   
+![](./shellfies/vertical/chartscii_beach_italic_bold_barsize.png)
 
-default theme with dim labels   
-![](./shellfies/vertical/chartscii_default_dim.png)
+pastel theme with bold and underlined labels with padding of 2
+![](./shellfies/vertical/chartscii_pastel_bold_underline_padding.png)
 
-lush theme with strikedout labels   
-![](./shellfies/vertical/chartscii_lush_strikeout.png)
+lush theme with strikedout labels no padding and emoji  
+![](./shellfies/vertical/chartscii_lush_strikeout_emoji.png)
 
-lush theme with underlined labels   
-![](./shellfies/vertical/chartscii_lush_underline.png)
+lush theme with underlined labels no padding and no axis structure char   
+![](./shellfies/vertical/chartscii_lush_underline_no_axis_structure.png)
 
-pastel theme with inverted labels   
-![](./shellfies/vertical/chartscii_pastel_invert.png)
+standard theme with dimmed and italic labels and padding 1   
+![](./shellfies/vertical/chartscii_standard_dim_underline_padding.png)
 
-pastel theme with multiple formatting applied to labels   
-![](./shellfies/vertical/chartscii_pastel_multi.png)
+pastel theme with inverted and underlined labels with a dark fill character   
+![](./shellfies/vertical/chartscii_pastel_inverted_underline_dark_fill.png)
 
-standard theme with italic labels   
-![](./shellfies/vertical/chartscii_standard_italic.png)
+
+
+
+## horizontal
+pastel theme with bold labels and percentage   
+![](./shellfies//horizontal/chartscii_pastel_bold_percentage.png)
+
+lush theme with inverted labels and naked chart      
+![](./shellfies//horizontal/chartscii_pastel_lush_invert_naked.png)
+
+beach theme with underlined labels and different structure characters         
+![](./shellfies//horizontal/chartscii_beach_underline_structure.png)
+
 
 
 # Unicode issues
