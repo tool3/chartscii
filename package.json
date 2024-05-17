@@ -1,6 +1,6 @@
 {
   "name": "chartscii",
-  "version": "2.0.2-dev",
+  "version": "2.0.2",
   "description": "awesome ascii charts",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
