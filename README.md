@@ -194,7 +194,7 @@ console.log(chart.create());
 here are some examples of charts using `styl3`'s formatting on the chart labels.    
 
 > [!TIP]  
-> you can run more examples from the `./examples/` directory of this repository using `ts-node`.
+> you can run more examples from the `./examples/` directory of this repository using `ts-node`.   
 > for example `npx ts-node examples/loaders.ts` 
 
 ## vertical
