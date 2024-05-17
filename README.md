@@ -140,16 +140,17 @@ const options: ChartOptions = {
 | reverse     | reverse the input data                                                       | `boolean` | `false`                                                                    |
 | naked       | don’t print chart structure ascii characters                                 | `boolean` | `false`                                                                    |
 | labels      | show labels                                                                  | `boolean` | `true`                                                                     |
-| color       | fallback color or unified char bars color                                              | `string`  |                                                                          |  `undefined`
+| color       | fallback color or unified char bars color                                    | `string`  | `undefined`                                                                | 
 | fill        | use this character to fill remaining chart bar space                         | `string`  | `undefined`                                                                |
+| maxValue    | values are scaled proportionate to this value. otherwise the max will be calculated from the provided data.  | `number`  | `undefined`                                                                |
 | width       | width of chart                                                               | `number`  | `100`                                                                      |
 | height      | height of chart                                                              | `number`  | `10`                                                                       |
 | padding     | padding between bars                                                         | `number`  | `0`                                                                        |
 | barSize     | size of each bar                                                             | `number`  | `1`                                                                        |
 | title       | chart title                                                                  | `string`  | `undefined`                                                                |
-| char        | use this character to draw the chart bars                                    | `string`  | `█`                                                                      |
+| char        | use this character to draw the chart bars                                    | `string`  | `█`                                                                        |
 | orientation | horizontal or vertical                                                       | `string`  | `horizontal`                                                               |
-| theme       | `styl3`'s [themes](https://github.com/tool3/styl3?tab=readme-ov-file#themes) | `string`  |                      `undefined`                                                    |        
+| theme       | `styl3`'s [themes](https://github.com/tool3/styl3?tab=readme-ov-file#themes) | `string`  |  `undefined`                                           |        
 | structure   | use these characters to draw the enclosing chart borders.                    | `object`  | `typescript{ x: '═', y: '╢', bottomLeft: '╚', axis: '║', topLeft: '╔' }` |
 
 ## chartscii + styl3 = ❤️
