@@ -190,8 +190,13 @@ console.log(chart.create());
 ![](./shellfies/chartscii_styl3.png)
 
 
-# styl3 examples
+# examples
 here are some examples of charts using `styl3`'s formatting on the chart labels.    
+
+> [!TIP]  
+> you can run more examples from the `./examples/` directory of this repository using `ts-node`.
+> for example `npx ts-node examples/loaders.ts` 
+
 ## vertical
 
 | options | chart |
