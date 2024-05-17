@@ -9,7 +9,7 @@
     "url": "https://github.com/tool3/chartscii"
   },
   "files": [
-    "dist"
+    "./dist"
   ],
   "scripts": {
     "build": "tsc",
