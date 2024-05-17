@@ -15,4 +15,5 @@ jobs:
           node-version: 16
       - run: |
           npm ci
+          npm run build
           npm run test
