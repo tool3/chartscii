@@ -19,33 +19,20 @@ const colors = [
 // generate random chart data
 const data = [];
 const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '3.0'];
-for (let i = 0; i < labels.length; i++) {
+for (let i = 0; i < 3; i++) {
     const color = colors[i];
-    const value = Math.floor(Math.random() * 10) + i;
-    data.push({ value, color, label: `~!${labels[i].toUpperCase()}!~` });
+    const value = Math.floor(Math.random() * 20);
+    data.push({ value, color, label: `loading` });
 }
 const chart = new Chartscii(data, {
-    // reverse: true,
-    color: color,
-    // naked: true,
-    // percentage: true,
-    // title: 'Emoji chart',
-    // barSize: 2,
     width: 50,
-    // barSize: 2,
-    padding: 1,
+    maxValue: 30,
+    padding: 2,
+    barSize: 1,
+    naked: true,
     fill: '░',
-    // char: '▓',
-    theme: 'standard',
     colorLabels: true,
-    // theme: 'pastel',
-    orientation: 'vertical',
-    structure: {
-        // y: '/',
-        // axis: '',
-        // bottomLeft: '',
-        // x: ''
-    }
+    theme: 'pastel'
 });
 
 
@@ -54,10 +41,10 @@ const chart = new Chartscii(data, {
         const data = chart.create();
         console.log(data);
         await shellfie(data, {
-            name: './vertical/chartscii_standard_bold_underline_padding',
+            name: './horizontal/chartscii_loaders',
             viewport: {
-                width: 600,
-                height: 350
+                width: 500,
+                height: 300
             },
         });
     } catch (error) {

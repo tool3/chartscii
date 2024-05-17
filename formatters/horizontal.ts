@@ -43,7 +43,8 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     scaleBar(bar: string, label: string, color: string, barHeight: number, padding: number) {
         const strippedLabel = this.stripStyle(label);
-        const space = strippedLabel.length - 1;
+        const naked = this.options.naked ? 0 : 1;
+        const space = strippedLabel.length - naked;
         const bars = [];
 
         for (let i = 0; i < barHeight; i++) {
@@ -65,6 +66,11 @@ class HorizontalChartFormatter extends ChartFormatter {
     formatFill(point: ChartPoint) {
         if (this.options.fill) {
             const diff = (this.options.max.scaled - point.scaled);
+
+            if (this.options.maxValue) {
+                const width = this.options.maxValue - point.value;
+                return this.options.fill.repeat(width);
+            }
 
             return this.options.fill.repeat(diff / this.options.fill.length);
         }

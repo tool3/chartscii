@@ -23,8 +23,8 @@ class ChartProcessor {
         return data.reduce<number>((a, p) => {
             const value = typeof p === "number" ? p : p.value
             const label = typeof p === "number" ? p.toString() : (p.label || p.value.toString());
-
-            this.options.max.value = value >= this.options.max.value ? value : this.options.max.value;
+            const maxValue = this.options.maxValue ? this.options.maxValue : this.options.max.value;
+            this.options.max.value = value >= maxValue ? value : maxValue;
 
             const scaledValue = this.scale(value);
             this.options.max.scaled = scaledValue >= this.options.max.scaled ? scaledValue : this.options.max.scaled;
@@ -52,9 +52,9 @@ class ChartProcessor {
         return 0;
     }
 
-    scale(value: number) {
+    scale(value: number, maxValue: number = this.options.maxValue) {
         const size = this.options.orientation === 'vertical' ? this.options.height : this.options.width;
-        return Math.round((value / this.options.max.value) * size);
+        return Math.round((value / this.options.max.value) * (maxValue || size));
     }
 
     preprocess(data: InputData[]): { processed: InputData[], key: string, total: number } {

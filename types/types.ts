@@ -23,9 +23,10 @@ export type CustomizationOptions = {
     title?: string;
     char?: string;
     fill?: string;
+    theme?: string;
+    maxValue?: number;
     width?: number;
     height?: number;
-    theme?: string;
     barSize?: number;
     padding?: number;
     orientation?: 'horizontal' | 'vertical';

@@ -45,3 +45,6 @@ class Options {
 }
 
 export default Options;
+
+// fills: ░, ▒, ▓
+// chars: ▀, ▁, ▂, ▃, ▄, ▅, ▆, ▇, █, ▉, ▊, ▋, ▌, ▍, ▎, ▏, ▐, ▔, ▕, ▖, ▗, ▘, ▙, ▚, ▛, ▜, ▝, ▞, ▟
