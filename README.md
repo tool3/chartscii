@@ -151,7 +151,7 @@ const options: ChartOptions = {
 | char        | use this character to draw the chart bars                                    | `string`  | `█`                                                                        |
 | orientation | horizontal or vertical                                                       | `string`  | `horizontal`                                                               |
 | theme       | `styl3`'s [themes](https://github.com/tool3/styl3?tab=readme-ov-file#themes) | `string`  |  `undefined`                                           |        
-| structure   | use these characters to draw the enclosing chart borders.                    | `object`  | `typescript{ x: '═', y: '╢', bottomLeft: '╚', axis: '║', topLeft: '╔' }` |
+| structure   | use these characters to draw the enclosing chart borders.                    | `object`  | `{ x: '═', y: '╢', bottomLeft: '╚', axis: '║', topLeft: '╔' }` |
 
 ## chartscii + styl3 = ❤️
 
