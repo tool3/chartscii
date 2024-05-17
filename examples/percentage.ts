@@ -1,24 +1,27 @@
-const Chartscii = require('../index');
+import Chartscii from '../chartscii';
+import { InputData } from '../types/types';
 
 
 const createAsciiCharts = () => {
     // generate random chart data
-    const data = [];
+    const data: InputData[] = [];
     let count = 0;
 
     for (let i = 1; i <= 20; i++) {
-        const value = Math.floor(Math.random() * 1000) + 1;
-        data.push({ value , label: `label ${count++}`, color: value > 200 ? 'green' : 'red' });
+        const value = Math.floor(Math.random() * 10) + 1;
+        data.push({ value , label: `label ${count++}`, color: value > 2 ? 'red' : 'marine' });
     }
 
     // create chart
     const chart = new Chartscii(data, {
-        label: 'Percentage Example',
+        title: 'Percentage',
         width: 100,
         sort: false,
         reverse: false,
-        char: '■',
+        char: '🧊',
+        fill: '🔥',
         colorLabels: true,
+        color: 'purple',
         percentage: true,
         labels: true
     });
@@ -30,5 +33,5 @@ const createAsciiCharts = () => {
 };
 
 
-setInterval(() => createAsciiCharts(), 500);
+setInterval(() => createAsciiCharts(), 300);
 

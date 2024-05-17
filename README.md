@@ -1,421 +1,232 @@
-<img src="./shellfies/logo.png"/>
+# Chartscii 3.0!
 
-[![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)  
+![](./shellfies/chartscii_main.png)
 
-* command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli)
-* typescript usage [typescript](#typescript-usage-example)
+[![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)
+
+for command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli)
+
+Chartscii was rewritten from scratch in TypeScript!
+It includes many new features, improvements and rich formatting capabilities.
+
+# What’s new
+
+✅ Full width and height control.  
+✅ New `padding` and `barSize` options!  
+✅ New `orientation` option! vertical charts are here!  
+✅ New rich styl3 formatting support!  
+✅ New Emoji characters support! [\*](#unicode-issues)
 
 # install
+
 ```bash
 npm install chartscii
 ```
 
 # usage
-`chartscii` accepts an array of data objects, with optional labels, and outputs an ascii bar chart.   
+
+`chartscii` accepts an array of data objects, with optional labels, and outputs an ascii bar chart.
 
 ## usage example
-```js
-const Chartscii = require('chartscii');
+
+```typescript
+import Chartscii from "chartscii";
+
+const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const options = {
+  title: "chartscii",
+  width: 50,
+  theme: "pastel",
+  color: "pink",
+  colorLabels: true,
+  barSize: 2,
+  orientation: "vertical"
+};
+const chart = new Chartscii(data, options);
+console.log(char.create());
+```
+
+![](./shellfies/chartscii_simple.png)
+
+# Input
+
+Chartscii accepts an array of data points to draw the chart.
+
+This can be an array of numbers, or an array of chart points as explained below.
+
+## number[]
+
+If you provide an array of numbers, chartscii will draw each bar using the provided values.
+
+Value is scaled to width/height of chart, depending on the orientation option.
+
+### example
+
+```tsx
+import Chartscii from "chartscii";
+
+const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const chart = new Chartscii(data);
+console.log(chart.create());
+```
+
+![](./shellfies//chartscii_dead_simple.png)
+
+## ChartPoint[]
+
+For maximum flexibility, provide an array of chart points. This will allow you to customize the following properties:
+
+| name  | description | type   | default       |
+| ----- | ----------- | ------ | ------------- |
+| label | bar label   | string | point.value   |
+| value | bar value   | number | N/A           |
+| color | bar color   | string | options.color |
+
+### example
+
+```tsx
+import Chartscii from 'chartscii';
+
+const data = [{ label: 'label', value: 2, color: 'pink' }, { label: 'label', value: 2, color: 'purple' }, { label: 'label', value: 2, color: 'marine' },];
+const chart = new Chartscii(data, { colorLabels: true });
+console.log(chart.create());
+```
+![](./shellfies/chartscii_chartpoint.png)
 
 
-// generate random chart data
+# Options
+
+You can customize the look and size of the chart, as well as rich formatting for labels provided by `styl3`.
+
+## default options
+
+Chartscii accepts customization options as a second argument and will merge the provided options with the following one:
+
+```tsx
+const options: ChartOptions = {
+  percentage: false,
+  colorLabels: false,
+  sort: false,
+  reverse: false,
+  naked: false,
+  labels: true,
+  color: undefined,
+  fill: undefined,
+  width: 100,
+  height: 10,
+  padding: 0,
+  barSize: 1,
+  title: "",
+  char: "█",
+  orientation: "horizontal",
+  theme: "",
+  structure: {
+    x: "═",
+    y: "╢",
+    axis: "║",
+    topLeft: "╔",
+    bottomLeft: "╚"
+  }
+};
+```
+
+## customization options
+
+| name        | description                                                                  | type    | default                                                                  |
+| ----------- | ---------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------ |
+| percentage  | calculate and show percentage data                                           | `boolean` | `false`                                                                    |
+| colorLabels | color labels with provided color per label, or color provided to option      | `boolean` | `false`                                                                    |
+| sort        | sort the input data                                                          | `boolean` | `false`                                                                    |
+| reverse     | reverse the input data                                                       | `boolean` | `false`                                                                    |
+| naked       | don’t print chart structure ascii characters                                 | `boolean` | `false`                                                                    |
+| labels      | show labels                                                                  | `boolean` | `true`                                                                     |
+| color       | fallback color or unified char bars color                                    | `string`  | `undefined`                                                                | 
+| fill        | use this character to fill remaining chart bar space                         | `string`  | `undefined`                                                                |
+| maxValue    | values are scaled proportionate to this value. otherwise the max will be calculated from the provided data.  | `number`  | `undefined`                                                                |
+| width       | width of chart                                                               | `number`  | `100`                                                                      |
+| height      | height of chart                                                              | `number`  | `10`                                                                       |
+| padding     | padding between bars                                                         | `number`  | `0`                                                                        |
+| barSize     | size of each bar                                                             | `number`  | `1`                                                                        |
+| title       | chart title                                                                  | `string`  | `undefined`                                                                |
+| char        | use this character to draw the chart bars                                    | `string`  | `█`                                                                        |
+| orientation | horizontal or vertical                                                       | `string`  | `horizontal`                                                               |
+| theme       | `styl3`'s [themes](https://github.com/tool3/styl3?tab=readme-ov-file#themes) | `string`  |  `undefined`                                           |        
+| structure   | use these characters to draw the enclosing chart borders.                    | `object`  | `typescript{ x: '═', y: '╢', bottomLeft: '╚', axis: '║', topLeft: '╔' }` |
+
+## chartscii + styl3 = ❤️
+
+You can use `styl3`’s [formatting](https://github.com/tool3/styl3?tab=readme-ov-file#map) for cool themes, built-in color names and rich label formatting.
+
+You should check out `styl3` for a full list of customization options.
+
+### example
+
+```tsx
+const colors = [
+  "red",
+  "green",
+  "yellow",
+  "blue",
+  "purple",
+  "pink",
+  "cyan",
+  "orange"
+];
+
 const data = [];
-
-for (let i = 1; i <= 20; i++) {
-    data.push(Math.floor(Math.random() * 100) + 1);
+for (let i = 0; i < colors.length; i++) {
+  const color = colors[i];
+  data.push({ value: i + 1, color, label: `@invert ${i}@`, theme: "pastel" });
 }
 
-// create chart
 const chart = new Chartscii(data, {
-    label: 'Example Chart',
-    theme: 'lush',
-    width: 50,
-    sort: true,
-    reverse: true,
-    color: 'pink'
+  fill: "░",
+  colorLabels: true,
+  orientation: "vertical"
 });
-console.log(chart.create(), 'example')
-```
 
-outputs:
-<img width="1000" src="./shellfies/example.png"/>   
-
-you can customize the acsii character for the bar chart using the `char` option. for example:   
-```js
-const chart = new Chartscii(data, {
-    label: 'Example Chart',
-    theme: 'pastel',
-    width: 50,
-    char: '■',
-    sort: true,
-    reverse: true,
-    color: 'green'
-});
-```
-
-outputs:   
-<img width="1000" src="./shellfies/char.png"/>   
-
-## typescript usage example
-example usage in typescript:   
-```ts
-import Chartscii, {ChartData} from 'chartscii';
-
-const data: Array<ChartData> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const chart: Chartscii = new Chartscii(data, { naked: true });
 console.log(chart.create());
 ```
-# options 
-## data options
-`chartscii` accepts data in objects or simply an array of numeric values
-```js
-[{ value: 2, label: 'some_label' }, { value: 2, label: 'some_label' }] 
-```
+![](./shellfies/chartscii_styl3.png)
 
-```js
-[3, 34, 45]
-```
 
-### label (string)
-a label for the data point.
+# examples
+here are some examples of charts using `styl3`'s formatting on the chart labels.    
 
-### value (number)
-a value for a bar in a chart.
+> [!TIP]  
+> you can run more examples from the `./examples/` directory of this repository using `ts-node`.   
+> for example `npx ts-node examples/loaders.ts` 
 
-### color (string)
-a color to paint the bar (colors label as well if `colorLabel: true`)   
-color should correspond to the [supported colors](#supported-colors)
+## vertical
 
-## chart options
+| options | chart |
+| ---- | ----- |
+| beach theme with italic and bold labels with a bar size of 2 | ![](./shellfies/vertical/chartscii_beach_italic_bold_barsize.png) |
+| pastel theme with bold and underlined labels with padding of 2 | ![](./shellfies/vertical/chartscii_pastel_bold_underline_padding.png) |
+| lush theme with strikedout labels no padding and emoji | ![](./shellfies/vertical/chartscii_lush_strikeout_emoji.png) |
+| lush theme with underlined labels no padding and no axis structure char | ![](./shellfies/vertical/chartscii_lush_underline_no_axis_structure.png) |
+| standard theme with dimmed and italic labels and padding 1 | ![](./shellfies/vertical/chartscii_standard_dimmed_italic_padding_structure.png) |
+| pastel theme with inverted and underlined labels with a dark fill character | ![](./shellfies/vertical/chartscii_pastel_inverted_underline_dark_fill.png) |
 
-### label (string)
-a label for the chart.
+## horizontal
 
-### width (number)
-the width of the chart, scales values accordingly   
-default: `100`
+| options | chart |
+| ---- | ----- |
+| pastel theme with bold labels and percentage | ![](./shellfies/horizontal/chartscii_pastel_bold_percentage.png) |
+| lush theme with inverted labels and naked chart | ![](./shellfies/horizontal/chartscii_pastel_lush_invert_naked.png) |
+| beach theme with underlined labels and different structure characters | ![](./shellfies/horizontal/chartscii_beach_underline_structure.png) |
+| pastel theme with padding of 1 and custom char | ![](./shellfies/horizontal/chartscii_pastel_char.png) |
+| pastel theme with naked chart - can be used to create loaders | ![](./shellfies/horizontal/chartscii_loaders.png) |
 
-### sort (boolean)
-sort data   
-default: `false`
+# Unicode issues
 
-### reverse (boolean)
-reverse chart values order   
-default: `false`
+Unfortunately, there are some known issues with specific unicode characters width.  
+This means that some emoji/unicode characters renders as 2 characters wide (or more) instead of 1, which is not a problem in itself.  
+The problem is that Javscript determines this length as 1, which creates an issue with label alignment, or drawing the chart bars correctly.
 
-### char (string)
-ascii char for bars   
-default: `█`
+> [!WARNING]  
+> If you have issues with label alignment, or the chart bars aren't spaced correctly - you are probably using an emoji/unicode character which produce the wrong width in javascript.
 
-### fill (string)
-fill chart with ascii character.   
-no default.   
-recommended: `░`
-
-### color (string)
-color bars in chart and label if provided.     
-see [colors](#colors)
-
-### percentage (boolean)
-show percentage of each bar, using the highest value in the provided data array   
-default `false`
-
-### colorLabels (boolean)
-color labels as well   
-default `false`
-
-### naked (boolean)
-don't print chart ascii structure
-default `false`
-
-## color
-this lib uses `styl3`, which has built in themes, the string you input in the color property of the chart or of a data point, will change depending on the theme.
-defaults to `pastel`.   
-these are the currently supported colors, provided as string in the data object (e.g `{ value: 3, color: 'green' }`) or for the entire chart as an option.
- - red
- - green
- - yellow
- - blue
- - purple
- - pink
- - cyan
- - orange
-
- > NOTE: you can also provide a string formatted color: '\x1b[32;1m'
- > see: https://misc.flogisoft.com/bash/tip_colors_and_formatting
-
-### themed charts
-<img src="./shellfies/default.png" />
-<img src="./shellfies/standard.png" />
-<img src="./shellfies/pastel.png" />
-<img src="./shellfies/lush.png" />
-<img src="./shellfies/beach.png" />
-
-<!--
-# Examples
-## intro example
-intro example, using no labels (value of bar is the default label)   
-
-<img width="1000" src="https://tool3.github.io/chartscii/img/example.svg"/>   
-
-```js
-const Chartscii = require('chartscii');
-
-
-const createAsciiCharts = () => {
-    let color = '';
-
-    const colors = ['green',
-        'red',
-        'cyan',
-        'pink',
-        'blue',
-        'yellow'
-    ];
-
-    // generate random chart data
-    const data = [];
-    
-    for (let i = 1; i <= 20; i++) {
-        color = colors[Math.floor(Math.random() * colors.length)];
-        data.push(Math.floor(Math.random() * 1000) + 1);
-    }
-
-    // create chart
-    const chart = new Chartscii(data, {
-        label: 'Example Chart',
-        width: 500,
-        sort: true,
-        reverse: true,
-        color
-    });
-
-    //print chart
-    process.stdout.write('\033c');
-    process.stdout.write(`${chart.create()}\n`);
-    
-};
-
-
-setInterval(() => createAsciiCharts(), 500);
-```
-
-## conditional colors example
-
-<img width="1000" src="https://tool3.github.io/chartscii/img/conditional_colors.svg"/>   
-
-```js
-const Chartscii = require('../index');
-
-
-const createAsciiCharts = () => {
-    // generate random chart data
-    const data = [];
-    let count = 0;
-
-    for (let i = 1; i <= 20; i++) {
-        const value = Math.floor(Math.random() * 1000) + 1;
-        data.push({ value , label: `label ${count++}`, color: value > 200 ? 'green' : 'red' });
-    }
-
-    // create chart
-    const chart = new Chartscii(data, {
-        label: 'Conditional Colors',
-        color: 'green',
-        width: 500,
-        sort: false,
-        reverse: false,
-        char: '■',
-        colorLabels: true,
-        percentage: true,
-        labels: true
-    });
-
-    //print chart
-    process.stdout.write('\x1Bc');
-    process.stdout.write(`${chart.create()}\n`);
-    
-};
-
-
-setInterval(() => createAsciiCharts(), 500);
-```
-
-## fancy example
-fancy example, using labels with colors   
-
-<img width="1000" src="https://tool3.github.io/chartscii/img/fancy.svg"/>   
-
-```js
-const Chartscii = require('chartscii');
-
-
-const createAsciiCharts = () => {
-    let color = '';
-
-    const colors = ['green',
-        'red',
-        'cyan',
-        'pink',
-        'blue',
-        'yellow'
-    ];
-
-    // generate random chart data
-    const data = [];
-    
-    for (let i = 1; i <= 20; i++) {
-        color = colors[Math.floor(Math.random() * colors.length)];
-        data.push({ value: Math.floor(Math.random() * 1000) + 1, color });
-    }
-
-    // create chart
-    const chart = new Chartscii(data, {
-        label: 'Example Chart',
-        width: 500,
-        sort: true,
-        reverse: true,
-        colorLabels: true
-        color: color
-    });
-
-    //print chart
-    process.stdout.write('\033c');
-    process.stdout.write(`${chart.create()}\n`);
-    
-};
-
-
-setInterval(() => createAsciiCharts(), 500);
-```
-
-## percentage example
-using percentage, solid color with label colors   
-
-<img width="1000" src="https://tool3.github.io/chartscii/img/percentage.svg"/>   
-
-```js
-const Chartscii = require('chartscii');
-
-
-const createAsciiCharts = () => {
-    // generate random chart data
-    const data = [];
-    let count = 0;
-    for (let i = 1; i <= 20; i++) {
-        
-        data.push({ value: Math.floor(Math.random() * 1000) + 1, label: `${count++}` });
-    }
-
-    // create chart
-    const chart = new Chartscii(data, {
-        label: 'Example Chart',
-        width: 500,
-        sort: true,
-        reverse: true,
-        color: colors[Math.floor(Math.random() * colors.length)];
-        colorLabels: true,
-        percentage: true
-    });
-
-    //print chart
-    process.stdout.write('\033c');
-    process.stdout.write(`${chart.create()}\n`);
-    
-};
-
-
-setInterval(() => createAsciiCharts(), 500);
-```
-
-## waka time example
-if you are using waka-time, then use this example to see your last 7 days coding stats with `chartscii`!   
-```js
-const Chartscii = require('chartscii');
-
-const waka = 'your api call to get last 7 days waka stats: https://wakatime.com/developers/#stats'
-const { languages }  = waka.data;
-
-const data = languages.map(lang => {
-    return { value: lang.total_seconds * 60, label: lang.name };
-});
-
-const chart = new Chartscii(data, {
-    label: 'Weekly Coding Stats',
-    width: 65,
-    sort: true,
-    percentage: true,
-    fill: '░',
-    char: '█'
-});
-
-//print chart
-console.log(chart.create());
-```
-outputs:
-
-```text
-Weekly Coding Stats                   
-JavaScript (68.3%) ╢████████████████████████████████████████████
-  Markdown (11.8%) ╢████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
- TypeScript (5.7%) ╢████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-       HTML (5.3%) ╢███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-       YAML (4.7%) ╢███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-       Bash (3.3%) ╢██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-       JSON (0.8%) ╢█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-                   ╚════════════════════════════════════════════
-```
-
-or naked and no title:   
-```js
-const chart = new Chartscii(data, {
-    width: 65,
-    sort: true,
-    reverse: true,
-    naked: true,
-    fill: '░',
-    char: '█',
-    percentage: true
-});
-```
-
-
-```text   
-JavaScript (68.3%)  ████████████████████████████████████████████
-  Markdown (11.8%)  ████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
- TypeScript (5.7%)  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-       HTML (5.3%)  ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-       YAML (4.7%)  ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-       Bash (3.3%)  ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-       JSON (0.8%)  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-```
-
-## theme example
-```javascript
-const shellfie = require('shellfie');
-const Chartscii = require('./');
-const style = require('styl3')({theme: 'pastel'});
-
-(async function () {
-  const data = [];
-  const keys = Object.values(style.colors.pastel);
-  for (let i = 0; i < keys.length; i++) {
-    const color = keys[i];
-    data.push({ value: i + 1, label: `label ${i}`, color });
-  }
-  const chart = new Chartscii(data, {
-    theme: 'lush',
-    label: style.pink`*LUSH THEME*`,
-    percentage: true,
-    colorLabels: true,
-    width: 50,
-  });
-  await shellfie(chart.create(), { name: 'chart', viewport: {height: 300} });
-})();
-```
-
-<img src="./shellfies/chart.png" />
-
-[![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)  
-!-->
-
+If you encounter this issue unfortunately the current solution is to simply use a different emoji.  
+(For example: 🔥 works well while ✅ will result in a misaligned chart).  
+PRs for this problem are more than welcome.

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022", "dom"],
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": false,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "declaration": true,
+    "types": ["@types/mocha", "@types/node"]
+  },
+  "exclude": ["examples", "shellfies", "dist", "node_modules", "*.test.ts"]
+}
