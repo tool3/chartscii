@@ -13,7 +13,6 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build:types": "npm-dts generate",
     "test": "mocha -r ts-node/register index.test.ts",
     "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" "
   },
