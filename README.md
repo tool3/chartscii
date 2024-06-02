@@ -85,18 +85,14 @@ For maximum flexibility, provide an array of chart points. This will allow you t
 ### example
 
 ```tsx
-import Chartscii from "chartscii";
+import Chartscii from 'chartscii';
 
-const data = [
-  { label: "label", value: 2, color: "pink" },
-  { label: "label", value: 2, color: "purple" },
-  { label: "label", value: 2, color: "marine" }
-];
+const data = [{ label: 'label', value: 2, color: 'pink' }, { label: 'label', value: 2, color: 'purple' }, { label: 'label', value: 2, color: 'marine' },];
 const chart = new Chartscii(data, { colorLabels: true });
 console.log(chart.create());
 ```
-
 ![](./shellfies/chartscii_chartpoint.png)
+
 
 # Options
 
@@ -136,26 +132,26 @@ const options: ChartOptions = {
 
 ## customization options
 
-| name        | description                                                                                                 | type      | default                                                        |
-| ----------- | ----------------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------- | ----------- |
-| percentage  | calculate and show percentage data                                                                          | `boolean` | `false`                                                        |
-| colorLabels | color labels with provided color per label, or color provided to option                                     | `boolean` | `false`                                                        |
-| sort        | sort the input data                                                                                         | `boolean` | `false`                                                        |
-| reverse     | reverse the input data                                                                                      | `boolean` | `false`                                                        |
-| naked       | don’t print chart structure ascii characters                                                                | `boolean` | `false`                                                        |
-| labels      | show labels                                                                                                 | `boolean` | `true`                                                         |
-| color       | fallback color or unified char bars color                                                                   | `string`  | `undefined`                                                    |
-| fill        | use this character to fill remaining chart bar space                                                        | `string`  | `undefined`                                                    |
-| scale       | values are scaled proportionate to this value. otherwise the max will be calculated from the provided data. | `number`  | `string`                                                       | `auto` |
-| width       | width of chart                                                                                              | `number`  | `100`                                                          |
-| height      | height of chart                                                                                             | `number`  | `10`                                                           |
-| padding     | padding between bars                                                                                        | `number`  | `0`                                                            |
-| barSize     | size of each bar                                                                                            | `number`  | `1`                                                            |
-| title       | chart title                                                                                                 | `string`  | `undefined`                                                    |
-| char        | use this character to draw the chart bars                                                                   | `string`  | `█`                                                            |
-| orientation | horizontal or vertical                                                                                      | `string`  | `horizontal`                                                   |
-| theme       | `styl3`'s [themes](https://github.com/tool3/styl3?tab=readme-ov-file#themes)                                | `string`  | `undefined`                                                    |
-| structure   | use these characters to draw the enclosing chart borders.                                                   | `object`  | `{ x: '═', y: '╢', bottomLeft: '╚', axis: '║', topLeft: '╔' }` |
+| name        | description                                                                  | type    | default                                                                  |
+| ----------- | ---------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------ |
+| percentage  | calculate and show percentage data                                           | `boolean` | `false`                                                                    |
+| colorLabels | color labels with provided color per label, or color provided to option      | `boolean` | `false`                                                                    |
+| sort        | sort the input data                                                          | `boolean` | `false`                                                                    |
+| reverse     | reverse the input data                                                       | `boolean` | `false`                                                                    |
+| naked       | don’t print chart structure ascii characters                                 | `boolean` | `false`                                                                    |
+| labels      | show labels                                                                  | `boolean` | `true`                                                                     |
+| color       | fallback color or unified char bars color                                    | `string`  | `undefined`                                                                | 
+| fill        | use this character to fill remaining chart bar space                         | `string`  | `undefined`                                                                |
+| scale    | values are scaled proportionate to this value. otherwise the max will be calculated from the provided data.  | `number`  | `undefined`                                                                |
+| width       | width of chart                                                               | `number`  | `100`                                                                      |
+| height      | height of chart                                                              | `number`  | `10`                                                                       |
+| padding     | padding between bars                                                         | `number`  | `0`                                                                        |
+| barSize     | size of each bar                                                             | `number`  | `1`                                                                        |
+| title       | chart title                                                                  | `string`  | `undefined`                                                                |
+| char        | use this character to draw the chart bars                                    | `string`  | `█`                                                                        |
+| orientation | horizontal or vertical                                                       | `string`  | `horizontal`                                                               |
+| theme       | `styl3`'s [themes](https://github.com/tool3/styl3?tab=readme-ov-file#themes) | `string`  |  `undefined`                                           |        
+| structure   | use these characters to draw the enclosing chart borders.                    | `object`  | `{ x: '═', y: '╢', bottomLeft: '╚', axis: '║', topLeft: '╔' }` |
 
 ## chartscii + styl3 = ❤️
 
@@ -191,37 +187,36 @@ const chart = new Chartscii(data, {
 
 console.log(chart.create());
 ```
-
 ![](./shellfies/chartscii_styl3.png)
 
-# examples
 
-here are some examples of charts using `styl3`'s formatting on the chart labels.
+# examples
+here are some examples of charts using `styl3`'s formatting on the chart labels.    
 
 > [!TIP]  
-> you can run more examples from the `./examples/` directory of this repository using `ts-node`.  
-> for example `npx ts-node examples/loaders.ts`
+> you can run more examples from the `./examples/` directory of this repository using `ts-node`.   
+> for example `npx ts-node examples/loaders.ts` 
 
 ## vertical
 
-| options                                                                     | chart                                                                            |
-| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| beach theme with italic and bold labels with a bar size of 2                | ![](./shellfies/vertical/chartscii_beach_italic_bold_barsize.png)                |
-| pastel theme with bold and underlined labels with padding of 2              | ![](./shellfies/vertical/chartscii_pastel_bold_underline_padding.png)            |
-| lush theme with strikedout labels no padding and emoji                      | ![](./shellfies/vertical/chartscii_lush_strikeout_emoji.png)                     |
-| lush theme with underlined labels no padding and no axis structure char     | ![](./shellfies/vertical/chartscii_lush_underline_no_axis_structure.png)         |
-| standard theme with dimmed and italic labels and padding 1                  | ![](./shellfies/vertical/chartscii_standard_dimmed_italic_padding_structure.png) |
-| pastel theme with inverted and underlined labels with a dark fill character | ![](./shellfies/vertical/chartscii_pastel_inverted_underline_dark_fill.png)      |
+| options | chart |
+| ---- | ----- |
+| beach theme with italic and bold labels with a bar size of 2 | ![](./shellfies/vertical/chartscii_beach_italic_bold_barsize.png) |
+| pastel theme with bold and underlined labels with padding of 2 | ![](./shellfies/vertical/chartscii_pastel_bold_underline_padding.png) |
+| lush theme with strikedout labels no padding and emoji | ![](./shellfies/vertical/chartscii_lush_strikeout_emoji.png) |
+| lush theme with underlined labels no padding and no axis structure char | ![](./shellfies/vertical/chartscii_lush_underline_no_axis_structure.png) |
+| standard theme with dimmed and italic labels and padding 1 | ![](./shellfies/vertical/chartscii_standard_dimmed_italic_padding_structure.png) |
+| pastel theme with inverted and underlined labels with a dark fill character | ![](./shellfies/vertical/chartscii_pastel_inverted_underline_dark_fill.png) |
 
 ## horizontal
 
-| options                                                               | chart                                                               |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| pastel theme with bold labels and percentage                          | ![](./shellfies/horizontal/chartscii_pastel_bold_percentage.png)    |
-| lush theme with inverted labels and naked chart                       | ![](./shellfies/horizontal/chartscii_pastel_lush_invert_naked.png)  |
+| options | chart |
+| ---- | ----- |
+| pastel theme with bold labels and percentage | ![](./shellfies/horizontal/chartscii_pastel_bold_percentage.png) |
+| lush theme with inverted labels and naked chart | ![](./shellfies/horizontal/chartscii_pastel_lush_invert_naked.png) |
 | beach theme with underlined labels and different structure characters | ![](./shellfies/horizontal/chartscii_beach_underline_structure.png) |
-| pastel theme with padding of 1 and custom char                        | ![](./shellfies/horizontal/chartscii_pastel_char.png)               |
-| pastel theme with naked chart - can be used to create loaders         | ![](./shellfies/horizontal/chartscii_loaders.png)                   |
+| pastel theme with padding of 1 and custom char | ![](./shellfies/horizontal/chartscii_pastel_char.png) |
+| pastel theme with naked chart - can be used to create loaders | ![](./shellfies/horizontal/chartscii_loaders.png) |
 
 # Unicode issues
 
