@@ -23,17 +23,17 @@ class ChartProcessor {
         return data.reduce<number>((a, p) => {
             const value = typeof p === "number" ? p : p.value
             const label = typeof p === "number" ? p.toString() : (p.label || p.value.toString());
-            const maxValue = this.options.maxValue ? this.options.maxValue : this.options.max.value;
-            this.options.max.value = value >= maxValue ? value : maxValue;
+
+            this.options.max.value = value >= this.options.max.value ? value : this.options.max.value;
 
             const scaledValue = this.scale(value);
             this.options.max.scaled = scaledValue >= this.options.max.scaled ? scaledValue : this.options.max.scaled;
 
             const percentage = this.percentage(value, total);
             const percentageLength = percentage ? percentage.toFixed(2).length + 5 : 0;
-            
+
             const maxLabelLength = this.options.percentage ? label.length + percentageLength : label.length;
-            
+
 
             if (this.options.labels) {
                 this.options.max.label = maxLabelLength > this.options.max.label ? maxLabelLength : this.options.max.label;
@@ -52,9 +52,18 @@ class ChartProcessor {
         return 0;
     }
 
-    scale(value: number, maxValue: number = this.options.maxValue) {
+    scale(value: number) {
         const size = this.options.orientation === 'vertical' ? this.options.height : this.options.width;
-        return Math.round((value / this.options.max.value) * (maxValue || size));
+        
+        const { scale, max } = this.options;
+
+        if (scale === "auto") {
+            return Math.round((value / max.value) * size);
+        } else if (typeof scale === "number" && scale > 0) {
+            return Math.round(value / scale)
+        } else {
+            return value;
+        }
     }
 
     preprocess(data: InputData[]): { processed: InputData[], key: string, total: number } {
@@ -74,12 +83,13 @@ class ChartProcessor {
 
         processed.forEach((point, i) => {
             const { color = this.options.color, label, value } = typeof point === "number" ? { value: point, label: point.toString() } : point;
-            const scaledValue = this.scale(value);
+            const scaled = Number(this.scale(value).toFixed(2));
+
             const formattedPoint = {
                 label: label || value.toString(),
                 value,
                 color,
-                scaled: scaledValue,
+                scaled,
                 percentage: this.percentage(value, total)
             }
             chartData.set(i, formattedPoint);

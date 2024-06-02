@@ -16,6 +16,7 @@ export type CustomizationOptions = {
     sort?: boolean;
     percentage?: boolean;
     colorLabels?: boolean;
+    valueLabels?: boolean;
     reverse?: boolean;
     naked?: boolean;
     labels?: boolean;
@@ -24,7 +25,7 @@ export type CustomizationOptions = {
     char?: string;
     fill?: string;
     theme?: string;
-    maxValue?: number;
+    scale?: string | number;
     width?: number;
     height?: number;
     barSize?: number;

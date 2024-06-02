@@ -13,8 +13,7 @@ const colors = [
     'cyan',
     'orange',
     'purple',
-    'pink',
-    'blue'
+    'marine',
 ];
 const labels = ['c', 'h', 'a', 'r', 't', 's', 'c', 'i', 'i', '🔥'];
 
@@ -22,7 +21,7 @@ function generateChartData() {
     const data: InputData[] = [];
     for (let i = 0; i < colors.length; i++) {
         const color = colors[i];
-        data.push({ value: i + 1, label: labels[i], color });
+        data.push({ value: (i + 1) * 10, label: labels[i], color });
     }
     return data;
 }
@@ -68,12 +67,11 @@ describe('chartscii tests', () => {
         const data = generateChartData();
         chart = new Chartscii(data, { percentage: true });
         const result = [...chart.chart.values()][0];
-        expect(result.percentage).to.equal(1.5151515151515151);
+        expect(result.percentage).to.equal(1.8181818181818181);
     });
 });
 
 describe('examples', () => {
-
     it('should match example', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { color: 'pink', colorLabels: true });
@@ -105,7 +103,6 @@ describe('examples', () => {
     it('should support fill', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { fill: '░', colorLabels: true });
-
         await snap(chart.create(), 'fill');
     });
 
@@ -170,88 +167,108 @@ describe('examples', () => {
         const chart = new Chartscii(data, { barSize: 2, width: 100, colorLabels: true, percentage: true });
         await snap(chart.create(), 'styl3 formatting');
     });
+    it('should support value labels', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color, label: `@invert ${i}@` });
+        }
+        const chart = new Chartscii(data, { barSize: 4, fill: '░', colorLabels: true, valueLabels: true });
+
+        await snap(chart.create(), 'value labels');
+    });
+    it('should support value labels no fill', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color, label: `*bold ${i}*` });
+        }
+        const chart = new Chartscii(data, { barSize: 4, colorLabels: true, valueLabels: true });
+
+        await snap(chart.create(), 'value labels no fill');
+    });
 });
 
 describe('vertical', () => {
 
     it('should support vertical orientation', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { width: 100, color: 'pink', colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 100, color: 'pink', colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'vertical');
     });
 
     it('should support barSize', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { width: 100, barSize: 5, color: 'green', colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 100, barSize: 5, color: 'green', colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'vertical barSize');
     });
 
     it('should support color per bar and label', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { width: 100, barSize: 5, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 100, barSize: 5, colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'vertical colors');
     });
 
     it('should support labeless vertical chart', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { labels: false, orientation: 'vertical' });
+        const chart = new Chartscii(data, { labels: false, orientation: 'vertical', });
 
         await snap(chart.create(), 'labeless vertical chart');
     });
 
     it('should support labeless colorful chart', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { labels: false, orientation: 'vertical' });
+        const chart = new Chartscii(data, { labels: false, orientation: 'vertical', });
         await snap(chart.create(), 'labeless color vertical chart');
     });
 
     it('should support vertical fill', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { fill: '░', colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { fill: '░', colorLabels: true, orientation: 'vertical', });
 
         await snap(chart.create(), 'vertical fill');
     });
 
     it('should support padding', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { fill: '░', padding: 4, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { fill: '░', padding: 4, colorLabels: true, orientation: 'vertical', });
 
         await snap(chart.create(), 'vertical padding');
     });
 
     it('should support vertical emoji character', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { char: '🌏', barSize: 2, orientation: 'vertical' });
+        const chart = new Chartscii(data, { char: '🌏', barSize: 2, orientation: 'vertical', });
         await snap(chart.create(), 'vertical emojis');
     });
 
     it('should support pastel theme', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { theme: 'pastel', barSize: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { theme: 'pastel', barSize: 2, width: 100, colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'pastel theme vertical');
     });
 
     it('should support lush theme', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { theme: 'lush', barSize: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { theme: 'lush', barSize: 2, width: 100, colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'lush theme vertical');
     });
 
     it('should support standard theme', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { theme: 'standard', barSize: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { theme: 'standard', barSize: 2, width: 100, colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'standard theme vertical');
     });
 
     it('should support beach theme', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { theme: 'beach', barSize: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { theme: 'beach', barSize: 2, width: 100, colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'beach theme vertical');
     });
 
     it('should support default theme', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { barSize: 2, width: 100, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { barSize: 2, width: 100, colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'default theme vertical');
     });
 
@@ -261,9 +278,30 @@ describe('vertical', () => {
             const color = colors[i];
             data.push({ value: i + 1, color, label: `@invert ${i}@` });
         }
-        const chart = new Chartscii(data, { fill: '░', colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { fill: '░', colorLabels: true, orientation: 'vertical', });
 
         await snap(chart.create(), 'styl3 formatting vertical');
+    });
+
+    it('should support value labels', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color, label: `@invert ${i}@` });
+        }
+        const chart = new Chartscii(data, { barSize: 4, fill: '░', colorLabels: true, orientation: 'vertical', valueLabels: true });
+
+        await snap(chart.create(), 'value labels vertical');
+    });
+    it('should support value labels no fill', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1, color, label: `*bold ${i}*` });
+        }
+        const chart = new Chartscii(data, { barSize: 4, colorLabels: true, orientation: 'vertical', valueLabels: true });
+
+        await snap(chart.create(), 'value labels vertical no fill');
     });
 });
 
@@ -271,27 +309,28 @@ describe('scale', () => {
     const data = generateChartData();
 
     it('should support char of different widths', async () => {
-        const chart = new Chartscii(data, { width: 100, color: 'pink', char: '++', colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 100, color: 'pink', char: '++', colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'scale char');
     });
 
     it('should support char and fill of different widths', async () => {
-        const chart = new Chartscii(data, { width: 100, color: 'pink', char: '🔥', fill: '🧊', colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 100, color: 'pink', char: '🔥', fill: '🧊', colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'scale char widths');
     });
 
     it('should support char and fill of different widths non equally', async () => {
-        const chart = new Chartscii(data, { width: 100, color: 'pink', char: '🔥', fill: '+', colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 100, color: 'pink', char: '🔥', fill: '+', colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'scale char widths non equal');
     });
 
     it('should support char and fill of different widths non equally reversed', async () => {
-        const chart = new Chartscii(data, { width: 100, color: 'blue', char: '+', fill: '🔥', colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { color: 'blue', char: '+', fill: '🔥', colorLabels: true, orientation: 'vertical', });
+
         await snap(chart.create(), 'scale char widths non equal reversed');
     });
 
     it('should support padding and width', async () => {
-        const chart = new Chartscii(data, { width: 150, color: 'cyan', padding: 2, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 150, color: 'cyan', padding: 2, colorLabels: true, orientation: 'vertical', });
         await snap(chart.create(), 'scale char padding');
     });
 

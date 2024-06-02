@@ -15,6 +15,7 @@ export const defaultOptions: CustomizationOptions = {
     padding: 0,
     orientation: 'horizontal',
     theme: '',
+    scale: 'auto',
     structure: {
         x: '═',
         y: '╢',
