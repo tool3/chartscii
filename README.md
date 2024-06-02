@@ -142,7 +142,7 @@ const options: ChartOptions = {
 | labels      | show labels                                                                  | `boolean` | `true`                                                                     |
 | color       | fallback color or unified char bars color                                    | `string`  | `undefined`                                                                | 
 | fill        | use this character to fill remaining chart bar space                         | `string`  | `undefined`                                                                |
-| scale    | values are scaled proportionate to this value. otherwise the max will be calculated from the provided data.  | `number`  | `undefined`                                                                |
+| scale    | values are scaled proportionate to this value. otherwise the max will be calculated from the provided data.  | `number` or `string`  | `auto`                                                                |
 | width       | width of chart                                                               | `number`  | `100`                                                                      |
 | height      | height of chart                                                              | `number`  | `10`                                                                       |
 | padding     | padding between bars                                                         | `number`  | `0`                                                                        |
