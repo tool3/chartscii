@@ -21,16 +21,16 @@ const data = [
 const chart = new Chartscii(data, {
     color: 'green',
     width: 100,
-    height: 30,
-    padding: 2,
-    // barSize: 2,
+    // height: 30,
+    // padding: 2,
+    barSize: 2,
     fill: '░',
     // char: '▌',
     valueLabels: true,
     theme: 'pastel',
     colorLabels: true,
     naked: true,
-    // scale: 'auto',
+    scale: 'auto',
     orientation: 'vertical'
 });
 

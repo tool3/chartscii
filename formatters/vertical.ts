@@ -37,9 +37,9 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private getMaxHeight(): number {
-        const height = this.options.height + (this.options.valueLabels ? 1 : 0);
+        const height = this.options.height + ((this.options.valueLabels && !this.options.fill) ? 1 : 0);
         const maxValue = this.options.scale === "auto" ? height : this.options.scale as number;
-        return maxValue;
+        return height;
     }
 
     private isLongChar(): boolean {
