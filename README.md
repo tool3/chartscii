@@ -92,7 +92,7 @@ const data = [
   { label: "label", value: 2, color: "purple" },
   { label: "label", value: 2, color: "marine" }
 ];
-const chart = new Chartscii(data, { colorLabels: true });
+const chart = new Chartscii(data, { colorLabels: true, valueLabels: true });
 console.log(chart.create());
 ```
 
@@ -140,7 +140,7 @@ const options: ChartOptions = {
 | ----------- | ----------------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------- |
 | percentage  | calculate and show percentage data                                                                          | `boolean`            | `false`                                                        |
 | colorLabels | color labels with provided color per label, or color provided to option                                     | `boolean`            | `false`                                                        |
-| valueLabels | show values of each bar                                                                                     | `boolean`            | `true`                                                         |
+| valueLabels | show values of each bar                                                                                     | `boolean`            | `false`                                                        |
 | sort        | sort the input data                                                                                         | `boolean`            | `false`                                                        |
 | reverse     | reverse the input data                                                                                      | `boolean`            | `false`                                                        |
 | naked       | don’t print chart structure ascii characters                                                                | `boolean`            | `false`                                                        |

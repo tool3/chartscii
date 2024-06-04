@@ -29,8 +29,8 @@ const data = [
   { label: "label", value: 1, color: "pink" },
   { label: "label", value: 2, color: "purple" },
   { label: "label", value: 1.5, color: "marine" },
-  { label: "label", value: 3, color: "red" },
-  { label: "label", value: 2.5, color: "blue" }
+  { label: "label", value: 3, color: "orange" },
+  { label: "label", value: 2.5, color: "green" }
 ];
 const chart = new Chartscii(data, {
     // height: 10
@@ -40,7 +40,8 @@ const chart = new Chartscii(data, {
     // barSize: 1,
     padding: 1,
     barSize: 1,
-    valueLabels: true
+    valueLabels: true,
+    colorLabels: true,
     // naked: true,
     // valueLabels: true,
     // fill: '░',
