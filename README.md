@@ -222,7 +222,7 @@ here are some examples of charts using `styl3`'s formatting on the chart labels.
 | lush theme with inverted labels and naked chart                       | ![](./shellfies/horizontal/chartscii_pastel_lush_invert_naked.png)  |
 | beach theme with underlined labels and different structure characters | ![](./shellfies/horizontal/chartscii_beach_underline_structure.png) |
 | pastel theme with padding of 1 and custom char                        | ![](./shellfies/horizontal/chartscii_pastel_char.png)               |
-| pastel theme with naked chart to create multiple loaders         | ![](./shellfies/horizontal/chartscii_loaders.png)                   |
+| pastel theme with naked chart to create multiple loaders              | ![](./shellfies/horizontal/chartscii_loaders.png)                   |
 
 # Unicode issues
 
