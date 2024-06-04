@@ -35,6 +35,6 @@
     "typescript": "5.4.5"
   },
   "dependencies": {
-    "styl3": "^1.2.4"
+    "styl3": "3.1.1"
   }
 }

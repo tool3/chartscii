@@ -12,5 +12,5 @@
     "declaration": true,
     "types": ["@types/mocha", "@types/node"]
   },
-  "exclude": ["examples", "shellfies", "dist", "node_modules", "*.test.ts"]
+  "exclude": ["examples", "shellfies", "dist", "node_modules", "index.test.ts"]
 }

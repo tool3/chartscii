@@ -32,16 +32,16 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     formatBar(point: ChartPoint, label: string, barHeight: number, padding: number) {
-        const repeat = Math.floor(point.scaled / this.options.char.length)
+        const repeat = point.scaled / this.options.char.length;
         const color = point.color || this.options.color;
         const value = this.options.char?.repeat(repeat) + this.formatFill(point);
-        const bar = this.scaleBar(value, label, color, barHeight, padding);
+        const bar = this.scaleBar(value, point.value, label, color, barHeight, padding);
 
         return point.color ? this.colorify(bar, color) : bar;
     }
 
 
-    scaleBar(bar: string, label: string, color: string, barHeight: number, padding: number) {
+    scaleBar(bar: string, value: number, label: string, color: string, barHeight: number, padding: number) {
         const strippedLabel = this.stripStyle(label);
         const naked = this.options.naked ? 0 : 1;
         const space = strippedLabel.length - naked;
@@ -49,9 +49,13 @@ class HorizontalChartFormatter extends ChartFormatter {
 
         for (let i = 0; i < barHeight; i++) {
             const char = this.formatStructure(this.options.structure.axis, color);
-
             const pad = i !== 0 ? this.pad(space) + char : '';
-            bars.push(pad + bar)
+
+            if (this.options.valueLabels && i === 0) {
+                bars.push(pad + bar + this.pad(1) + value)
+            } else {
+                bars.push(pad + bar)
+            }
         }
 
         for (let i = 0; i < padding; i++) {
@@ -65,14 +69,16 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     formatFill(point: ChartPoint) {
         if (this.options.fill) {
-            const diff = (this.options.max.scaled - point.scaled);
+            const diff = (this.options.width - point.scaled);
 
-            if (this.options.maxValue) {
-                const width = this.options.maxValue - point.value;
-                return this.options.fill.repeat(width);
+            if (this.options.scale) {
+                const width = Math.floor(this.options.width - Math.floor(point.scaled));
+                if (width > 0) return this.options.fill.repeat(width);
             }
 
-            return this.options.fill.repeat(diff / this.options.fill.length);
+            if (diff > 0) {
+                return this.options.fill.repeat(diff / this.options.fill.length);
+            }
         }
 
         return '';

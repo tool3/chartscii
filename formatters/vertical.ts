@@ -24,7 +24,7 @@ class VerticalChartFormatter extends ChartFormatter {
     private formatChartScale(length: number) {
         const charWidth = this.options.char.length;
         const defaultBarSize = this.options.barSize || 1;
-        const calculatedBarWidth = Math.floor((this.options.width / (defaultBarSize * length)) / charWidth) || 1;
+        const calculatedBarWidth = Math.floor((this.options.width / (defaultBarSize * length)) / charWidth) + 1;
         const barSize = this.options.barSize === undefined ? calculatedBarWidth : this.options.barSize;
 
         const calculatedPadding = Math.round((this.options.width / this.chart.length) / charWidth);
@@ -37,8 +37,9 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private getMaxHeight(): number {
-        const maxValue = this.options.maxValue;
-        return this.options.height || maxValue;
+        const height = this.options.height + ((this.options.valueLabels && !this.options.fill) ? 1 : 0);
+        const maxValue = this.options.scale === "auto" ? height : this.options.scale as number;
+        return height;
     }
 
     private isLongChar(): boolean {
@@ -64,7 +65,7 @@ class VerticalChartFormatter extends ChartFormatter {
     private getCharWidth() {
         return this.isLongChar() ? this.options.char.length : (this.isFillLonger() ? this.options.fill.length : 1);
     }
-    
+
     private getScaledBarSize(barSize: number): number {
         const { char, fill } = this.getCharLengths();
 
@@ -91,7 +92,11 @@ class VerticalChartFormatter extends ChartFormatter {
             const color = point.color;
 
             for (let i = 0; i < maxHeight; i++) {
-                if (i < maxHeight - height) {
+                if (i === maxHeight - height - 1 && this.options.valueLabels && !this.options.fill) {
+                    const label = this.formatValueLabel(point);
+                    const space = barSize - this.stripStyle(label).length + padding;
+                    verticalChart[i][index] = label + ' '.repeat(space);
+                } else if (i < maxHeight - height) {
                     const spaces = this.formatSpace(barSize, padding);
                     const fill = this.formatFill(barSize, padding, color);
                     const fills = this.options.fill ? fill : spaces;
@@ -146,6 +151,18 @@ class VerticalChartFormatter extends ChartFormatter {
         return label;
     }
 
+    private formatValueLabel(point: ChartPoint) {
+        const value = point.value.toString()
+
+        if (this.options.colorLabels) {
+            const color = point.color || this.options.color;
+            const coloredLabel = color ? this.colorify(value, color) : value;
+            return coloredLabel;
+        }
+
+        return value;
+    }
+
     private formatLabels(barSize: number, padding: number) {
         const formatted: string[] = [];
         this.chart.forEach((point, i) => {
@@ -155,7 +172,24 @@ class VerticalChartFormatter extends ChartFormatter {
                 const charLength = this.getCharWidth();
                 const barWidth = this.isLongChar() ? barSize * charLength + padding : barSize + padding + Math.floor(charLength / 2);
                 const rightPad = Math.abs(barWidth - label.length);
-                const isFirst = i === 0 ? 1 : 0;
+                const isFirst = i === 0 && !this.options.naked ? 1 : 0;
+                formatted.push(' '.repeat(isFirst) + formattedLabel + ' '.repeat(rightPad));
+            }
+        })
+
+        return formatted.join('');
+    }
+
+    private formatValueLabels(barSize: number, padding: number) {
+        const formatted: string[] = [];
+        this.chart.forEach((point, i) => {
+            if (this.options.labels) {
+                const formattedLabel = this.formatValueLabel(point);
+                const label = this.stripStyle(formattedLabel);
+                const charLength = this.getCharWidth();
+                const barWidth = this.isLongChar() ? barSize * charLength + padding : barSize + padding + Math.floor(charLength / 2);
+                const rightPad = Math.abs(barWidth - label.length);
+                const isFirst = i === 0 && !this.options.naked ? 1 : 0;
                 formatted.push(' '.repeat(isFirst) + formattedLabel + ' '.repeat(rightPad));
             }
         })
@@ -181,7 +215,14 @@ class VerticalChartFormatter extends ChartFormatter {
             chart.push('');
         }
 
-        if (this.options.labels) chart.push(this.formatLabels(barSize, padding));
+        if (this.options.labels) {
+            chart.push(this.formatLabels(barSize, padding));
+        }
+
+        if (this.options.valueLabels && this.options.fill) {
+            chart.unshift('');
+            chart.unshift(this.formatValueLabels(barSize, padding));
+        }
 
         return chart.join('\n');
     }
