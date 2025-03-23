@@ -40,11 +40,18 @@ class HorizontalChartFormatter extends ChartFormatter {
         return point.color ? this.colorify(bar, color) : bar;
     }
 
-    formatValueWithDecimals(value: number): string | number {
+    formatValueWithDecimals(value: number): string {
+        let formattedValue: string | number = value;
         if (this.options.valueLabelsDecimalPlaces !== undefined) {
-            return value.toFixed(this.options.valueLabelsDecimalPlaces);
+            formattedValue = value.toFixed(this.options.valueLabelsDecimalPlaces);
         }
-        return value;
+        
+        // Add prefix if specified
+        if (this.options.valueLabelPrefix) {
+            return `${this.options.valueLabelPrefix}${formattedValue}`;
+        }
+        
+        return String(formattedValue);
     }
 
     scaleBar(bar: string, value: number, label: string, color: string, barHeight: number, padding: number) {
