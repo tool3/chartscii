@@ -247,8 +247,8 @@ class VerticalChartFormatter extends ChartFormatter {
         }
         
         // Add prefix if specified
-        if (this.options.valueLabelPrefix) {
-            return `${this.options.valueLabelPrefix}${formattedValue}`;
+        if (this.options.valueLabelsPrefix) {
+            return `${this.options.valueLabelsPrefix}${formattedValue}`;
         }
         
         return String(formattedValue);
