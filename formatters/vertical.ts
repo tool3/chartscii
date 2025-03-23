@@ -152,7 +152,7 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatValueLabel(point: ChartPoint) {
-        const value = point.value.toString()
+        const value = this.formatValueWithDecimals(point.value).toString();
 
         if (this.options.colorLabels) {
             const color = point.color || this.options.color;
@@ -238,6 +238,13 @@ class VerticalChartFormatter extends ChartFormatter {
         const width = ((barWidth * charLength + padding) * this.chart.length) - padding;
 
         return this.options.structure.bottomLeft + this.options.structure.x.repeat(width);
+    }
+
+    private formatValueWithDecimals(value: number): string | number {
+        if (this.options.valueLabelsDecimalPlaces !== undefined) {
+            return value.toFixed(this.options.valueLabelsDecimalPlaces);
+        }
+        return value;
     }
 }
 

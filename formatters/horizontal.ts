@@ -40,6 +40,12 @@ class HorizontalChartFormatter extends ChartFormatter {
         return point.color ? this.colorify(bar, color) : bar;
     }
 
+    formatValueWithDecimals(value: number): string | number {
+        if (this.options.valueLabelsDecimalPlaces !== undefined) {
+            return value.toFixed(this.options.valueLabelsDecimalPlaces);
+        }
+        return value;
+    }
 
     scaleBar(bar: string, value: number, label: string, color: string, barHeight: number, padding: number) {
         const strippedLabel = this.stripStyle(label);
@@ -52,9 +58,10 @@ class HorizontalChartFormatter extends ChartFormatter {
             const pad = i !== 0 ? this.pad(space) + char : '';
 
             if (this.options.valueLabels && i === 0) {
-                bars.push(pad + bar + this.pad(1) + value)
+                const formattedValue = this.formatValueWithDecimals(value);
+                bars.push(pad + bar + this.pad(1) + formattedValue);
             } else {
-                bars.push(pad + bar)
+                bars.push(pad + bar);
             }
         }
 

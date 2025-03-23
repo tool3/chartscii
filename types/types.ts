@@ -19,6 +19,7 @@ export type CustomizationOptions = {
     percentage?: boolean;
     colorLabels?: boolean;
     valueLabels?: boolean;
+    valueLabelsDecimalPlaces?: number;
     reverse?: boolean;
     naked?: boolean;
     labels?: boolean;
