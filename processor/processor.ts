@@ -57,7 +57,7 @@ class ChartProcessor {
         const { scale, max } = this.options;
 
         if (scale === "auto") {
-            return Math.round((value / max.value) * size);
+            return Math.ceil((value / max.value) * size);
         } else if (typeof scale === "number" && scale > 0) {
             return Math.round(value / scale)
         } else {

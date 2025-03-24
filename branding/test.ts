@@ -18,22 +18,27 @@ import Chartscii from '../chartscii';
 //     { value: 212.05, label: '2012' },
 //     { value: 10.01, label: '2014' },
 // ]
-const data = [
-    { label: "label", value: 1, color: "pink" },
-    { label: "label", value: 2, color: "purple" },
-    { label: "label", value: 1.5, color: "marine" }
-  ];
-  
+// const data = [
+//   { label: "label", value: 1, color: "pink" },
+//   { label: "label", value: 2, color: "purple" },
+//   { label: "label", value: 1.5, color: "marine" }
+// ];
+
+const data = Array.from({ length: 10 }, (_val, i: number) => Math.sin(i + 1));
+
+// console.log({data});
+
 const chart = new Chartscii(data, {
-    // width: 50,
-    // // padding: 2,
-    // barSize: 1,
-    // naked: true,
-    // valueLabels: true,
-    // fill: '░',
-    // colorLabels: true,
-    // theme: 'pastel',
-    // orientation: 'vertical',    
+  width: 100,
+  // scale: 1,
+  // padding: 1,
+  barSize: 2,
+  // naked: true,
+  labels: false,
+  fill: '░',
+  // colorLabels: true,
+  theme: 'pastel',
+  orientation: 'vertical',
 });
 
-console.log(chart.create());
+setInterval(() => chart.create(), 1000)
