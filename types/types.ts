@@ -20,7 +20,7 @@ export type CustomizationOptions = {
     colorLabels?: boolean;
     valueLabels?: boolean;
     valueLabelsPrefix?: string;
-    valueLabelsDecimalPlaces?: number;
+    valueLabelsFloatingPoint?: number;
     reverse?: boolean;
     naked?: boolean;
     labels?: boolean;

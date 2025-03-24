@@ -42,8 +42,8 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     formatValueWithDecimals(value: number): string {
         let formattedValue: string | number = value;
-        if (this.options.valueLabelsDecimalPlaces !== undefined) {
-            formattedValue = value.toFixed(this.options.valueLabelsDecimalPlaces);
+        if (this.options.valueLabelsFloatingPoint !== undefined) {
+            formattedValue = value.toFixed(this.options.valueLabelsFloatingPoint);
         }
         
         // Add prefix if specified
