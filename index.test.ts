@@ -71,7 +71,7 @@ describe('chartscii tests', () => {
     });
 });
 
-describe('examples', () => {
+describe('horizontal', () => {
     it('should match example', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { color: 'pink', colorLabels: true });
@@ -186,6 +186,22 @@ describe('examples', () => {
         const chart = new Chartscii(data, { barSize: 4, colorLabels: true, valueLabels: true });
 
         await snap(chart.create(), 'value labels no fill');
+    });
+
+    it('should support prefix for value labels', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '#', color: 'red', padding: 2, colorLabels: true });
+        await snap(chart.create(), 'value labels prefix');
+    });
+
+    it('should support floating point for value labels', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1.3413413413, color, label: `*bold ${i}*` });
+        }
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '$', valueLabelsFloatingPoint: 4, color: 'red', padding: 2, colorLabels: true });
+        await snap(chart.create(), 'value labels floating point');
     });
 });
 
@@ -303,6 +319,22 @@ describe('vertical', () => {
 
         await snap(chart.create(), 'value labels vertical no fill');
     });
+
+    it('should support prefix for value labels', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '#', color: 'red', padding: 2, colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'value labels prefix vertical');
+    });
+
+    it('should support floating point for value labels', async () => {
+        const data: InputData[] = [];
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            data.push({ value: i + 1.3413413413, color, label: `*bold ${i}*` });
+        }
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '$', valueLabelsFloatingPoint: 4, color: 'red', padding: 2, colorLabels: true, orientation: 'vertical' });
+        await snap(chart.create(), 'value labels floating point vertical ');
+    });
 });
 
 describe('scale', () => {
@@ -350,4 +382,3 @@ describe('scale', () => {
     });
 
 });
-
