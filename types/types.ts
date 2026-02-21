@@ -36,14 +36,31 @@ export type CustomizationOptions = {
     padding?: number;
     orientation?: 'horizontal' | 'vertical';
     structure?: Structure;
+    stackColors?: string[];
+    stackLabels?: string[];
+    stackValueLabels?: boolean;
 }
 
 export type ChartOptions = CustomizationOptions & { max: Max };
 
-export type InputPoint = {
+export type SegmentValue = {
     value: number;
     color?: string;
+}
+
+export type StackedValue = number[] | SegmentValue[];
+
+export type InputPoint = {
+    value: number | StackedValue;
+    color?: string;
     label?: string;
+}
+
+export type ChartSegment = {
+    value: number;
+    color: string;
+    scaled: number;
+    percentage: number;
 }
 
 export type ChartPoint = {
@@ -52,6 +69,7 @@ export type ChartPoint = {
     color: string;
     scaled: number;
     percentage: number;
+    segments?: ChartSegment[];
 }
 
 export type InputData = InputPoint | number;

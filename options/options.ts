@@ -23,6 +23,9 @@ export const defaultOptions: CustomizationOptions = {
         topLeft: '╔',
         bottomLeft: '╚',
     },
+    stackColors: undefined,
+    stackLabels: undefined,
+    stackValueLabels: false,
 }
 
 class Options {
