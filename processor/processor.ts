@@ -28,70 +28,66 @@ class ChartProcessor {
         return point.value as number;
     }
 
+    getPointLabel(point: InputData, value: number): string {
+        if (typeof point === "number") return point.toString();
+        if (point.label) return point.label;
+        if (this.isStackedPoint(point)) return value.toString();
+        return (point.value as number).toString();
+    }
+
+    getPointColor(point: InputData, segments?: ChartSegment[]): string {
+        if (typeof point === "number") return this.options.color;
+        if (segments?.length) return segments[0].color || this.options.color;
+        return point.color || this.options.color;
+    }
+
+    getPointSegments(point: InputData, value: number): ChartSegment[] | undefined {
+        if (!this.isStackedPoint(point)) return undefined;
+        return this.processSegments(point.value as StackedValue, value);
+    }
+
     calculateTotal(data: InputData[]): number {
-        return data.reduce<number>((a, p) => {
-            const value = this.getPointValue(p);
-            return a + value;
-        }, 0);
+        return data.reduce<number>((sum, point) => sum + this.getPointValue(point), 0);
     }
 
     calculateData(data: InputData[]): number {
         const total = this.calculateTotal(data);
 
-        return data.reduce<number>((a, p) => {
-            const value = this.getPointValue(p);
-            let label: string;
-            if (typeof p === "number") {
-                label = p.toString();
-            } else if (p.label) {
-                label = p.label;
-            } else if (this.isStackedPoint(p)) {
-                label = value.toString();
-            } else {
-                label = (p.value as number).toString();
-            }
-
+        return data.reduce<number>((sum, point) => {
+            const value = this.getPointValue(point);
+            const label = this.getPointLabel(point, value);
             const percentage = this.percentage(value, total);
             const percentageLength = percentage ? percentage.toFixed(2).length + 5 : 0;
-
             const maxLabelLength = this.options.percentage ? label.length + percentageLength : label.length;
-            if (this.options.labels) this.options.max.label = Math.max(maxLabelLength, this.options.max.label);
 
+            if (this.options.labels) {
+                this.options.max.label = Math.max(maxLabelLength, this.options.max.label);
+            }
             this.options.max.value = Math.max(value, this.options.max.value);
             this.options.max.scaled = Math.max(this.scale(value), this.options.max.scaled);
 
-            return a + value;
+            return sum + value;
         }, 0);
     }
 
-    percentage(value: number, total: number) {
-        if (this.options.percentage) {
-            const avg = value / total;
-            return avg * 100;
-        }
-
-        return 0;
+    percentage(value: number, total: number): number {
+        if (!this.options.percentage) return 0;
+        return (value / total) * 100;
     }
 
-    scale(value: number) {
+    scale(value: number): number {
         const size = this.options.orientation === 'vertical' ? this.options.height : this.options.width;
-
         const { scale, max } = this.options;
 
-        if (scale === "auto") {
-            return Math.ceil((value / max.value) * size);
-        } else if (typeof scale === "number" && scale > 0) {
-            return Math.round(value / scale)
-        } else {
-            return value;
-        }
+        if (scale === "auto") return Math.ceil((value / max.value) * size);
+        if (typeof scale === "number" && scale > 0) return Math.round(value / scale);
+        return value;
     }
 
     processSegments(segments: StackedValue, totalBarValue: number): ChartSegment[] {
-        return segments.map((seg, i) => {
+        return segments.map((seg, index) => {
             const value = this.getSegmentValue(seg);
-            const segmentColor = typeof seg === "object" && seg.color;
-            const color = segmentColor || this.options.stackColors?.[i] || this.options.color;
+            const color = this.getSegmentColor(seg, index);
             const scaled = Number(this.scale(value).toFixed(2));
             const percentage = totalBarValue > 0 ? (value / totalBarValue) * 100 : 0;
             return { value, color, scaled, percentage };
@@ -103,62 +99,43 @@ class ChartProcessor {
         const key = this.options.structure.y;
         const total = this.calculateData(data);
         const processed = this.options.reverse ? sorted.reverse() : sorted;
-        return { processed, key, total }
+        return { processed, key, total };
     }
 
     process(data: InputData[]): [ChartData, ChartOptions] {
         const { processed, total } = this.preprocess(data);
-
         this.validator.validate(data);
 
         const chartData = new Map();
-
-        processed.forEach((point, i) => {
-            const isStacked = this.isStackedPoint(point);
-            const value = this.getPointValue(point);
-            const scaled = Number(this.scale(value).toFixed(2));
-            const percentage = this.percentage(value, total);
-
-            let color: string;
-            let label: string;
-            let segments: ChartSegment[] | undefined;
-
-            if (typeof point === "number") {
-                color = this.options.color;
-                label = point.toString();
-            } else {
-                color = point.color || this.options.color;
-                label = point.label || value.toString();
-                if (isStacked) {
-                    segments = this.processSegments(point.value as StackedValue, value);
-                    color = segments[0]?.color || this.options.color;
-                }
-            }
-
-            const formattedPoint = {
-                label,
-                value,
-                color,
-                scaled,
-                percentage,
-                ...(segments && { segments })
-            }
-            chartData.set(i, formattedPoint);
+        processed.forEach((point, index) => {
+            chartData.set(index, this.createChartPoint(point, total));
         });
 
         return [chartData, this.options];
     }
 
     sort(data: InputData[]): InputData[] {
-        if (this.options.sort) {
-            return data.sort((a, b) => {
-                const first = this.getPointValue(a);
-                const second = this.getPointValue(b);
-                return first - second;
-            });
-        }
+        if (!this.options.sort) return data;
+        return data.sort((a, b) => this.getPointValue(a) - this.getPointValue(b));
+    }
 
-        return data;
+    private getSegmentColor(segment: number | SegmentValue, index: number): string {
+        const segmentColor = typeof segment === "object" ? segment.color : undefined;
+        return segmentColor || this.options.stackColors?.[index] || this.options.color;
+    }
+
+    private createChartPoint(point: InputData, total: number) {
+        const value = this.getPointValue(point);
+        const segments = this.getPointSegments(point, value);
+
+        return {
+            label: this.getPointLabel(point, value),
+            value,
+            color: this.getPointColor(point, segments),
+            scaled: Number(this.scale(value).toFixed(2)),
+            percentage: this.percentage(value, total),
+            ...(segments && { segments })
+        };
     }
 }
 

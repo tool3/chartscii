@@ -9,174 +9,77 @@ class HorizontalChartFormatter extends ChartFormatter {
         this.options = options;
     }
 
-    pad(space: number) {
-        return ' '.repeat(space)
+    pad(space: number): string {
+        return ' '.repeat(space);
     }
 
-    offsetPercentage() {
+    offsetPercentage(): number {
         return this.options.labels && !this.options.percentage ? 1 : 0;
     }
 
-    formatStructure(structChar: string, color?: string) {
-        if (!this.options.naked) {
-            const colorful = color || this.options.color;
-            if (colorful) {
-                const string = this.colorify(structChar, colorful);
-                const [color, reset] = string.split(structChar);
-                return reset + structChar + color;
-            }
-            return this.colors.colors.reset + structChar;
-        }
+    formatStructure(structChar: string, color?: string): string {
+        if (this.options.naked) return '';
 
-        return '';
+        const colorful = color || this.options.color;
+        if (!colorful) return this.colors.colors.reset + structChar;
+
+        const string = this.colorify(structChar, colorful);
+        const [colorCode, reset] = string.split(structChar);
+        return reset + structChar + colorCode;
     }
 
-    formatBar(point: ChartPoint, label: string, barHeight: number, padding: number) {
-        if (point.segments && point.segments.length > 0) {
+    formatBar(point: ChartPoint, label: string, barHeight: number, padding: number): string {
+        if (point.segments?.length) {
             return this.formatStackedBar(point, label, barHeight, padding);
         }
-
-        const repeat = point.scaled / this.options.char.length;
-        const color = point.color || this.options.color;
-        const value = this.options.char?.repeat(repeat) + this.formatFill(point);
-        const bar = this.scaleBar(value, point.value, label, color, barHeight, padding);
-
-        return point.color ? this.colorify(bar, color) : bar;
-    }
-
-    formatStackedBar(point: ChartPoint, label: string, barHeight: number, padding: number) {
-        const segments = point.segments.map((seg: ChartSegment) => {
-            const repeat = Math.floor(seg.scaled / this.options.char.length);
-            const segmentBar = this.options.char?.repeat(repeat);
-            return seg.color ? this.colorify(segmentBar, seg.color) : segmentBar;
-        });
-
-        const combinedBar = segments.join('');
-        const fill = this.formatFill(point);
-        const barWithFill = combinedBar + fill;
-        const color = point.color || this.options.color;
-
-        return this.scaleStackedBar(barWithFill, point, label, color, barHeight, padding);
-    }
-
-    scaleStackedBar(bar: string, point: ChartPoint, label: string, color: string, barHeight: number, padding: number) {
-        const strippedLabel = this.stripStyle(label);
-        const naked = this.options.naked ? 0 : 1;
-        const space = strippedLabel.length - naked;
-        const bars = [];
-
-        for (let i = 0; i < barHeight; i++) {
-            const char = this.formatStructure(this.options.structure.axis, color);
-            const pad = i !== 0 ? this.pad(space) + char : '';
-
-            if (this.options.valueLabels && i === 0) {
-                let valueLabel: string;
-                if (this.options.stackValueLabels && point.segments) {
-                    valueLabel = point.segments.map((s: ChartSegment) => this.formatValueWithDecimals(s.value)).join('|');
-                } else {
-                    valueLabel = this.formatValueWithDecimals(point.value);
-                }
-                bars.push(pad + bar + this.pad(1) + valueLabel);
-            } else {
-                bars.push(pad + bar);
-            }
-        }
-
-        for (let i = 0; i < padding; i++) {
-            const char = this.formatStructure(this.options.structure.axis, color);
-            const pad = this.options.labels ? this.pad(space) : '';
-            bars.push(pad + char);
-        }
-
-        return bars.join('\n');
+        return this.formatSingleBar(point, label, barHeight, padding);
     }
 
     formatValueWithDecimals(value: number): string {
-        let formattedValue: string | number = value;
-        if (this.options.valueLabelsFloatingPoint !== undefined) {
-            formattedValue = value.toFixed(this.options.valueLabelsFloatingPoint);
-        }
-        
-        // Add prefix if specified
-        if (this.options.valueLabelsPrefix) {
-            return `${this.options.valueLabelsPrefix}${formattedValue}`;
-        }
-        
-        return String(formattedValue);
+        const formattedValue = this.options.valueLabelsFloatingPoint !== undefined
+            ? value.toFixed(this.options.valueLabelsFloatingPoint)
+            : String(value);
+
+        return this.options.valueLabelsPrefix
+            ? `${this.options.valueLabelsPrefix}${formattedValue}`
+            : formattedValue;
     }
 
-    scaleBar(bar: string, value: number, label: string, color: string, barHeight: number, padding: number) {
-        const strippedLabel = this.stripStyle(label);
-        const naked = this.options.naked ? 0 : 1;
-        const space = strippedLabel.length - naked;
-        const bars = [];
-
-        for (let i = 0; i < barHeight; i++) {
-            const char = this.formatStructure(this.options.structure.axis, color);
-            const pad = i !== 0 ? this.pad(space) + char : '';
-
-            if (this.options.valueLabels && i === 0) {
-                const formattedValue = this.formatValueWithDecimals(value);
-                bars.push(pad + bar + this.pad(1) + formattedValue);
-            } else {
-                bars.push(pad + bar);
-            }
-        }
-
-        for (let i = 0; i < padding; i++) {
-            const char = this.formatStructure(this.options.structure.axis, color);
-            const pad = this.options.labels ? this.pad(space) : '';
-            bars.push(pad + char);
-        }
-
-        return bars.join('\n');
+    scaleBar(bar: string, value: number, label: string, color: string, barHeight: number, padding: number): string {
+        const valueLabel = this.formatValueWithDecimals(value);
+        return this.buildScaledBar(bar, label, color, barHeight, padding, valueLabel);
     }
 
-    formatFill(point: ChartPoint) {
-        if (this.options.fill) {
-            const diff = (this.options.width - point.scaled);
+    formatFill(point: ChartPoint): string {
+        if (!this.options.fill) return '';
 
-            if (this.options.scale) {
-                const width = Math.floor(this.options.width - Math.floor(point.scaled));
-                if (width > 0) return this.options.fill.repeat(width);
-            }
+        const diff = this.options.width - point.scaled;
 
-            if (diff > 0) {
-                return this.options.fill.repeat(diff / this.options.fill.length);
-            }
+        if (this.options.scale) {
+            const width = Math.floor(this.options.width - Math.floor(point.scaled));
+            return width > 0 ? this.options.fill.repeat(width) : '';
         }
 
-        return '';
+        return diff > 0 ? this.options.fill.repeat(diff / this.options.fill.length) : '';
     }
 
-    formatPercentage(point: ChartPoint) {
-        if (this.options.percentage) {
-            return `(${point.percentage.toFixed(2)}%)`
-        }
-
-        return '';
+    formatPercentage(point: ChartPoint): string {
+        return this.options.percentage ? `(${point.percentage.toFixed(2)}%)` : '';
     }
 
+    formatLabelSpace(label: string): string {
+        if (!this.options.max.label) return '';
 
-    formatLabelSpace(label: string) {
-        if (this.options.max.label) {
-            const addOne = this.offsetPercentage();
-            const space = this.options.max.label - label.length + addOne;
-            return this.pad(space)
-        }
-
-        return '';
+        const addOne = this.offsetPercentage();
+        const space = this.options.max.label - label.length + addOne;
+        return this.pad(space);
     }
 
-    formatChartLabel(label: string = '') {
-        if (this.options.colorLabels) {
-            return this.colorify(label, this.options.color);
-        }
-
-        return label;
+    formatChartLabel(label: string = ''): string {
+        return this.options.colorLabels ? this.colorify(label, this.options.color) : label;
     }
 
-    formatChartScale(chart: ChartData) {
+    formatChartScale(chart: ChartData): { padding: number; barHeight: number } {
         const hasPadding = this.options.padding !== undefined;
         const chartPadding = hasPadding ? this.options.padding : 0;
         const defaultPadding = Math.floor((this.options.height - chartPadding) / chart.size);
@@ -186,52 +89,125 @@ class HorizontalChartFormatter extends ChartFormatter {
         return { padding, barHeight };
     }
 
-    format(chart: ChartData) {
-        const output = [];
-        output.push(this.formatChartLabel(this.options.title));
-
+    format(chart: ChartData): string {
         const { barHeight, padding } = this.formatChartScale(chart);
         const labels: string[] = [];
-        chart.forEach((point, i) => {
+
+        const lines = Array.from(chart.entries()).map(([i, point]) => {
             const isLast = Number(i) === chart.size - 1;
-            const line = this.formatLine(point, barHeight, padding, isLast);
-            output.push(line);
             labels.push(this.formatLabel(point, this.options.structure.y));
-        })
+            return this.formatLine(point, barHeight, padding, isLast);
+        });
 
-        output.push(this.formatBottom(labels))
-
-        return output.join('\n');
+        return [
+            this.formatChartLabel(this.options.title),
+            ...lines,
+            this.formatBottom(labels)
+        ].join('\n');
     }
 
-    formatLine(point: ChartPoint, barHeight: number, padding: number, isLast: boolean) {
+    formatLine(point: ChartPoint, barHeight: number, padding: number, isLast: boolean): string {
         const label = this.formatLabel(point, this.options.structure.y);
-        const value = this.formatBar(point, label, barHeight, isLast ? 0 : padding);
-
-
-        return `${label}${value}`;
+        const bar = this.formatBar(point, label, barHeight, isLast ? 0 : padding);
+        return `${label}${bar}`;
     }
 
-    formatLabel(point: ChartPoint, key: string) {
+    formatLabel(point: ChartPoint, key: string): string {
         const percentage = this.formatPercentage(point);
         const label = percentage ? `${point.label} ${percentage}` : point.label;
         const color = point.color || this.options.color;
         const space = this.formatLabelSpace(label);
 
-        const value = this.options.labels ? `${label}${space}${this.formatStructure(key)}` : this.formatStructure(this.options.structure.axis);
+        const value = this.options.labels
+            ? `${label}${space}${this.formatStructure(key)}`
+            : this.formatStructure(this.options.structure.axis);
 
         return this.options.colorLabels ? this.colorify(value, color) : value;
     }
 
-    formatBottom(labels: string[]) {
-        if (!this.options.naked) {
-            const strippedLabels = labels.map(this.stripStyle);
-            const max = Math.max(...strippedLabels.map(label => label.length - 1));
+    formatBottom(labels: string[]): string {
+        if (this.options.naked) return '';
 
-            return this.pad(max) + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width);
-        }
+        const strippedLabels = labels.map(this.stripStyle);
+        const max = Math.max(...strippedLabels.map(label => label.length - 1));
+
+        return this.pad(max) + this.options.structure.bottomLeft + this.options.structure.x.repeat(this.options.width);
+    }
+    
+    private formatSingleBar(point: ChartPoint, label: string, barHeight: number, padding: number): string {
+        const repeat = point.scaled / this.options.char.length;
+        const color = point.color || this.options.color;
+        const barContent = this.options.char?.repeat(repeat) + this.formatFill(point);
+        const bar = this.scaleBar(barContent, point.value, label, color, barHeight, padding);
+        return point.color ? this.colorify(bar, color) : bar;
     }
 
+    private formatStackedBar(point: ChartPoint, label: string, barHeight: number, padding: number): string {
+        const combinedBar = this.buildStackedBarContent(point.segments);
+        const barWithFill = combinedBar + this.formatFill(point);
+        const color = point.color || this.options.color;
+        const valueLabel = this.getStackedValueLabel(point);
+
+        return this.buildScaledBar(barWithFill, label, color, barHeight, padding, valueLabel);
+    }
+
+    private buildStackedBarContent(segments: ChartSegment[]): string {
+        return segments
+            .map(seg => this.formatSegment(seg))
+            .join('');
+    }
+
+    private formatSegment(segment: ChartSegment): string {
+        const repeat = Math.floor(segment.scaled / this.options.char.length);
+        const segmentBar = this.options.char?.repeat(repeat);
+        return segment.color ? this.colorify(segmentBar, segment.color) : segmentBar;
+    }
+
+    private getStackedValueLabel(point: ChartPoint): string {
+        if (this.options.stackValueLabels && point.segments) {
+            return point.segments.map(s => this.formatValueWithDecimals(s.value)).join('|');
+        }
+        return this.formatValueWithDecimals(point.value);
+    }
+
+    private buildScaledBar(bar: string, label: string, color: string, barHeight: number, padding: number, valueLabel: string): string {
+        const space = this.calculateLabelSpace(label);
+        const barLines = this.buildBarLines(bar, space, color, barHeight, valueLabel);
+        const paddingLines = this.buildPaddingLines(space, color, padding);
+
+        return [...barLines, ...paddingLines].join('\n');
+    }
+
+    private calculateLabelSpace(label: string): number {
+        const strippedLabel = this.stripStyle(label);
+        const naked = this.options.naked ? 0 : 1;
+        return strippedLabel.length - naked;
+    }
+
+    private buildBarLines(bar: string, space: number, color: string, barHeight: number, valueLabel: string): string[] {
+        return Array.from({ length: barHeight }, (_, index) =>
+            this.buildBarLine(bar, space, color, index, valueLabel)
+        );
+    }
+
+    private buildBarLine(bar: string, space: number, color: string, index: number, valueLabel: string): string {
+        const axisChar = this.formatStructure(this.options.structure.axis, color);
+        const linePad = index !== 0 ? this.pad(space) + axisChar : '';
+
+        const shouldShowValue = this.options.valueLabels && index === 0;
+        const lineContent = shouldShowValue
+            ? bar + this.pad(1) + valueLabel
+            : bar;
+
+        return linePad + lineContent;
+    }
+
+    private buildPaddingLines(space: number, color: string, padding: number): string[] {
+        const axisChar = this.formatStructure(this.options.structure.axis, color);
+        const linePad = this.options.labels ? this.pad(space) : '';
+
+        return Array.from({ length: padding }, () => linePad + axisChar);
+    }
 }
 
 export default HorizontalChartFormatter;
