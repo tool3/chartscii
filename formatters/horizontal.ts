@@ -1,4 +1,4 @@
-import { ChartOptions, ChartData, ChartPoint } from '../types/types';
+import { ChartOptions, ChartData, ChartPoint, ChartSegment } from '../types/types';
 import ChartFormatter from './formatter';
 
 class HorizontalChartFormatter extends ChartFormatter {
@@ -32,12 +32,63 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     formatBar(point: ChartPoint, label: string, barHeight: number, padding: number) {
+        if (point.segments && point.segments.length > 0) {
+            return this.formatStackedBar(point, label, barHeight, padding);
+        }
+
         const repeat = point.scaled / this.options.char.length;
         const color = point.color || this.options.color;
         const value = this.options.char?.repeat(repeat) + this.formatFill(point);
         const bar = this.scaleBar(value, point.value, label, color, barHeight, padding);
 
         return point.color ? this.colorify(bar, color) : bar;
+    }
+
+    formatStackedBar(point: ChartPoint, label: string, barHeight: number, padding: number) {
+        const segments = point.segments.map((seg: ChartSegment) => {
+            const repeat = Math.floor(seg.scaled / this.options.char.length);
+            const segmentBar = this.options.char?.repeat(repeat);
+            return seg.color ? this.colorify(segmentBar, seg.color) : segmentBar;
+        });
+
+        const combinedBar = segments.join('');
+        const fill = this.formatFill(point);
+        const barWithFill = combinedBar + fill;
+        const color = point.color || this.options.color;
+
+        return this.scaleStackedBar(barWithFill, point, label, color, barHeight, padding);
+    }
+
+    scaleStackedBar(bar: string, point: ChartPoint, label: string, color: string, barHeight: number, padding: number) {
+        const strippedLabel = this.stripStyle(label);
+        const naked = this.options.naked ? 0 : 1;
+        const space = strippedLabel.length - naked;
+        const bars = [];
+
+        for (let i = 0; i < barHeight; i++) {
+            const char = this.formatStructure(this.options.structure.axis, color);
+            const pad = i !== 0 ? this.pad(space) + char : '';
+
+            if (this.options.valueLabels && i === 0) {
+                let valueLabel: string;
+                if (this.options.stackValueLabels && point.segments) {
+                    valueLabel = point.segments.map((s: ChartSegment) => this.formatValueWithDecimals(s.value)).join('|');
+                } else {
+                    valueLabel = this.formatValueWithDecimals(point.value);
+                }
+                bars.push(pad + bar + this.pad(1) + valueLabel);
+            } else {
+                bars.push(pad + bar);
+            }
+        }
+
+        for (let i = 0; i < padding; i++) {
+            const char = this.formatStructure(this.options.structure.axis, color);
+            const pad = this.options.labels ? this.pad(space) : '';
+            bars.push(pad + char);
+        }
+
+        return bars.join('\n');
     }
 
     formatValueWithDecimals(value: number): string {

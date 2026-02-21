@@ -1,4 +1,4 @@
-import { ChartOptions, ChartData, ChartPoint } from '../types/types';
+import { ChartOptions, ChartData, ChartPoint, ChartSegment } from '../types/types';
 import ChartFormatter from './formatter';
 
 class VerticalChartFormatter extends ChartFormatter {
@@ -87,26 +87,72 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private formatChart(verticalChart: string[][], maxHeight: number, padding: number, barSize: number): void {
         this.chart.forEach((point, index) => {
-            const value = point.scaled;
-            const height = Math.round((value / maxHeight) * maxHeight);
-            const color = point.color;
-
-            for (let i = 0; i < maxHeight; i++) {
-                if (i === maxHeight - height - 1 && this.options.valueLabels && !this.options.fill) {
-                    const label = this.formatValueLabel(point);
-                    const space = barSize - this.stripStyle(label).length + padding;
-                    verticalChart[i][index] = label + ' '.repeat(space);
-                } else if (i < maxHeight - height) {
-                    const spaces = this.formatSpace(barSize, padding);
-                    const fill = this.formatFill(barSize, padding, color);
-                    const fills = this.options.fill ? fill : spaces;
-                    verticalChart[i][index] = fills;
-                } else {
-                    const bars = this.formatBar(barSize, padding, color);
-                    verticalChart[i][index] = bars;
-                }
+            if (point.segments && point.segments.length > 0) {
+                this.formatStackedColumn(verticalChart, point, index, maxHeight, padding, barSize);
+            } else {
+                this.formatSingleColumn(verticalChart, point, index, maxHeight, padding, barSize);
             }
         });
+    }
+
+    private formatSingleColumn(verticalChart: string[][], point: ChartPoint, index: number, maxHeight: number, padding: number, barSize: number): void {
+        const value = point.scaled;
+        const height = Math.round((value / maxHeight) * maxHeight);
+        const color = point.color;
+
+        for (let i = 0; i < maxHeight; i++) {
+            if (i === maxHeight - height - 1 && this.options.valueLabels && !this.options.fill) {
+                const label = this.formatValueLabel(point);
+                const space = barSize - this.stripStyle(label).length + padding;
+                verticalChart[i][index] = label + ' '.repeat(space);
+            } else if (i < maxHeight - height) {
+                const spaces = this.formatSpace(barSize, padding);
+                const fill = this.formatFill(barSize, padding, color);
+                const fills = this.options.fill ? fill : spaces;
+                verticalChart[i][index] = fills;
+            } else {
+                const bars = this.formatBar(barSize, padding, color);
+                verticalChart[i][index] = bars;
+            }
+        }
+    }
+
+    private formatStackedColumn(verticalChart: string[][], point: ChartPoint, index: number, maxHeight: number, padding: number, barSize: number): void {
+        const totalHeight = Math.round((point.scaled / maxHeight) * maxHeight);
+        const segments = point.segments;
+
+        const segmentHeights = segments.map((seg: ChartSegment) => {
+            return Math.round((seg.scaled / maxHeight) * maxHeight);
+        });
+
+        let currentRow = maxHeight - 1;
+        for (let segIdx = 0; segIdx < segments.length; segIdx++) {
+            const seg = segments[segIdx];
+            const segmentHeight = segmentHeights[segIdx];
+            const segmentStartRow = currentRow - segmentHeight + 1;
+
+            for (let row = currentRow; row >= segmentStartRow && row >= 0; row--) {
+                verticalChart[row][index] = this.formatBar(barSize, padding, seg.color);
+            }
+
+            currentRow = segmentStartRow - 1;
+        }
+
+        const emptyStartRow = maxHeight - totalHeight - 1;
+        for (let row = emptyStartRow; row >= 0; row--) {
+            if (this.options.fill) {
+                const color = segments[0]?.color || point.color;
+                verticalChart[row][index] = this.formatFill(barSize, padding, color);
+            } else {
+                verticalChart[row][index] = this.formatSpace(barSize, padding);
+            }
+        }
+
+        if (this.options.valueLabels && !this.options.fill && emptyStartRow >= 0) {
+            const label = this.formatValueLabel(point);
+            const space = barSize - this.stripStyle(label).length + padding;
+            verticalChart[emptyStartRow][index] = label + ' '.repeat(Math.max(0, space));
+        }
     }
 
     private formatPercentage(point: ChartPoint) {
