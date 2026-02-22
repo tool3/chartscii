@@ -1,5 +1,3 @@
-
-
 export type Max = {
     label: number;
     value: number;
@@ -29,6 +27,7 @@ export type CustomizationOptions = {
     char?: string;
     fill?: string;
     theme?: string;
+    alignBars?: 'left' | 'center' | 'right' | 'justify';
     scale?: string | number;
     width?: number;
     height?: number;
