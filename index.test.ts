@@ -657,3 +657,54 @@ describe('vertical alignment', () => {
         await snap(chart.create(), 'vertical align center stacked');
     });
 });
+
+describe('horizontal alignment', () => {
+    const data: InputData[] = [
+        { label: 'A', value: 3 },
+        { label: 'B', value: 7 },
+        { label: 'C', value: 5 },
+    ];
+
+    it('should align bars top', async () => {
+        const chart = new Chartscii(data, {
+            width: 50,
+            height: 15,
+            barSize: 1,
+            padding: 1,
+            alignBars: 'top',
+        });
+        await snap(chart.create(), 'horizontal align top');
+    });
+
+    it('should align bars bottom', async () => {
+        const chart = new Chartscii(data, {
+            width: 50,
+            height: 15,
+            barSize: 1,
+            padding: 1,
+            alignBars: 'bottom',
+        });
+        await snap(chart.create(), 'horizontal align bottom');
+    });
+
+    it('should align bars center', async () => {
+        const chart = new Chartscii(data, {
+            width: 50,
+            height: 15,
+            barSize: 1,
+            padding: 1,
+            alignBars: 'center',
+        });
+        await snap(chart.create(), 'horizontal align center');
+    });
+
+    it('should justify bars by default (current behavior)', async () => {
+        const chart = new Chartscii(data, {
+            width: 50,
+            height: 15,
+            barSize: 1,
+            padding: 1,
+        });
+        await snap(chart.create(), 'horizontal align justify');
+    });
+});

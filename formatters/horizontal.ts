@@ -80,9 +80,45 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     formatChartScale(chart: ChartData): { padding: number; barHeight: number } {
+        const alignment = this.options.alignBars || 'justify';
+        const isVerticalAlignment = alignment === 'top' || alignment === 'bottom' || alignment === 'center';
+
+        if (isVerticalAlignment) {
+            const barHeight = this.options.barSize || 1;
+            const padding = this.options.padding || 0;
+            return { padding, barHeight };
+        }
+
+        // For justify: distribute bars across the full height
+        const chartSize = chart.size;
+        const totalHeight = this.options.height;
+
+        // Check if user explicitly set padding > 0 (not just defaulted to 0)
+        const hasPaddingExplicit = this.options.padding !== undefined && this.options.padding > 0;
+
+        if (hasPaddingExplicit && chartSize > 1) {
+            // Padding explicitly set > 0
+            if (this.options.barSize !== undefined) {
+                // Both barSize and padding set - use barSize, calculate extra padding to fill height
+                // Total height = (barSize * n) + (padding * (n-1)) + extraPadding
+                const minHeight = (this.options.barSize * chartSize) + (this.options.padding * (chartSize - 1));
+                const extraPadding = Math.max(0, totalHeight - minHeight);
+                const paddingPerGap = Math.floor(extraPadding / (chartSize - 1));
+                const totalPadding = this.options.padding + paddingPerGap;
+                return { padding: totalPadding, barHeight: this.options.barSize };
+            }
+            // Only padding set - calculate barHeight to fill height
+            const totalPaddingHeight = this.options.padding * (chartSize - 1);
+            const availableForBars = totalHeight - totalPaddingHeight;
+            const barHeight = Math.max(1, Math.floor(availableForBars / chartSize));
+            return { padding: this.options.padding, barHeight };
+        }
+
+        // Use original behavior (backward compatible)
+        // This handles: barSize only, neither, or padding=0 (from defaults)
         const hasPadding = this.options.padding !== undefined;
         const chartPadding = hasPadding ? this.options.padding : 0;
-        const defaultPadding = Math.floor((this.options.height - chartPadding) / chart.size);
+        const defaultPadding = Math.floor((totalHeight - chartPadding) / chartSize);
         const barHeight = this.options.barSize || defaultPadding || 1;
         const padding = hasPadding ? chartPadding : defaultPadding;
 
@@ -99,11 +135,50 @@ class HorizontalChartFormatter extends ChartFormatter {
             return this.formatLine(point, barHeight, padding, isLast);
         });
 
+        const { topPad, bottomPad } = this.calculateVerticalAlignmentPadding(chart.size, barHeight, padding);
+        const topPadLines = this.buildAlignmentPadLines(topPad, labels);
+        const bottomPadLines = this.buildAlignmentPadLines(bottomPad, labels);
+
         return [
             this.formatChartLabel(this.options.title),
+            ...topPadLines,
             ...lines,
+            ...bottomPadLines,
             this.formatBottom(labels)
         ].join('\n');
+    }
+
+    private calculateVerticalAlignmentPadding(chartSize: number, barHeight: number, padding: number): { topPad: number; bottomPad: number } {
+        const alignment = this.options.alignBars || 'justify';
+        if (alignment === 'justify' || alignment === 'left' || alignment === 'right') {
+            return { topPad: 0, bottomPad: 0 };
+        }
+
+        const barsHeight = chartSize * (barHeight + padding) - padding;
+        const totalHeight = this.options.height;
+        const extraSpace = Math.max(0, totalHeight - barsHeight);
+
+        switch (alignment) {
+            case 'bottom':
+                return { topPad: extraSpace, bottomPad: 0 };
+            case 'center':
+                const top = Math.floor(extraSpace / 2);
+                return { topPad: top, bottomPad: extraSpace - top };
+            case 'top':
+            default:
+                return { topPad: 0, bottomPad: extraSpace };
+        }
+    }
+
+    private buildAlignmentPadLines(count: number, labels: string[]): string[] {
+        if (count <= 0) return [];
+
+        const strippedLabels = labels.map(this.stripStyle);
+        const maxLabelLength = Math.max(...strippedLabels.map(label => label.length - 1));
+        const axisChar = this.formatStructure(this.options.structure.axis);
+        const linePad = this.options.labels ? this.pad(maxLabelLength) : '';
+
+        return Array.from({ length: count }, () => linePad + axisChar);
     }
 
     formatLine(point: ChartPoint, barHeight: number, padding: number, isLast: boolean): string {
