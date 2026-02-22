@@ -85,13 +85,28 @@ class ChartProcessor {
     }
 
     processSegments(segments: StackedValue, totalBarValue: number): ChartSegment[] {
-        return segments.map((seg, index) => {
+        const totalScaled = this.scale(totalBarValue);
+
+        const rawSegments = segments.map((seg, index) => {
             const value = this.getSegmentValue(seg);
             const color = this.getSegmentColor(seg, index);
-            const scaled = Number(this.scale(value).toFixed(2));
+            const proportion = totalBarValue > 0 ? value / totalBarValue : 0;
+            const scaled = Math.floor(proportion * totalScaled);
             const percentage = totalBarValue > 0 ? (value / totalBarValue) * 100 : 0;
             return { value, color, scaled, percentage };
         });
+
+        const sumScaled = rawSegments.reduce((sum, seg) => sum + seg.scaled, 0);
+        const remainder = totalScaled - sumScaled;
+
+        if (remainder > 0) {
+            const largestIndex = rawSegments.reduce((maxIdx, seg, idx, arr) => {
+                return seg.value > arr[maxIdx].value ? idx : maxIdx
+            }, 0);
+            rawSegments[largestIndex].scaled += remainder;
+        }
+
+        return rawSegments;
     }
 
     preprocess(data: InputData[]): { processed: InputData[], key: string, total: number } {
