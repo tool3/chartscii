@@ -31,17 +31,44 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private formatChartScale(length: number): { padding: number; barWidth: number } {
         const charWidth = this.options.char.length;
-        const defaultBarSize = this.options.barSize || 1;
-        const calculatedBarWidth = Math.floor((this.options.width / (defaultBarSize * length)) / charWidth) + 1;
-        const barSize = this.options.barSize === undefined ? calculatedBarWidth : this.options.barSize;
-
         const alignment = this.options.alignBars || 'justify';
+
+        // For non-justify alignments, use explicit barSize and padding
         if (alignment !== 'justify') {
+            const barSize = this.options.barSize || 1;
             const padding = this.options.padding || 0;
             return { padding, barWidth: barSize };
         }
 
-        const calculatedPadding = Math.round((this.options.width / this.chart.length) / charWidth);
+        // For justify: distribute bars across the full width
+        const totalWidth = this.options.width;
+
+        // Check if user explicitly set padding > 0 (not just defaulted to 0)
+        const hasPaddingExplicit = this.options.padding !== undefined && this.options.padding > 0;
+
+        if (hasPaddingExplicit && length > 1) {
+            // Padding explicitly set > 0
+            if (this.options.barSize !== undefined) {
+                // Both barSize and padding set - use barSize, calculate extra padding to fill width
+                const minWidth = (this.options.barSize * charWidth * length) + (this.options.padding * (length - 1));
+                const extraPadding = Math.max(0, totalWidth - minWidth);
+                const paddingPerGap = Math.floor(extraPadding / (length - 1));
+                const totalPadding = this.options.padding + paddingPerGap;
+                return { padding: totalPadding, barWidth: this.options.barSize };
+            }
+            // Only padding set - calculate barWidth to fill width
+            const totalPaddingWidth = this.options.padding * (length - 1);
+            const availableForBars = totalWidth - totalPaddingWidth;
+            const barWidth = Math.max(1, Math.floor(availableForBars / (length * charWidth)));
+            return { padding: this.options.padding, barWidth };
+        }
+
+        // Use original behavior (backward compatible)
+        const defaultBarSize = this.options.barSize || 1;
+        const calculatedBarWidth = Math.floor((totalWidth / (defaultBarSize * length)) / charWidth) + 1;
+        const barSize = this.options.barSize === undefined ? calculatedBarWidth : this.options.barSize;
+
+        const calculatedPadding = Math.round((totalWidth / length) / charWidth);
         const defaultPadding = calculatedPadding <= barSize ? 0 : calculatedPadding - barSize;
         const padding = this.options.padding || defaultPadding;
 

@@ -27,7 +27,7 @@ export type CustomizationOptions = {
     char?: string;
     fill?: string;
     theme?: string;
-    alignBars?: 'left' | 'center' | 'right' | 'justify';
+    alignBars?: 'left' | 'center' | 'right' | 'justify' | 'top' | 'bottom';
     scale?: string | number;
     width?: number;
     height?: number;
