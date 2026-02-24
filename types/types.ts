@@ -12,7 +12,10 @@ export type Structure = {
     axis: string;
 }
 
-export type CustomizationOptions = {
+export type VerticalChartAlignment = 'left' | 'center' | 'right' | 'justify';
+export type HorizontalChartAlignment = 'top' | 'center' | 'bottom' | 'justify';
+
+type BaseOptions = {
     sort?: boolean;
     percentage?: boolean;
     colorLabels?: boolean;
@@ -27,20 +30,34 @@ export type CustomizationOptions = {
     char?: string;
     fill?: string;
     theme?: string;
-    alignBars?: 'left' | 'center' | 'right' | 'justify' | 'top' | 'bottom';
     scale?: string | number;
     width?: number;
     height?: number;
     barSize?: number;
     padding?: number;
-    orientation?: 'horizontal' | 'vertical';
     structure?: Structure;
     stackColors?: string[];
     stackLabels?: string[];
     stackValueLabels?: boolean;
 }
 
-export type ChartOptions = CustomizationOptions & { max: Max };
+type VerticalChartOptions = BaseOptions & {
+    orientation: 'vertical';
+    alignBars?: VerticalChartAlignment;
+}
+
+type HorizontalChartOptions = BaseOptions & {
+    orientation?: 'horizontal';
+    alignBars?: HorizontalChartAlignment;
+}
+
+export type CustomizationOptions = VerticalChartOptions | HorizontalChartOptions;
+
+export type ChartOptions = BaseOptions & {
+    orientation?: 'horizontal' | 'vertical';
+    alignBars?: VerticalChartAlignment | HorizontalChartAlignment;
+    max: Max;
+}
 
 export type SegmentValue = {
     value: number;

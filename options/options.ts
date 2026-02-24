@@ -27,29 +27,31 @@ export const defaultOptions: CustomizationOptions = {
     stackLabels: undefined,
     stackValueLabels: false,
     alignBars: 'justify',
+};
+
+/**
+ * Create chart options by merging user options with defaults
+ */
+export function createOptions(options: CustomizationOptions): ChartOptions {
+    return {
+        ...defaultOptions,
+        ...options,
+        max: {
+            label: 0,
+            value: 0,
+            scaled: 0
+        },
+        structure: {
+            ...defaultOptions.structure,
+            ...options?.structure
+        }
+    };
 }
 
 class Options {
     constructor(options: CustomizationOptions) {
-        const config: ChartOptions = {
-            ...defaultOptions,
-            ...options,
-            max: {
-                label: 0,
-                value: 0,
-                scaled: 0
-            },
-            structure: {
-                ...defaultOptions.structure,
-                ...options?.structure
-            }
-        };
-
-        return config;
+        return createOptions(options) as unknown as Options;
     }
 }
 
 export default Options;
-
-// fills: ░, ▒, ▓
-// chars: ▀, ▁, ▂, ▃, ▄, ▅, ▆, ▇, █, ▉, ▊, ▋, ▌, ▍, ▎, ▏, ▐, ▔, ▕, ▖, ▗, ▘, ▙, ▚, ▛, ▜, ▝, ▞, ▟
