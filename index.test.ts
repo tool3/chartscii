@@ -543,6 +543,44 @@ describe('stacked bar charts', () => {
             });
             await snap(chart.create(), 'stacked vertical stackColors with theme');
         });
+
+        it('should apply stackColors with theme justified', async () => {
+            const data: InputData[] = [
+                { label: 'Jan', value: [5, 10, 3] },
+                { label: 'Feb', value: [7, 8, 5] },
+                { label: 'March', value: [10, 3, 5] },
+            ];
+            const chart = new Chartscii(data, {
+                height: 10,
+                barSize: 1,
+                width: 50,
+                padding: 5,
+                theme: 'beach',
+                alignBars: 'justify',
+                orientation: 'vertical',
+                stackColors: ['red', 'orange', 'yellow'],
+            });
+            await snap(chart.create(), 'stacked vertical stackColors with theme justified');
+        });
+
+        it('should apply stackColors with fill', async () => {
+            const data: InputData[] = [
+                { label: 'Jan', value: [2, 3, 3] },
+                { label: 'Feb', value: [1, 3, 2] },
+                { label: 'March', value: [5, 1, 2] },
+            ];
+            const chart = new Chartscii(data, {
+                height: 20,
+                barSize: 1,
+                width: 50,
+                padding: 5,
+                fill: '░',
+                alignBars: 'justify',
+                orientation: 'vertical',
+                stackColors: ['red', 'orange', 'yellow'],
+            });
+            await snap(chart.create(), 'stacked vertical stackColors with fill');
+        });
     });
 
     describe('backward compatibility', () => {
