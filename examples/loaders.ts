@@ -11,7 +11,6 @@ const createAsciiCharts = () => {
     // create chart
     const chart = new Chartscii(data, {
         width: 50,
-        maxValue: 20,
         padding: 2,
         color: 'green',
         naked: true,

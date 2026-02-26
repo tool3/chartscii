@@ -9,19 +9,19 @@ const createAsciiCharts = () => {
 
     for (let i = 1; i <= 20; i++) {
         const value = Math.floor(Math.random() * 10) + 1;
-        data.push({ value , label: `label ${count++}`, color: value > 2 ? 'red' : 'marine' });
+        data.push({ value , label: `label ${count++}`, color: value > 2 ? 'red' : 'white' });
     }
 
     // create chart
     const chart = new Chartscii(data, {
         title: 'Percentage',
-        width: 100,
+        // width: 50,
+        height: 20,
         sort: false,
-        reverse: false,
-        char: '🧊',
-        fill: '🔥',
+        fill: '❤️',
+        char: '📊',
         colorLabels: true,
-        color: 'purple',
+        color: 'red',
         percentage: true,
         labels: true
     });

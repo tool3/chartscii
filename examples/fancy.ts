@@ -30,7 +30,7 @@ const createAsciiCharts = () => {
 
     for (let i = 0; i <= colors.length; i++) {
         color = colors[Math.floor(Math.random() * colors.length)];
-        data.push({ value: Math.floor(Math.random() * 10) + 1, color, label: `${i} ${emojis[i]}` });
+        data.push({ value: Math.floor(Math.random() * 10) + 1, color, label: `${emojis[i]}` });
     }
 
     // create chart
