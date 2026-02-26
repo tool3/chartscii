@@ -1,4 +1,4 @@
-import Chartscii from '../chartscii';
+import Chartscii from '../dist';
 
 
 
@@ -41,4 +41,4 @@ const chart = new Chartscii(data, {
   orientation: 'vertical',
 });
 
-setInterval(() => chart.create(), 1000)
+console.log(chart.create())
