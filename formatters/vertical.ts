@@ -225,7 +225,8 @@ class VerticalChartFormatter extends ChartFormatter {
 
         const barWidth = this.getScaledBarSize(barSize);
         const value = character.repeat(barWidth) + ' '.repeat(padding);
-        return color ? this.colorify(value, color) : value;
+        const fillColor = this.options.fillColor || color;
+        return fillColor ? this.colorify(value, fillColor) : value;
     }
 
     private formatLabel(point: ChartPoint): string {

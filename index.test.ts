@@ -106,6 +106,12 @@ describe('horizontal', () => {
         await snap(chart.create(), 'fill');
     });
 
+    it('should support fillColor', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { fill: '░', fillColor: '#808080', colorLabels: true });
+        await snap(chart.create(), 'fillColor');
+    });
+
     it('should support emoji character', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { char: '🧨' });
@@ -243,6 +249,13 @@ describe('vertical', () => {
         const chart = new Chartscii(data, { fill: '░', colorLabels: true, orientation: 'vertical', });
 
         await snap(chart.create(), 'vertical fill');
+    });
+
+    it('should support vertical fillColor', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, { fill: '░', fillColor: 'red', colorLabels: true, orientation: 'vertical', });
+
+        await snap(chart.create(), 'vertical fillColor');
     });
 
     it('should support padding', async () => {
@@ -474,6 +487,20 @@ describe('stacked bar charts', () => {
                 fill: '░',
             });
             await snap(chart.create(), 'stacked horizontal fill');
+        });
+
+        it('should apply fillColor correctly', async () => {
+            const data: InputData[] = [
+                { label: 'A', value: [10, 20] },
+                { label: 'B', value: [5, 10] },
+            ];
+            const chart = new Chartscii(data, {
+                width: 80,
+                stackColors: ['green', 'yellow'],
+                fill: '░',
+                fillColor: 'blue',
+            });
+            await snap(chart.create(), 'stacked horizontal fillColor');
         });
     });
 
