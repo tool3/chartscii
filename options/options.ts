@@ -27,6 +27,7 @@ export const defaultOptions: CustomizationOptions = {
     stackLabels: undefined,
     stackValueLabels: false,
     alignBars: 'justify',
+    fillColor: undefined,
 };
 
 /**

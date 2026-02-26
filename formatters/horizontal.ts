@@ -86,15 +86,26 @@ class HorizontalChartFormatter extends ChartFormatter {
     private formatSingleBar(point: ChartPoint, label: string, barSize: number, padding: number): string {
         const repeat = point.scaled / this.options.char.length;
         const color = point.color || this.options.color;
-        const barContent = this.options.char?.repeat(repeat) + this.formatFill(point);
+        const barChars = this.options.char?.repeat(repeat);
+        const fill = this.formatFill(point);
+
+        if (this.options.fillColor) {
+            // When fillColor is set, color bar and fill separately
+            const coloredBar = color ? this.colorify(barChars, color) : barChars;
+            const barContent = coloredBar + fill;
+            return this.scaleBar(barContent, point.value, label, color, barSize, padding);
+        }
+
+        // Default behavior: color the whole bar+fill together
+        const barContent = barChars + fill;
         const bar = this.scaleBar(barContent, point.value, label, color, barSize, padding);
-        return point.color ? this.colorify(bar, color) : bar;
+        return color ? this.colorify(bar, color) : bar;
     }
 
     private formatStackedBar(point: ChartPoint, label: string, barSize: number, padding: number): string {
         const combinedBar = this.buildStackedBarContent(point.segments);
-        const barWithFill = combinedBar + this.formatFill(point);
         const color = point.color || this.options.color;
+        const barWithFill = combinedBar + this.formatFill(point);
         const valueLabel = this.getStackedValueLabel(point);
 
         return this.buildScaledBar(barWithFill, label, color, barSize, padding, valueLabel);
@@ -167,13 +178,23 @@ class HorizontalChartFormatter extends ChartFormatter {
         if (!this.options.fill) return '';
 
         const diff = this.options.width - point.scaled;
+        let fillStr = '';
 
         if (this.options.scale) {
             const width = Math.floor(this.options.width - Math.floor(point.scaled));
-            return width > 0 ? this.options.fill.repeat(width) : '';
+            fillStr = width > 0 ? this.options.fill.repeat(width) : '';
+        } else {
+            fillStr = diff > 0 ? this.options.fill.repeat(diff / this.options.fill.length) : '';
         }
 
-        return diff > 0 ? this.options.fill.repeat(diff / this.options.fill.length) : '';
+        if (!fillStr) return '';
+
+        // Only colorify if fillColor is explicitly set
+        if (this.options.fillColor) {
+            return this.colorify(fillStr, this.options.fillColor);
+        }
+
+        return fillStr;
     }
 
     private formatLabel(point: ChartPoint, key: string): string {

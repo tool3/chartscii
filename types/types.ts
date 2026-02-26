@@ -29,6 +29,7 @@ type BaseOptions = {
     title?: string;
     char?: string;
     fill?: string;
+    fillColor?: string;
     theme?: string;
     scale?: string | number;
     width?: number;
