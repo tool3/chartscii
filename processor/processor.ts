@@ -35,9 +35,8 @@ class ChartProcessor {
         return (point.value as number).toString();
     }
 
-    getPointColor(point: InputData, segments?: ChartSegment[]): string {
+    getPointColor(point: InputData): string {
         if (typeof point === "number") return this.options.color;
-        if (segments?.length) return segments[0].color || this.options.color;
         return point.color || this.options.color;
     }
 
@@ -146,7 +145,7 @@ class ChartProcessor {
         return {
             label: this.getPointLabel(point, value),
             value,
-            color: this.getPointColor(point, segments),
+            color: this.getPointColor(point),
             scaled: Number(this.scale(value).toFixed(2)),
             percentage: this.percentage(value, total),
             ...(segments && { segments })
