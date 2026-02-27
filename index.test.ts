@@ -246,7 +246,7 @@ describe('vertical', () => {
 
     it('should support vertical fill', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { fill: '░', colorLabels: true, orientation: 'vertical', });
+        const chart = new Chartscii(data, { fill: '▒', colorLabels: true, orientation: 'vertical', });
 
         await snap(chart.create(), 'vertical fill');
     });
@@ -411,6 +411,24 @@ describe('stacked bar charts', () => {
                 stackColors: ['green', 'yellow', 'red'],
             });
             await snap(chart.create(), 'stacked horizontal basic');
+        });
+
+        it('should render stacked bars with fillColor', async () => {
+            const data: InputData[] = [
+                { label: 'abc123', value: [1, 2, 10] },
+                { label: 'def456', value: [1, 3, 2] },
+                { label: 'ghi789', value: [3, 2, 1] },
+            ];
+            const chart = new Chartscii(data, {
+                width: 100,
+                barSize: 1,
+                padding: 1,
+                alignBars: 'center',
+                fill: '▒',
+                fillColor: 'pink',
+                stackColors: ['green', 'yellow', 'red'],
+            });
+            await snap(chart.create(), 'stacked horizontal custom fill fillColor');
         });
 
         it('should render stacked bars with segment objects', async () => {

@@ -93,22 +93,20 @@ class HorizontalChartFormatter extends ChartFormatter {
             // When fillColor is set, color bar and fill separately
             const coloredBar = color ? this.colorify(barChars, color) : barChars;
             const barContent = coloredBar + fill;
-            return this.scaleBar(barContent, point.value, label, color, barSize, padding);
+            return this.scaleBar(barContent, point.value, label, barSize, padding);
         }
 
         // Default behavior: color the whole bar+fill together
         const barContent = barChars + fill;
-        const bar = this.scaleBar(barContent, point.value, label, color, barSize, padding);
-        return color ? this.colorify(bar, color) : bar;
+        return this.scaleBar(barContent, point.value, label, barSize, padding, color);
     }
 
     private formatStackedBar(point: ChartPoint, label: string, barSize: number, padding: number): string {
         const combinedBar = this.buildStackedBarContent(point.segments);
-        const color = point.color || this.options.color;
         const barWithFill = combinedBar + this.formatFill(point);
         const valueLabel = this.getStackedValueLabel(point);
 
-        return this.buildScaledBar(barWithFill, label, color, barSize, padding, valueLabel);
+        return this.buildScaledBar(barWithFill, label, barSize, padding, valueLabel);
     }
 
     private buildStackedBarContent(segments: ChartSegment[]): string {
@@ -130,15 +128,15 @@ class HorizontalChartFormatter extends ChartFormatter {
         return this.formatValueWithDecimals(point.value);
     }
 
-    private scaleBar(bar: string, value: number, label: string, color: string, barSize: number, padding: number): string {
+    private scaleBar(bar: string, value: number, label: string, barSize: number, padding: number, color?: string): string {
         const valueLabel = this.formatValueWithDecimals(value);
-        return this.buildScaledBar(bar, label, color, barSize, padding, valueLabel);
+        return this.buildScaledBar(bar, label, barSize, padding, valueLabel, color);
     }
 
-    private buildScaledBar(bar: string, label: string, color: string, barSize: number, padding: number, valueLabel: string): string {
+    private buildScaledBar(bar: string, label: string, barSize: number, padding: number, valueLabel: string, color?: string): string {
         const space = this.calculateLabelSpace(label);
-        const barLines = this.buildBarLines(bar, space, color, barSize, valueLabel);
-        const paddingLines = this.buildPaddingLines(space, color, padding);
+        const barLines = this.buildBarLines(bar, space, barSize, valueLabel, color);
+        const paddingLines = this.buildPaddingLines(space, padding);
 
         return [...barLines, ...paddingLines].join('\n');
     }
@@ -149,26 +147,27 @@ class HorizontalChartFormatter extends ChartFormatter {
         return strippedLabel.length - naked;
     }
 
-    private buildBarLines(bar: string, space: number, color: string, barSize: number, valueLabel: string): string[] {
+    private buildBarLines(bar: string, space: number, barSize: number, valueLabel: string, color?: string): string[] {
         return Array.from({ length: barSize }, (_, index) =>
-            this.buildBarLine(bar, space, color, index, valueLabel)
+            this.buildBarLine(bar, space, index, valueLabel, color)
         );
     }
 
-    private buildBarLine(bar: string, space: number, color: string, index: number, valueLabel: string): string {
-        const axisChar = this.formatStructure(this.options.structure.axis, color);
+    private buildBarLine(bar: string, space: number, index: number, valueLabel: string, color?: string): string {
+        const axisChar = this.formatStructure(this.options.structure.axis);
         const linePad = index !== 0 ? this.pad(space) + axisChar : '';
 
         const shouldShowValue = this.options.valueLabels && index === 0;
+        const barContent = color ? this.colorify(bar, color) : bar;
         const lineContent = shouldShowValue
-            ? bar + this.pad(1) + valueLabel
-            : bar;
+            ? barContent + this.pad(1) + valueLabel
+            : barContent;
 
         return linePad + lineContent;
     }
 
-    private buildPaddingLines(space: number, color: string, padding: number): string[] {
-        const axisChar = this.formatStructure(this.options.structure.axis, color);
+    private buildPaddingLines(space: number, padding: number): string[] {
+        const axisChar = this.formatStructure(this.options.structure.axis);
         const linePad = this.options.labels ? this.pad(space) : '';
 
         return Array.from({ length: padding }, () => linePad + axisChar);
@@ -222,15 +221,9 @@ class HorizontalChartFormatter extends ChartFormatter {
         return this.options.colorLabels ? this.colorify(label, this.options.color) : label;
     }
 
-    private formatStructure(structChar: string, color?: string): string {
+    private formatStructure(structChar: string): string {
         if (this.options.naked) return '';
-
-        const colorful = color || this.options.color;
-        if (!colorful) return this.colors.colors.reset + structChar;
-
-        const string = this.colorify(structChar, colorful);
-        const [colorCode, reset] = string.split(structChar);
-        return reset + structChar + colorCode;
+        return this.colors.colors.reset + structChar;
     }
 
     private formatBottom(labels: string[]): string {
