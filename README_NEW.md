@@ -96,7 +96,7 @@ const chart = new Chartscii(data, { colorLabels: true, valueLabels: true });
 |----------|------|-------------|
 | `label` | `string` | Bar label (defaults to value) |
 | `value` | `number` or `array` | Bar value or array for stacked bars |
-| `color` | `string` | Bar color (overrides global color) |
+| `color` | `string` or `string[]` | Bar color or per-segment colors for stacked bars |
 
 ---
 
@@ -141,6 +141,29 @@ const chart = new Chartscii(data, {
   stackValueLabels: true  // Show individual segment values
 });
 ```
+
+### Per-Bar Color Override
+
+Override segment colors for individual bars using a `color` array. This allows mixing custom colors with global `stackColors`:
+
+```typescript
+const data = [
+  { label: 'default', value: [5, 12, 3] },                              // uses stackColors
+  { label: 'custom', value: [5, 12, 3], color: ['red', 'blue', 'green'] }, // full override
+  { label: 'partial', value: [5, 12, 3], color: ['white'] }             // first segment white, rest use stackColors
+];
+
+const chart = new Chartscii(data, {
+  width: 50,
+  stackColors: ['green', 'yellow', 'red']  // default colors for all bars
+});
+```
+
+**Color Priority (highest to lowest):**
+1. Segment object color: `{ value: 10, color: 'blue' }`
+2. Per-bar color array: `{ value: [1,2,3], color: ['red', 'green', 'blue'] }`
+3. Global `stackColors` option
+4. Global `color` option (fallback)
 
 ### Vertical Stacked Bars
 
@@ -421,7 +444,7 @@ const chart = new Chartscii(data: InputData[], options?: ChartOptions);
 type InputData = number | {
   value: number | StackedValue;
   label?: string;
-  color?: string;
+  color?: string | string[];  // string[] for per-segment colors in stacked bars
 };
 
 type StackedValue = number[] | { value: number; color?: string }[];

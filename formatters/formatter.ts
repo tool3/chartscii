@@ -101,17 +101,18 @@ abstract class ChartFormatter {
         return this.options.percentage ? `(${point.percentage.toFixed(2)}%)` : '';
     }
 
-    protected colorify(txt: string, color?: string): string {
+    protected colorify(txt: string, color?: string | number[]): string {
         if (!color) return txt;
 
+        // Check array first before calling string methods
+        if (Array.isArray(color)) {
+            return this.colors.rgb(...color)`${txt}`;
+        }
         if (color.includes('#')) {
             return this.colors.hex(color)`${txt}`;
         }
         if (color.match(/[0-9]/)) {
             return this.colors.ansi(color)`${txt}`;
-        }
-        if (Array.isArray(color)) {
-            return this.colors.rgb(...color)`${txt}`;
         }
         return this.colors[color]`${txt}`;
     }

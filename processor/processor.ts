@@ -37,12 +37,21 @@ class ChartProcessor {
 
     getPointColor(point: InputData): string {
         if (typeof point === "number") return this.options.color;
+        // If color is an array, use first color for the point's general color
+        if (Array.isArray(point.color)) return point.color[0] || this.options.color;
         return point.color || this.options.color;
     }
 
     getPointSegments(point: InputData, value: number): ChartSegment[] | undefined {
         if (!this.isStackedPoint(point)) return undefined;
-        return this.processSegments(point.value as StackedValue, value);
+        const pointColors = this.getPointColorArray(point);
+        return this.processSegments(point.value as StackedValue, value, pointColors);
+    }
+
+    private getPointColorArray(point: InputData): string[] | undefined {
+        if (typeof point === "number") return undefined;
+        if (Array.isArray(point.color)) return point.color;
+        return undefined;
     }
 
     calculateTotal(data: InputData[]): number {
@@ -83,12 +92,12 @@ class ChartProcessor {
         return value;
     }
 
-    processSegments(segments: StackedValue, totalBarValue: number): ChartSegment[] {
+    processSegments(segments: StackedValue, totalBarValue: number, pointColors?: string[]): ChartSegment[] {
         const totalScaled = this.scale(totalBarValue);
 
         const rawSegments = segments.map((seg, index) => {
             const value = this.getSegmentValue(seg);
-            const color = this.getSegmentColor(seg, index);
+            const color = this.getSegmentColor(seg, index, pointColors);
             const proportion = totalBarValue > 0 ? value / totalBarValue : 0;
             const scaled = Math.floor(proportion * totalScaled);
             const percentage = totalBarValue > 0 ? (value / totalBarValue) * 100 : 0;
@@ -133,9 +142,10 @@ class ChartProcessor {
         return data.sort((a, b) => this.getPointValue(a) - this.getPointValue(b));
     }
 
-    private getSegmentColor(segment: number | SegmentValue, index: number): string {
+    private getSegmentColor(segment: number | SegmentValue, index: number, pointColors?: string[]): string {
+        // Priority: segment object color > point color array > stackColors > global color
         const segmentColor = typeof segment === "object" ? segment.color : undefined;
-        return segmentColor || this.options.stackColors?.[index] || this.options.color;
+        return segmentColor || pointColors?.[index] || this.options.stackColors?.[index] || this.options.color;
     }
 
     private createChartPoint(point: InputData, total: number) {

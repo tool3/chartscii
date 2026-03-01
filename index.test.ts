@@ -467,6 +467,20 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal color override');
         });
 
+        it('should allow per-bar color array override', async () => {
+            const data: InputData[] = [
+                { label: 'default', value: [5, 12, 3] },
+                { label: 'full', value: [5, 12, 3], color: ['red', 'blue', 'green'] },
+                { label: 'partial', value: [5, 12, 3], color: ['white'] },
+            ];
+            const chart = new Chartscii(data, {
+                width: 50,
+                barSize: 1,
+                stackColors: ['green', 'yellow', 'red'],
+            });
+            await snap(chart.create(), 'stacked horizontal per-bar color array');
+        });
+
         it('should show total value by default', async () => {
             const data: InputData[] = [
                 { label: 'A', value: [5, 10, 15] },
