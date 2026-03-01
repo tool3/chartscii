@@ -69,7 +69,7 @@ export type StackedValue = number[] | SegmentValue[];
 
 export type InputPoint = {
     value: number | StackedValue;
-    color?: string;
+    color?: string | string[];
     label?: string;
 }
 
