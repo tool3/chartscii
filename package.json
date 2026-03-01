@@ -2,8 +2,21 @@
   "name": "chartscii",
   "version": "3.2.0",
   "description": "awesome ascii charts",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/tool3/chartscii"
@@ -12,7 +25,9 @@
     "./dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
     "test": "mocha -r ts-node/register index.test.ts",
     "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" "
   },
@@ -24,6 +39,7 @@
   ],
   "author": "Tal Hayut",
   "license": "MIT",
+  "sideEffects": false,
   "devDependencies": {
     "@types/chai": "4.3.14",
     "@types/mocha": "10.0.6",

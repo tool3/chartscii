@@ -2,7 +2,7 @@ import chai from 'chai';
 const expect = chai.expect;
 import Chartscii from './chartscii';
 import snap from 'snaptdout';
-import { InputData } from './dist/types/types';
+import { InputData } from './types/types';
 const colors = [
     'red',
     'green',
