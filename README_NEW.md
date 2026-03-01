@@ -1,23 +1,10 @@
-<p align="center">
-  <img src="./shellfies/chartscii_main.png" alt="Chartscii" />
-</p>
+# Chartscii
+Beautiful ASCII charts for your terminal
 
-<h1 align="center">Chartscii</h1>
+![](./shellfies/chartscii_main.png)
 
-<p align="center">
-  <strong>Beautiful ASCII charts for your terminal</strong>
-</p>
+Transform your data into stunning ASCII bar charts with full color support, stacked bars, vertical layouts, and rich text formatting.
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/chartscii"><img src="https://img.shields.io/npm/v/chartscii.svg?style=flat-square" alt="npm version" /></a>
-  <a href="https://www.npmjs.com/package/chartscii"><img src="https://img.shields.io/npm/dm/chartscii.svg?style=flat-square" alt="npm downloads" /></a>
-  <a href="https://github.com/tool3/chartscii/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/chartscii.svg?style=flat-square" alt="license" /></a>
-  <a href="https://github.com/tool3/shellfie"><img src="https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink&style=flat-square" alt="shellfie" /></a>
-</p>
-
-<p align="center">
-  Transform your data into stunning ASCII bar charts with full color support, stacked bars, vertical layouts, and rich text formatting.
-</p>
 
 ---
 

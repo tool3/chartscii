@@ -1,16 +1,19 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
-    "lib": ["ES2022", "dom"],
+    "module": "CommonJS",
     "outDir": "./dist",
     "rootDir": ".",
-    "strict": false,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "declaration": true,
     "types": ["@types/mocha", "@types/node"]
   },
-  "exclude": ["examples", "shellfies", "dist", "node_modules", "index.test.ts"]
+  "include": [
+    "index.ts",
+    "chartscii.ts",
+    "types/**/*.ts",
+    "options/**/*.ts",
+    "formatters/**/*.ts",
+    "processor/**/*.ts",
+    "validator/**/*.ts",
+    "index.test.ts"
+  ]
 }
