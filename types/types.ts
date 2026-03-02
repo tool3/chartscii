@@ -2,6 +2,7 @@ export type Max = {
     label: number;
     value: number;
     scaled: number;
+    min?: number;
 }
 
 export type Structure = {
@@ -31,7 +32,7 @@ type BaseOptions = {
     fill?: string;
     fillColor?: string;
     theme?: string;
-    scale?: string | number;
+    scale?: 'auto' | 'relative' | 'relative-zero' | number;
     width?: number;
     height?: number;
     barSize?: number;
