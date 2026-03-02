@@ -289,11 +289,80 @@ const options = {
 | `percentage` | `boolean` | `false` | Show percentage values |
 | `sort` | `boolean` | `false` | Sort data ascending |
 | `reverse` | `boolean` | `false` | Reverse data order |
-| `scale` | `number\|string` | `'auto'` | Scale factor |
+| `scale` | `'auto'\|'relative'\|'relative-zero'\|number` | `'auto'` | Scale mode (see [Scaling Modes](#scaling-modes)) |
 | `stackColors` | `string[]` | `undefined` | Colors for stacked segments |
 | `stackLabels` | `string[]` | `undefined` | Labels for stacked segments |
 | `stackValueLabels` | `boolean` | `false` | Show segment values |
 | `structure` | `object` | See above | Border characters |
+
+---
+
+## Scaling Modes
+
+The `scale` option controls how bar lengths are calculated relative to your data values. This is particularly useful when your data has a narrow range or when you want to emphasize differences between values.
+
+### `'auto'` (Default)
+
+Absolute scaling from 0 to the maximum value. Each bar's length is proportional to its value relative to the maximum.
+
+```typescript
+const data = [100, 200, 300];
+const chart = new Chartscii(data, { scale: 'auto', width: 30 });
+// 100 → 10 chars (1/3 of max)
+// 200 → 20 chars (2/3 of max)
+// 300 → 30 chars (full width)
+```
+
+### `'relative'`
+
+Relative scaling with a baseline. The minimum value displays a small bar, and differences between values are emphasized. Maps your data range `[min, max]` to `[1, size]`.
+
+```typescript
+const data = [98, 99, 100];
+const chart = new Chartscii(data, { scale: 'relative', width: 30 });
+// 98  → 10 chars (small baseline bar)
+// 99  → 20 chars (middle)
+// 100 → 30 chars (full width)
+```
+
+Use `'relative'` when:
+- Your values are clustered in a narrow range (e.g., 95-100)
+- You want to emphasize small differences between values
+- The minimum value should still be visible
+
+### `'relative-zero'`
+
+Relative scaling without a baseline. The minimum value displays no bar (zero length), maximizing the visual difference between values. Maps your data range `[min, max]` to `[0, size]`.
+
+```typescript
+const data = [98, 99, 100];
+const chart = new Chartscii(data, { scale: 'relative-zero', width: 30 });
+// 98  → 0 chars (no bar)
+// 99  → 15 chars (middle)
+// 100 → 30 chars (full width)
+```
+
+Use `'relative-zero'` when:
+- You want maximum visual contrast between values
+- The absolute value of the minimum isn't important
+- Comparing relative differences is the priority
+
+### Numeric Scale
+
+Provide a number to set a fixed scale factor. The bar length is calculated as `value / scale`, capped at the chart size.
+
+```typescript
+const data = [50, 100, 150];
+const chart = new Chartscii(data, { scale: 5, width: 50 });
+// 50  → 10 chars (50 / 5)
+// 100 → 20 chars (100 / 5)
+// 150 → 30 chars (150 / 5)
+```
+
+Use a numeric scale when:
+- You need consistent scaling across multiple charts
+- You want precise control over bar lengths
+- Comparing charts with different data ranges
 
 ---
 

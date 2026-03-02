@@ -61,6 +61,18 @@ class ChartProcessor {
     calculateData(data: InputData[]): number {
         const total = this.calculateTotal(data);
 
+        // First pass: calculate min and max values
+        data.forEach(point => {
+            const value = this.getPointValue(point);
+            this.options.max.value = Math.max(value, this.options.max.value);
+            if (this.options.max.min === undefined) {
+                this.options.max.min = value;
+            } else {
+                this.options.max.min = Math.min(value, this.options.max.min);
+            }
+        });
+
+        // Second pass: calculate labels and scaled values (now that min/max are known)
         return data.reduce<number>((sum, point) => {
             const value = this.getPointValue(point);
             const label = this.getPointLabel(point, value);
@@ -71,7 +83,7 @@ class ChartProcessor {
             if (this.options.labels) {
                 this.options.max.label = Math.max(maxLabelLength, this.options.max.label);
             }
-            this.options.max.value = Math.max(value, this.options.max.value);
+
             this.options.max.scaled = Math.max(this.scale(value), this.options.max.scaled);
 
             return sum + value;
@@ -87,9 +99,36 @@ class ChartProcessor {
         const size = this.options.orientation === 'vertical' ? this.options.height : this.options.width;
         const { scale, max } = this.options;
 
-        if (scale === "auto") return Math.ceil((value / max.value) * size);
-        if (typeof scale === "number" && scale > 0) return Math.round(value / scale);
-        return value;
+        // Handle string scale modes
+        if (scale === "auto" || scale === undefined) {
+            // Default: absolute scaling from 0 to max
+            return Math.ceil((value / max.value) * size);
+        }
+
+        if (scale === "relative" && max.min !== undefined && max.min !== max.value) {
+            // Relative scaling with baseline: min value shows a small bar
+            // Maps [min, max] to [1, size] so output matches absolute scaling of [1, range+1]
+            const range = max.value - max.min;
+            const normalized = value - max.min;
+            // Add 1 to normalized so min value (0) becomes 1, max value (range) becomes range+1
+            return Math.ceil(((normalized + 1) / (range + 1)) * size);
+        }
+
+        if (scale === "relative-zero" && max.min !== undefined && max.min !== max.value) {
+            // Relative scaling without baseline: min value shows no bar
+            // Maps [min, max] to [0, size]
+            const range = max.value - max.min;
+            const normalized = value - max.min;
+            return Math.ceil((normalized / range) * size);
+        }
+
+        // Numeric scale: divide value by scale factor, capped at chart size
+        if (typeof scale === "number" && scale > 0) {
+            return Math.min(Math.round(value / scale), size);
+        }
+
+        // Fallback
+        return Math.min(value, size);
     }
 
     processSegments(segments: StackedValue, totalBarValue: number, pointColors?: string[]): ChartSegment[] {
