@@ -1,5 +1,7 @@
 import { Gradient } from '../types/types';
 
+export type ThemeColors = Record<string, string | Record<string, string>>;
+
 export const NAMED_COLORS: Record<string, [number, number, number]> = {
     red: [255, 0, 0],
     green: [0, 255, 0],
@@ -37,7 +39,15 @@ export function isGradient(color: any): color is Gradient {
     return typeof color === 'object' && color !== null && color.type === 'gradient' && Array.isArray(color.colors);
 }
 
-export function parseColorToRgb(color: string): [number, number, number] {
+export function extractRgbFromAnsi(ansiCode: string): [number, number, number] | null {
+    const match = ansiCode.match(/\x1b\[38;2;(\d+);(\d+);(\d+)m/);
+    if (match) {
+        return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)];
+    }
+    return null;
+}
+
+export function parseColorToRgb(color: string, themeColors?: ThemeColors): [number, number, number] {
     if (color.startsWith('#')) {
         const hex = color.slice(1);
         if (hex.length === 3) {
@@ -52,6 +62,19 @@ export function parseColorToRgb(color: string): [number, number, number] {
             parseInt(hex.slice(2, 4), 16),
             parseInt(hex.slice(4, 6), 16)
         ];
+    }
+
+    if (color.startsWith('\x1b[')) {
+        const rgb = extractRgbFromAnsi(color);
+        if (rgb) return rgb;
+    }
+
+    if (themeColors) {
+        const themeColor = themeColors[color.toLowerCase()];
+        if (typeof themeColor === 'string') {
+            const rgb = extractRgbFromAnsi(themeColor);
+            if (rgb) return rgb;
+        }
     }
 
     const named = NAMED_COLORS[color.toLowerCase()];
@@ -72,10 +95,10 @@ export function interpolateRgb(
     ];
 }
 
-export function getColorAtPosition(gradient: Gradient, position: number): [number, number, number] {
+export function getColorAtPosition(gradient: Gradient, position: number, themeColors?: ThemeColors): [number, number, number] {
     const { colors } = gradient;
     if (colors.length === 0) return [255, 255, 255];
-    if (colors.length === 1) return parseColorToRgb(colors[0]);
+    if (colors.length === 1) return parseColorToRgb(colors[0], themeColors);
 
     const clampedPosition = Math.max(0, Math.min(1, position));
     const scaledPosition = clampedPosition * (colors.length - 1);
@@ -83,16 +106,16 @@ export function getColorAtPosition(gradient: Gradient, position: number): [numbe
     const upperIndex = Math.min(lowerIndex + 1, colors.length - 1);
     const localT = scaledPosition - lowerIndex;
 
-    const color1 = parseColorToRgb(colors[lowerIndex]);
-    const color2 = parseColorToRgb(colors[upperIndex]);
+    const color1 = parseColorToRgb(colors[lowerIndex], themeColors);
+    const color2 = parseColorToRgb(colors[upperIndex], themeColors);
     return interpolateRgb(color1, color2, localT);
 }
 
-export function applyGradientToText(text: string, gradient: Gradient): string {
+export function applyGradientToText(text: string, gradient: Gradient, themeColors?: ThemeColors): string {
     const { colors } = gradient;
     if (colors.length === 0 || text.length === 0) return text;
     if (colors.length === 1) {
-        const [r, g, b] = parseColorToRgb(colors[0]);
+        const [r, g, b] = parseColorToRgb(colors[0], themeColors);
         return `\x1b[38;2;${r};${g};${b}m${text}\x1b[0m`;
     }
 
@@ -101,20 +124,20 @@ export function applyGradientToText(text: string, gradient: Gradient): string {
 
     for (let i = 0; i < chars.length; i++) {
         const position = chars.length > 1 ? i / (chars.length - 1) : 0;
-        const [r, g, b] = getColorAtPosition(gradient, position);
+        const [r, g, b] = getColorAtPosition(gradient, position, themeColors);
         result += `\x1b[38;2;${r};${g};${b}m${chars[i]}\x1b[39m`;
     }
 
     return result;
 }
 
-export function interpolateGradientColor(gradient: Gradient, index: number, total: number): string {
+export function interpolateGradientColor(gradient: Gradient, index: number, total: number, themeColors?: ThemeColors): string {
     const { colors } = gradient;
     if (colors.length === 0) return '';
     if (colors.length === 1) return colors[0];
 
     const position = total > 1 ? index / (total - 1) : 0;
-    const [r, g, b] = getColorAtPosition(gradient, position);
+    const [r, g, b] = getColorAtPosition(gradient, position, themeColors);
 
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }

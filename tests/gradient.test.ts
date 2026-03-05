@@ -160,4 +160,40 @@ describe('gradient', () => {
         expect(output).to.include('\x1b[38;2;');
         await snap(output, 'gradient vertical direction vertical chart');
     });
+
+    it('should use theme colors for gradient when theme is set', async () => {
+        const data = [1, 2, 3, 4, 5];
+        // Beach theme has: red: '#fe4a49' (254, 74, 73), green: '#2ab7ca' (42, 183, 202)
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['red', 'green']
+            },
+            theme: 'beach',
+        });
+        const output = chart.create();
+
+        // Beach theme red is #fe4a49 = rgb(254, 74, 73)
+        expect(output).to.include('\x1b[38;2;254;74;73m');
+        // Beach theme green is #2ab7ca = rgb(42, 183, 202)
+        expect(output).to.include('\x1b[38;2;42;183;202m');
+        await snap(output, 'gradient with beach theme');
+    });
+
+    it('should use default colors when no theme is set', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['red', 'green']
+            },
+        });
+        const output = chart.create();
+
+        // Default red is rgb(255, 0, 0)
+        expect(output).to.include('\x1b[38;2;255;0;0m');
+        // Default green is rgb(0, 255, 0)
+        expect(output).to.include('\x1b[38;2;0;255;0m');
+        await snap(output, 'gradient with default colors');
+    });
 });
