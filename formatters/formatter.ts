@@ -4,7 +4,8 @@ import {
     isGradient as isGradientUtil,
     parseColorToRgb,
     getColorAtPosition as getColorAtPositionUtil,
-    applyGradientToText
+    applyGradientToText,
+    ThemeColors
 } from '../utils/color';
 
 export type BarDimensions = {
@@ -130,8 +131,12 @@ abstract class ChartFormatter {
         return isGradientUtil(color);
     }
 
+    protected getThemeColors(): ThemeColors {
+        return this.colors.colors as ThemeColors;
+    }
+
     protected getColorAtPosition(gradient: Gradient, position: number): [number, number, number] {
-        return getColorAtPositionUtil(gradient, position);
+        return getColorAtPositionUtil(gradient, position, this.getThemeColors());
     }
 
     protected applyGradientWithContext(
@@ -172,7 +177,7 @@ abstract class ChartFormatter {
     }
 
     private applyGradient(text: string, gradient: Gradient): string {
-        return applyGradientToText(text, gradient);
+        return applyGradientToText(text, gradient, this.getThemeColors());
     }
 
     protected stripStyle(label: string): string {
