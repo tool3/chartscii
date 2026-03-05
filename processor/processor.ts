@@ -1,6 +1,18 @@
 import { InputData, ChartOptions, ChartData, InputPoint, StackedValue, ChartSegment, SegmentValue } from '../types/types';
 import ChartValidator from '../validator/validator';
 
+const AUTO_COLORS = [
+    'red',
+    'green',
+    'yellow',
+    'blue',
+    'purple',
+    'cyan',
+    'pink',
+    'orange',
+    'marine'
+];
+
 class ChartProcessor {
     private options: ChartOptions;
     private validator: ChartValidator;
@@ -99,35 +111,26 @@ class ChartProcessor {
         const size = this.options.orientation === 'vertical' ? this.options.height : this.options.width;
         const { scale, max } = this.options;
 
-        // Handle string scale modes
         if (scale === "auto" || scale === undefined) {
-            // Default: absolute scaling from 0 to max
             return Math.ceil((value / max.value) * size);
         }
 
         if (scale === "relative" && max.min !== undefined && max.min !== max.value) {
-            // Relative scaling with baseline: min value shows a small bar
-            // Maps [min, max] to [1, size] so output matches absolute scaling of [1, range+1]
             const range = max.value - max.min;
             const normalized = value - max.min;
-            // Add 1 to normalized so min value (0) becomes 1, max value (range) becomes range+1
             return Math.ceil(((normalized + 1) / (range + 1)) * size);
         }
 
         if (scale === "relative-zero" && max.min !== undefined && max.min !== max.value) {
-            // Relative scaling without baseline: min value shows no bar
-            // Maps [min, max] to [0, size]
             const range = max.value - max.min;
             const normalized = value - max.min;
             return Math.ceil((normalized / range) * size);
         }
 
-        // Numeric scale: divide value by scale factor, capped at chart size
         if (typeof scale === "number" && scale > 0) {
             return Math.min(Math.round(value / scale), size);
         }
 
-        // Fallback
         return Math.min(value, size);
     }
 
@@ -156,10 +159,48 @@ class ChartProcessor {
         return rawSegments;
     }
 
+    applyAutoColor(data: InputData[]): InputData[] {
+        return data.map((point, index) => {
+            const color = AUTO_COLORS[index % AUTO_COLORS.length];
+
+            if (typeof point === "number") {
+                return { value: point, color };
+            }
+
+            if (point.color) {
+                return point;
+            }
+
+            return { ...point, color };
+        });
+    }
+
+    applyAutoStackColors(data: InputData[]): void {
+        if (!this.options.stackColors || this.options.stackColors.length === 0) {
+            let maxSegments = 0;
+            data.forEach(point => {
+                if (this.isStackedPoint(point)) {
+                    maxSegments = Math.max(maxSegments, (point.value as StackedValue).length);
+                }
+            });
+            if (maxSegments > 0) {
+                this.options.stackColors = AUTO_COLORS.slice(0, maxSegments);
+            }
+        }
+    }
+
     preprocess(data: InputData[]): { processed: InputData[], key: string, total: number } {
-        const sorted = this.sort(data);
+        let workingData = data;
+
+        if (this.options.color === 'auto') {
+            workingData = this.applyAutoColor(workingData);
+            this.applyAutoStackColors(workingData);
+            this.options.color = '';
+        }
+
+        const sorted = this.sort(workingData);
         const key = this.options.structure.y;
-        const total = this.calculateData(data);
+        const total = this.calculateData(workingData);
         const processed = this.options.reverse ? sorted.reverse() : sorted;
         return { processed, key, total };
     }
