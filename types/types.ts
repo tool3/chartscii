@@ -26,7 +26,7 @@ type BaseOptions = {
     reverse?: boolean;
     naked?: boolean;
     labels?: boolean;
-    color?: string;
+    color?: string | 'auto';
     title?: string;
     char?: string;
     fill?: string;
