@@ -183,6 +183,50 @@ abstract class ChartFormatter {
         return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     }
 
+    protected getValueLabelColorForBar(
+        color: string | Gradient | undefined,
+        barIndex: number,
+        totalBars: number,
+        barEndPosition?: number
+    ): string | undefined {
+        if (!color) return undefined;
+        if (!this.isGradient(color)) return color as string;
+
+        const { direction = 'horizontal', reverse = false } = color;
+        const chartOrientation = this.options.orientation || 'horizontal';
+
+        let position: number;
+
+        // Value labels should use the color at the actual end of the bar
+        // - Horizontal chart with horizontal gradient: use actual bar endpoint (not always 1)
+        // - Vertical chart with vertical gradient: use actual bar top position (not always 0)
+        if (chartOrientation === 'horizontal') {
+            if (direction === 'horizontal') {
+                // Horizontal gradient on horizontal chart: use actual bar endpoint
+                position = barEndPosition !== undefined ? barEndPosition : 1;
+            } else {
+                // Vertical gradient on horizontal chart: value labels vary by row (bar index)
+                position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+            }
+        } else {
+            // Vertical chart
+            if (direction === 'vertical') {
+                // Vertical gradient on vertical chart: use actual bar top position
+                position = barEndPosition !== undefined ? barEndPosition : 0;
+            } else {
+                // Horizontal gradient on vertical chart: value labels vary by column (bar index)
+                position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+            }
+        }
+
+        if (reverse) {
+            position = 1 - position;
+        }
+
+        const [r, g, b] = this.getColorAtPosition(color, position);
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    }
+
     protected applyGradientWithContext(
         text: string,
         gradient: Gradient,

@@ -44,7 +44,7 @@ class VerticalChartFormatter extends ChartFormatter {
         const verticalChart = this.buildVerticalChart(chart.length, maxHeight, padding);
 
         this.formatChart(chart, verticalChart, maxHeight, padding, barSize);
-        return this.composeFinalChart(chart, verticalChart, barSize, padding);
+        return this.composeFinalChart(chart, verticalChart, barSize, padding, maxHeight);
     }
 
     private getMaxHeight(): number {
@@ -137,7 +137,7 @@ class VerticalChartFormatter extends ChartFormatter {
         const isBarRow = row >= barStartRow;
 
         if (isValueLabelRow) {
-            return this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length);
+            return this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length, ctx.chart, ctx.maxHeight);
         }
         if (isAboveBar) {
             return this.formatEmptyCell(ctx.barSize, ctx.padding, ctx.point.color);
@@ -236,7 +236,7 @@ class VerticalChartFormatter extends ChartFormatter {
         const shouldShowLabel = this.options.valueLabels && !this.options.fill && emptyStartRow >= 0;
 
         if (shouldShowLabel) {
-            ctx.verticalChart[emptyStartRow][ctx.index] = this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length);
+            ctx.verticalChart[emptyStartRow][ctx.index] = this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length, ctx.chart, ctx.maxHeight);
         }
     }
 
@@ -244,8 +244,8 @@ class VerticalChartFormatter extends ChartFormatter {
         return Math.round((scaled / maxHeight) * maxHeight);
     }
 
-    private formatValueLabelCell(point: ChartPoint, barSize: number, padding: number, barIndex: number, totalBars: number): string {
-        const label = this.formatValueLabel(point, barIndex, totalBars);
+    private formatValueLabelCell(point: ChartPoint, barSize: number, padding: number, barIndex: number, totalBars: number, chart: ChartPoint[], maxHeight: number): string {
+        const label = this.formatValueLabel(point, barIndex, totalBars, chart, maxHeight);
         const space = Math.max(0, barSize - this.stripStyle(label).length + padding);
         return label + ' '.repeat(space);
     }
@@ -310,14 +310,31 @@ class VerticalChartFormatter extends ChartFormatter {
         return labelColor ? this.colorify(label, labelColor) : label;
     }
 
-    private formatValueLabel(point: ChartPoint, barIndex: number, totalBars: number): string {
+    private formatValueLabel(point: ChartPoint, barIndex: number, totalBars: number, chart?: ChartPoint[], maxHeight?: number): string {
         const value = this.formatValueWithDecimals(point.value);
 
         if (!this.options.colorLabels) return value;
 
         const pointColor = point.color || this.options.color;
-        const labelColor = this.getLabelColorForBar(pointColor, barIndex, totalBars);
-        return labelColor ? this.colorify(value, labelColor) : value;
+
+        // For vertical gradients on vertical charts, calculate the actual bar top position
+        let barEndPosition: number | undefined;
+        if (chart && maxHeight && this.isGradient(pointColor)) {
+            const gradient = pointColor;
+            if (gradient.direction === 'vertical') {
+                // Calculate where the bar top is as a position (0 = top, 1 = bottom)
+                const barHeight = this.calculateBarHeight(point.scaled, maxHeight);
+                const barStartRow = maxHeight - barHeight;
+                // Position 0 is top of chart, position 1 is bottom
+                // barStartRow = 0 means full height bar (position 0)
+                // barStartRow = maxHeight - 1 means shortest bar (position close to 1)
+                barEndPosition = maxHeight > 1 ? barStartRow / (maxHeight - 1) : 0;
+            }
+        }
+
+        // Value labels use opposite position from regular labels (top vs bottom for vertical charts)
+        const valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, barEndPosition);
+        return valueLabelColor ? this.colorify(value, valueLabelColor) : value;
     }
 
     private formatLabels(chart: ChartPoint[], barSize: number, padding: number): string {
@@ -334,18 +351,18 @@ class VerticalChartFormatter extends ChartFormatter {
         return this.formatEntryWithLabel(this.formatLabel(point, index, totalBars), barSize, padding, index);
     }
 
-    private formatValueLabels(chart: ChartPoint[], barSize: number, padding: number): string {
+    private formatValueLabels(chart: ChartPoint[], barSize: number, padding: number, maxHeight: number): string {
         if (!this.options.labels) return '';
 
         const { leftPad } = this.getHorizontalAlignmentPadding(chart.length, barSize, padding);
         const labels = chart
-            .map((point, i) => this.formatValueLabelEntry(point, barSize, padding, i, chart.length))
+            .map((point, i) => this.formatValueLabelEntry(point, barSize, padding, i, chart.length, chart, maxHeight))
             .join('');
         return ' '.repeat(leftPad) + labels;
     }
 
-    private formatValueLabelEntry(point: ChartPoint, barSize: number, padding: number, index: number, totalBars: number): string {
-        return this.formatEntryWithLabel(this.formatValueLabel(point, index, totalBars), barSize, padding, index);
+    private formatValueLabelEntry(point: ChartPoint, barSize: number, padding: number, index: number, totalBars: number, chart: ChartPoint[], maxHeight: number): string {
+        return this.formatEntryWithLabel(this.formatValueLabel(point, index, totalBars, chart, maxHeight), barSize, padding, index);
     }
 
     private formatEntryWithLabel(formattedLabel: string, barSize: number, padding: number, index: number): string {
@@ -360,11 +377,11 @@ class VerticalChartFormatter extends ChartFormatter {
         return ' '.repeat(isFirst) + formattedLabel + ' '.repeat(rightPad);
     }
 
-    private composeFinalChart(chart: ChartPoint[], verticalChart: string[][], barSize: number, padding: number): string {
+    private composeFinalChart(chart: ChartPoint[], verticalChart: string[][], barSize: number, padding: number, maxHeight: number): string {
         const chartRows = this.buildChartRows(chart.length, verticalChart, barSize, padding);
         const header = this.buildHeader();
         const footer = this.buildFooter(chart, barSize, padding);
-        const valueLabelsHeader = this.buildValueLabelsHeader(chart, barSize, padding);
+        const valueLabelsHeader = this.buildValueLabelsHeader(chart, barSize, padding, maxHeight);
 
         return [...valueLabelsHeader, ...header, ...chartRows, ...footer].join('\n');
     }
@@ -398,9 +415,9 @@ class VerticalChartFormatter extends ChartFormatter {
         return footer;
     }
 
-    private buildValueLabelsHeader(chart: ChartPoint[], barSize: number, padding: number): string[] {
+    private buildValueLabelsHeader(chart: ChartPoint[], barSize: number, padding: number, maxHeight: number): string[] {
         if (!this.options.valueLabels || !this.options.fill) return [];
-        return [this.formatValueLabels(chart, barSize, padding), ''];
+        return [this.formatValueLabels(chart, barSize, padding, maxHeight)];
     }
 
     private formatChartTitle(): string {

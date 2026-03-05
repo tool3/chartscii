@@ -95,7 +95,7 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     private formatBarWithContext(ctx: HorizontalBarContext, label: string): string {
         if (ctx.point.segments?.length) {
-            return this.formatStackedBar(ctx.point, label, ctx.barSize, ctx.padding);
+            return this.formatStackedBar(ctx.point, label, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length, ctx.chart);
         }
         return this.formatSingleBarWithContext(ctx, label);
     }
@@ -104,13 +104,16 @@ class HorizontalChartFormatter extends ChartFormatter {
         const repeat = ctx.point.scaled / this.options.char.length;
         const color = ctx.point.color || this.options.color || '';
         const barChars = this.options.char?.repeat(repeat);
+        const totalBars = ctx.chart.length;
+        const maxBarLength = Math.max(...ctx.chart.map(p => Math.floor(p.scaled / this.options.char.length)));
+
+        // Calculate bar end position for value label coloring (0-1 scale relative to max bar)
+        const barEndPosition = maxBarLength > 1 ? (repeat - 1) / (maxBarLength - 1) : 0;
 
         if (this.isGradient(color)) {
             const gradient = color;
             const direction = gradient.direction || 'horizontal';
             const reverse = gradient.reverse || false;
-            const totalBars = ctx.chart.length;
-            const maxBarLength = Math.max(...ctx.chart.map(p => Math.floor(p.scaled / this.options.char.length)));
 
             // Calculate the last bar color for auto fillColor
             let lastBarColorRgb: string | undefined;
@@ -121,7 +124,7 @@ class HorizontalChartFormatter extends ChartFormatter {
                     const lastCharIndex = ctx.index * maxBarLength + (repeat - 1);
                     lastPosition = totalChars > 1 ? lastCharIndex / (totalChars - 1) : 0;
                 } else {
-                    lastPosition = maxBarLength > 1 ? (repeat - 1) / (maxBarLength - 1) : 0;
+                    lastPosition = barEndPosition;
                 }
                 if (reverse) lastPosition = 1 - lastPosition;
                 const [r, g, b] = this.getColorAtPosition(gradient, lastPosition);
@@ -142,12 +145,12 @@ class HorizontalChartFormatter extends ChartFormatter {
                     result += `\x1b[38;2;${r};${g};${b}m${chars[i]}\x1b[39m`;
                 }
                 const barContent = result + fill;
-                return this.scaleBar(barContent, ctx.point.value, label, ctx.barSize, ctx.padding);
+                return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, undefined, barEndPosition);
             } else {
                 const totalChars = maxBarLength;
                 const coloredBar = this.applyGradientWithContext(barChars, gradient, 0, totalChars, ctx.index, totalBars);
                 const barContent = coloredBar + fill;
-                return this.scaleBar(barContent, ctx.point.value, label, ctx.barSize, ctx.padding);
+                return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, undefined, barEndPosition);
             }
         }
 
@@ -156,19 +159,24 @@ class HorizontalChartFormatter extends ChartFormatter {
         if (this.options.fillColor) {
             const coloredBar = color ? this.colorify(barChars, color) : barChars;
             const barContent = coloredBar + fill;
-            return this.scaleBar(barContent, ctx.point.value, label, ctx.barSize, ctx.padding);
+            return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, undefined, barEndPosition);
         }
 
         const barContent = barChars + fill;
-        return this.scaleBar(barContent, ctx.point.value, label, ctx.barSize, ctx.padding, color);
+        return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, color, barEndPosition);
     }
 
-    private formatStackedBar(point: ChartPoint, label: string, barSize: number, padding: number): string {
+    private formatStackedBar(point: ChartPoint, label: string, barSize: number, padding: number, barIndex: number, totalBars: number, chart: ChartPoint[]): string {
         const combinedBar = this.buildStackedBarContent(point.segments);
         const barWithFill = combinedBar + this.formatFill(point);
         const valueLabel = this.getStackedValueLabel(point);
 
-        return this.buildScaledBar(barWithFill, label, barSize, padding, valueLabel);
+        // Calculate bar end position for stacked bars
+        const maxBarLength = Math.max(...chart.map(p => Math.floor(p.scaled / this.options.char.length)));
+        const barLength = Math.floor(point.scaled / this.options.char.length);
+        const barEndPosition = maxBarLength > 1 ? (barLength - 1) / (maxBarLength - 1) : 0;
+
+        return this.buildScaledBar(barWithFill, point, label, barSize, padding, valueLabel, barIndex, totalBars, undefined, barEndPosition);
     }
 
     private buildStackedBarContent(segments: ChartSegment[]): string {
@@ -190,14 +198,14 @@ class HorizontalChartFormatter extends ChartFormatter {
         return this.formatValueWithDecimals(point.value);
     }
 
-    private scaleBar(bar: string, value: number, label: string, barSize: number, padding: number, color?: string | Gradient): string {
-        const valueLabel = this.formatValueWithDecimals(value);
-        return this.buildScaledBar(bar, label, barSize, padding, valueLabel, color);
+    private scaleBar(bar: string, point: ChartPoint, label: string, barSize: number, padding: number, barIndex: number, totalBars: number, color?: string | Gradient, barEndPosition?: number): string {
+        const valueLabel = this.formatValueWithDecimals(point.value);
+        return this.buildScaledBar(bar, point, label, barSize, padding, valueLabel, barIndex, totalBars, color, barEndPosition);
     }
 
-    private buildScaledBar(bar: string, label: string, barSize: number, padding: number, valueLabel: string, color?: string | Gradient): string {
+    private buildScaledBar(bar: string, point: ChartPoint, label: string, barSize: number, padding: number, valueLabel: string, barIndex: number, totalBars: number, color?: string | Gradient, barEndPosition?: number): string {
         const space = this.calculateLabelSpace(label);
-        const barLines = this.buildBarLines(bar, space, barSize, valueLabel, color);
+        const barLines = this.buildBarLines(bar, point, space, barSize, valueLabel, barIndex, totalBars, color, barEndPosition);
         const paddingLines = this.buildPaddingLines(space, padding);
 
         return [...barLines, ...paddingLines].join('\n');
@@ -209,21 +217,28 @@ class HorizontalChartFormatter extends ChartFormatter {
         return strippedLabel.length - naked;
     }
 
-    private buildBarLines(bar: string, space: number, barSize: number, valueLabel: string, color?: string | Gradient): string[] {
+    private buildBarLines(bar: string, point: ChartPoint, space: number, barSize: number, valueLabel: string, barIndex: number, totalBars: number, color?: string | Gradient, barEndPosition?: number): string[] {
         return Array.from({ length: barSize }, (_, index) =>
-            this.buildBarLine(bar, space, index, valueLabel, color)
+            this.buildBarLine(bar, point, space, index, valueLabel, barIndex, totalBars, color, barEndPosition)
         );
     }
 
-    private buildBarLine(bar: string, space: number, index: number, valueLabel: string, color?: string | Gradient): string {
+    private buildBarLine(bar: string, point: ChartPoint, space: number, index: number, valueLabel: string, barIndex: number, totalBars: number, color?: string | Gradient, barEndPosition?: number): string {
         const axisChar = this.formatStructure(this.options.structure.axis);
         const linePad = index !== 0 ? this.pad(space) + axisChar : '';
 
         const shouldShowValue = this.options.valueLabels && index === 0;
         const barContent = color ? this.colorify(bar, color) : bar;
-        const lineContent = shouldShowValue
-            ? barContent + this.pad(1) + valueLabel
-            : barContent;
+
+        let lineContent: string;
+        if (shouldShowValue) {
+            const pointColor = point.color || this.options.color;
+            const valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, barEndPosition);
+            const coloredValueLabel = valueLabelColor ? this.colorify(valueLabel, valueLabelColor) : valueLabel;
+            lineContent = barContent + this.pad(1) + coloredValueLabel;
+        } else {
+            lineContent = barContent;
+        }
 
         return linePad + lineContent;
     }

@@ -159,7 +159,7 @@ describe('vertical', () => {
             const color = colors[i];
             data.push({ value: i + 1.3413413413, color, label: `*bold ${i}*` });
         }
-        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '$', valueLabelsFloatingPoint: 4, color: 'red', padding: 2, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '$', valueLabelsFloatingPoint: 3, color: 'red', padding: 2, colorLabels: true, orientation: 'vertical' });
         await snap(chart.create(), 'value labels floating point vertical ');
     });
 });
