@@ -421,7 +421,8 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatChartTitle(): string {
-        return this.colorify(this.options.title, this.options.color);
+        // Add 1 for the axis/structure character on the left
+        return this.formatTitle(this.options.width + 1);
     }
 
     private formatBottom(chartLength: number, barSize: number, padding: number): string {

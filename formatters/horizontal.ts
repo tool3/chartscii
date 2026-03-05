@@ -53,8 +53,13 @@ class HorizontalChartFormatter extends ChartFormatter {
         const topPadLines = this.buildAlignmentPadLines(leadingPad, labels);
         const bottomPadLines = this.buildAlignmentPadLines(trailingPad, labels);
 
+        // Calculate total chart width for title alignment
+        const strippedLabels = labels.map(l => this.stripStyle(l));
+        const maxLabelWidth = Math.max(...strippedLabels.map(label => label.length - 1));
+        const totalChartWidth = maxLabelWidth + 1 + this.options.width; // labels + structure char + bar width
+
         return [
-            this.formatChartLabel(this.options.title),
+            this.formatChartLabel(totalChartWidth),
             ...topPadLines,
             ...lines,
             ...bottomPadLines,
@@ -305,8 +310,8 @@ class HorizontalChartFormatter extends ChartFormatter {
         return this.pad(space);
     }
 
-    private formatChartLabel(label: string = ''): string {
-        return this.options.colorLabels ? this.colorify(label, this.options.color) : label;
+    private formatChartLabel(totalWidth: number): string {
+        return this.formatTitle(totalWidth);
     }
 
     private formatStructure(structChar: string): string {

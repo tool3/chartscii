@@ -8,3 +8,4 @@ import './tests/scale-options.test';
 import './tests/horizontal-alignment.test';
 import './tests/auto-color.test';
 import './tests/gradient.test';
+import './tests/title.test';

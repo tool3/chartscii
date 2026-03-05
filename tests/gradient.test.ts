@@ -483,6 +483,7 @@ describe('gradient', () => {
                 type: 'gradient',
                 colors: ['cyan', 'pink']
             },
+            title: 'gradient with fill',
             colorLabels: true,
             valueLabels: true,
             fill: '░',
