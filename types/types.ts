@@ -26,11 +26,11 @@ type BaseOptions = {
     reverse?: boolean;
     naked?: boolean;
     labels?: boolean;
-    color?: string | 'auto';
+    color?: string | 'auto' | Gradient;
     title?: string;
     char?: string;
     fill?: string;
-    fillColor?: string;
+    fillColor?: string | 'auto';
     theme?: string;
     scale?: 'auto' | 'relative' | 'relative-zero' | number;
     width?: number;
@@ -68,9 +68,16 @@ export type SegmentValue = {
 
 export type StackedValue = number[] | SegmentValue[];
 
+export type Gradient = {
+    type: 'gradient';
+    colors: string[];
+    direction?: 'horizontal' | 'vertical';
+    reverse?: boolean;
+}
+
 export type InputPoint = {
     value: number | StackedValue;
-    color?: string | string[];
+    color?: string | string[] | Gradient;
     label?: string;
 }
 

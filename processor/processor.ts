@@ -1,5 +1,6 @@
-import { InputData, ChartOptions, ChartData, InputPoint, StackedValue, ChartSegment, SegmentValue } from '../types/types';
+import { InputData, ChartOptions, ChartData, InputPoint, StackedValue, ChartSegment, SegmentValue, Gradient } from '../types/types';
 import ChartValidator from '../validator/validator';
+import { isGradient, interpolateGradientColor } from '../utils/color';
 
 const AUTO_COLORS = [
     'red',
@@ -26,6 +27,15 @@ class ChartProcessor {
         return typeof point !== "number" && Array.isArray(point.value);
     }
 
+    isGradient(color: any): color is Gradient {
+        return isGradient(color);
+    }
+
+    interpolateGradient(gradient: Gradient, index: number, total: number): string {
+        const result = interpolateGradientColor(gradient, index, total);
+        return result || (this.options.color as string) || '';
+    }
+
     getSegmentValue(segment: number | SegmentValue): number {
         return typeof segment === "number" ? segment : segment.value;
     }
@@ -47,11 +57,19 @@ class ChartProcessor {
         return (point.value as number).toString();
     }
 
-    getPointColor(point: InputData): string {
-        if (typeof point === "number") return this.options.color;
-        // If color is an array, use first color for the point's general color
-        if (Array.isArray(point.color)) return point.color[0] || this.options.color;
-        return point.color || this.options.color;
+    getPointColor(point: InputData): string | undefined {
+        if (typeof point === "number") {
+            const color = this.options.color;
+            if (typeof color === 'string') return color || undefined;
+            return undefined;
+        }
+        if (Array.isArray(point.color)) {
+            const optColor = this.options.color;
+            return point.color[0] || (typeof optColor === 'string' ? optColor : undefined) || undefined;
+        }
+        if (typeof point.color === 'string') return point.color || undefined;
+        const color = this.options.color;
+        return (typeof color === 'string' ? color : undefined) || undefined;
     }
 
     getPointSegments(point: InputData, value: number): ChartSegment[] | undefined {
@@ -189,13 +207,29 @@ class ChartProcessor {
         }
     }
 
+    applyGradient(data: InputData[], gradient: Gradient): InputData[] {
+        return data.map((point, index) => {
+            const color = this.interpolateGradient(gradient, index, data.length);
+
+            if (typeof point === "number") {
+                return { value: point, color };
+            }
+
+            if (point.color) {
+                return point;
+            }
+
+            return { ...point, color };
+        });
+    }
+
     preprocess(data: InputData[]): { processed: InputData[], key: string, total: number } {
         let workingData = data;
 
         if (this.options.color === 'auto') {
             workingData = this.applyAutoColor(workingData);
             this.applyAutoStackColors(workingData);
-            this.options.color = '';
+            (this.options as any).color = '';
         }
 
         const sorted = this.sort(workingData);
@@ -223,9 +257,12 @@ class ChartProcessor {
     }
 
     private getSegmentColor(segment: number | SegmentValue, index: number, pointColors?: string[]): string {
-        // Priority: segment object color > point color array > stackColors > global color
         const segmentColor = typeof segment === "object" ? segment.color : undefined;
-        return segmentColor || pointColors?.[index] || this.options.stackColors?.[index] || this.options.color;
+        if (segmentColor) return segmentColor;
+        if (pointColors?.[index]) return pointColors[index];
+        if (this.options.stackColors?.[index]) return this.options.stackColors[index];
+        const color = this.options.color;
+        return typeof color === 'string' ? color : '';
     }
 
     private createChartPoint(point: InputData, total: number) {

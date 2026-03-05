@@ -1,4 +1,4 @@
-import { ChartOptions, ChartData, ChartPoint, ChartSegment } from '../types/types';
+import { ChartData, ChartOptions, ChartPoint, ChartSegment } from '../types/types';
 import ChartFormatter, { BarDimensions } from './formatter';
 
 type ColumnContext = {
@@ -143,9 +143,60 @@ class VerticalChartFormatter extends ChartFormatter {
             return this.formatEmptyCell(ctx.barSize, ctx.padding, ctx.point.color);
         }
         if (isBarRow) {
-            return this.formatBarCell(ctx.barSize, ctx.padding, ctx.point.color);
+            return this.formatBarCellWithContext(ctx, row, barStartRow);
         }
         return this.formatSpace(ctx.barSize, ctx.padding);
+    }
+
+    private formatBarCellWithContext(ctx: ColumnContext, row: number, barStartRow: number): string {
+        const barWidth = this.calculateBarWidth(ctx.barSize);
+        const value = this.options.char.repeat(barWidth);
+        const padding = ' '.repeat(ctx.padding);
+
+        const effectiveColor = ctx.point.color || this.options.color;
+
+        if (this.isGradient(effectiveColor)) {
+            const gradient = effectiveColor;
+            const direction = gradient.direction || 'horizontal';
+            const reverse = gradient.reverse || false;
+
+            if (direction === 'vertical') {
+                // For vertical gradient on vertical chart: gradient flows top to bottom
+                // Use per-character coloring where row determines the primary position
+                // and horizontal position adds subtle variation within the row
+                const chars = [...value];
+                let result = '';
+                const totalBars = ctx.chart.length;
+                const charsPerRow = barWidth * totalBars;
+
+                for (let i = 0; i < chars.length; i++) {
+                    // Primary position from row (0 = top, 1 = bottom)
+                    const rowPosition = ctx.maxHeight > 1 ? row / (ctx.maxHeight - 1) : 0;
+
+                    // Add horizontal variation within row for smoother appearance
+                    // Each row covers 1/(maxHeight-1) of the gradient
+                    const rowSpan = ctx.maxHeight > 1 ? 1 / (ctx.maxHeight - 1) : 1;
+                    const charIndexInRow = ctx.index * barWidth + i;
+                    const charFraction = charsPerRow > 1 ? charIndexInRow / (charsPerRow - 1) : 0;
+
+                    // Position varies within half the row span for subtle transition
+                    let position = rowPosition + (charFraction - 0.5) * rowSpan * 0.5;
+                    position = Math.max(0, Math.min(1, position));
+
+                    if (reverse) position = 1 - position;
+                    const [r, g, b] = this.getColorAtPosition(gradient, position);
+                    result += `\x1b[38;2;${r};${g};${b}m${chars[i]}\x1b[39m`;
+                }
+                return result + padding;
+            } else {
+                const totalBars = ctx.chart.length;
+                const totalChars = barWidth * totalBars;
+                const charIndex = ctx.index * barWidth;
+                return this.applyGradientWithContext(value, gradient, charIndex, totalChars, ctx.index, totalBars) + padding;
+            }
+        }
+
+        return effectiveColor ? this.colorify(value, effectiveColor) + padding : value + padding;
     }
 
     private formatStackedColumn(ctx: ColumnContext): void {
@@ -210,13 +261,17 @@ class VerticalChartFormatter extends ChartFormatter {
         return ' '.repeat(width) + ' '.repeat(padding);
     }
 
-    private formatBarCell(barSize: number, padding: number, color: string): string {
-        const character = this.options.char;
-        const barWidth = this.isFillLonger()
-            ? barSize + (this.options.fill.length - character.length)
+    private calculateBarWidth(barSize: number): number {
+        return this.isFillLonger()
+            ? barSize + (this.options.fill.length - this.options.char.length)
             : this.getScaledBarSize(barSize);
-        const value = character.repeat(barWidth) + ' '.repeat(padding);
-        return color ? this.colorify(value, color) : value;
+    }
+
+    private formatBarCell(barSize: number, padding: number, color: string): string {
+        const barWidth = this.calculateBarWidth(barSize);
+        const value = this.options.char.repeat(barWidth) + ' '.repeat(padding);
+        const effectiveColor = color || this.options.color;
+        return effectiveColor ? this.colorify(value, effectiveColor) : value;
     }
 
     private formatFillCell(barSize: number, padding: number, color: string): string {
@@ -225,7 +280,23 @@ class VerticalChartFormatter extends ChartFormatter {
 
         const barWidth = this.getScaledBarSize(barSize);
         const value = character.repeat(barWidth) + ' '.repeat(padding);
-        const fillColor = this.options.fillColor || color;
+
+        let fillColor: string | number[] | undefined;
+        if (this.options.fillColor === 'auto') {
+            const effectiveColor = color || this.options.color;
+            if (this.isGradient(effectiveColor)) {
+                // For auto with gradient, use the middle color of the gradient
+                const midPosition = 0.5;
+                fillColor = this.getColorAtPosition(effectiveColor, midPosition);
+            } else {
+                fillColor = effectiveColor as string;
+            }
+        } else if (this.options.fillColor) {
+            fillColor = this.options.fillColor;
+        } else {
+            fillColor = color;
+        }
+
         return fillColor ? this.colorify(value, fillColor) : value;
     }
 
@@ -234,7 +305,7 @@ class VerticalChartFormatter extends ChartFormatter {
 
         if (!this.options.colorLabels) return label;
 
-        const color = point.color || this.options.color;
+        const color = point.color || this.options.color || '';
         return color ? this.colorify(label, color) : label;
     }
 
@@ -243,7 +314,7 @@ class VerticalChartFormatter extends ChartFormatter {
 
         if (!this.options.colorLabels) return value;
 
-        const color = point.color || this.options.color;
+        const color = point.color || this.options.color || '';
         return color ? this.colorify(value, color) : value;
     }
 
@@ -258,16 +329,7 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatLabelEntry(point: ChartPoint, barSize: number, padding: number, index: number): string {
-        const formattedLabel = this.formatLabel(point);
-        const label = this.stripStyle(formattedLabel);
-        const charLength = this.getCharWidth();
-        const barWidth = this.isLongChar()
-            ? barSize * charLength + padding
-            : barSize + padding + Math.floor(charLength / 2);
-        const rightPad = Math.abs(barWidth - label.length);
-        const isFirst = index === 0 && !this.options.naked ? 1 : 0;
-
-        return ' '.repeat(isFirst) + formattedLabel + ' '.repeat(rightPad);
+        return this.formatEntryWithLabel(this.formatLabel(point), barSize, padding, index);
     }
 
     private formatValueLabels(chart: ChartPoint[], barSize: number, padding: number): string {
@@ -281,7 +343,10 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatValueLabelEntry(point: ChartPoint, barSize: number, padding: number, index: number): string {
-        const formattedLabel = this.formatValueLabel(point);
+        return this.formatEntryWithLabel(this.formatValueLabel(point), barSize, padding, index);
+    }
+
+    private formatEntryWithLabel(formattedLabel: string, barSize: number, padding: number, index: number): string {
         const label = this.stripStyle(formattedLabel);
         const charLength = this.getCharWidth();
         const barWidth = this.isLongChar()
