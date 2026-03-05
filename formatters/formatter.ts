@@ -139,6 +139,50 @@ abstract class ChartFormatter {
         return getColorAtPositionUtil(gradient, position, this.getThemeColors());
     }
 
+    protected getLabelColorForBar(
+        color: string | Gradient | undefined,
+        barIndex: number,
+        totalBars: number
+    ): string | undefined {
+        if (!color) return undefined;
+        if (!this.isGradient(color)) return color as string;
+
+        const { direction = 'horizontal', reverse = false } = color;
+        const chartOrientation = this.options.orientation || 'horizontal';
+
+        let position: number;
+
+        // Determine label position based on gradient direction and chart orientation
+        // Labels are always at a fixed position on one axis:
+        // - Horizontal chart: labels are at the LEFT (position 0 on horizontal axis)
+        // - Vertical chart: labels are at the BOTTOM (position 1 on vertical axis)
+        if (chartOrientation === 'horizontal') {
+            if (direction === 'horizontal') {
+                // Horizontal gradient on horizontal chart: labels at left = position 0
+                position = 0;
+            } else {
+                // Vertical gradient on horizontal chart: labels vary by row (bar index)
+                position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+            }
+        } else {
+            // Vertical chart
+            if (direction === 'vertical') {
+                // Vertical gradient on vertical chart: labels at bottom = position 1
+                position = 1;
+            } else {
+                // Horizontal gradient on vertical chart: labels vary by column (bar index)
+                position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+            }
+        }
+
+        if (reverse) {
+            position = 1 - position;
+        }
+
+        const [r, g, b] = this.getColorAtPosition(color, position);
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    }
+
     protected applyGradientWithContext(
         text: string,
         gradient: Gradient,

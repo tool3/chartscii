@@ -196,4 +196,175 @@ describe('gradient', () => {
         expect(output).to.include('\x1b[38;2;0;255;0m');
         await snap(output, 'gradient with default colors');
     });
+
+    // Label color tests for all 6 orientation/direction combinations
+    // cyan = (0, 255, 255), pink = (255, 192, 203)
+
+    // Case 1: Horizontal chart + horizontal gradient - all labels should be cyan (position 0 = left)
+    it('should color all labels cyan for horizontal chart with horizontal gradient', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink']
+            },
+            colorLabels: true,
+        });
+        const output = chart.create();
+        const lines = output.split('\n');
+
+        // All labels should be cyan (position 0) - labels are at left edge
+        // Line 0 is empty (title), labels start at line 1
+        expect(lines[1]).to.include('\x1b[38;2;0;255;255m1');
+        expect(lines[9]).to.include('\x1b[38;2;0;255;255m5');
+        await snap(output, 'gradient labels horizontal chart horizontal gradient');
+    });
+
+    // Case 2: Horizontal chart + horizontal gradient + reverse - all labels should be pink
+    it('should color all labels pink for horizontal chart with horizontal gradient reversed', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                reverse: true
+            },
+            colorLabels: true,
+        });
+        const output = chart.create();
+        const lines = output.split('\n');
+
+        // All labels should be pink (position 0 reversed = 1) - labels are at left edge
+        expect(lines[1]).to.include('\x1b[38;2;255;192;203m1');
+        expect(lines[9]).to.include('\x1b[38;2;255;192;203m5');
+        await snap(output, 'gradient labels horizontal chart horizontal gradient reversed');
+    });
+
+    // Case 3: Horizontal chart + vertical gradient - labels vary by bar index (cyan to pink)
+    it('should color labels by bar position for horizontal chart with vertical gradient', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                direction: 'vertical'
+            },
+            colorLabels: true,
+        });
+        const output = chart.create();
+        const lines = output.split('\n');
+
+        // First label should be cyan (bar index 0)
+        expect(lines[1]).to.include('\x1b[38;2;0;255;255m1');
+        // Last label should be pink (bar index 4)
+        expect(lines[9]).to.include('\x1b[38;2;255;192;203m5');
+        await snap(output, 'gradient labels horizontal chart vertical gradient');
+    });
+
+    // Case 4: Horizontal chart + vertical gradient + reverse - labels vary by bar index (pink to cyan)
+    it('should color labels by bar position reversed for horizontal chart with vertical gradient reversed', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                direction: 'vertical',
+                reverse: true
+            },
+            colorLabels: true,
+        });
+        const output = chart.create();
+        const lines = output.split('\n');
+
+        // First label should be pink (bar index 0 reversed)
+        expect(lines[1]).to.include('\x1b[38;2;255;192;203m1');
+        // Last label should be cyan (bar index 4 reversed)
+        expect(lines[9]).to.include('\x1b[38;2;0;255;255m5');
+        await snap(output, 'gradient labels horizontal chart vertical gradient reversed');
+    });
+
+    // Case 5: Vertical chart + vertical gradient - all labels should be pink (position 1 = bottom)
+    it('should color all labels pink for vertical chart with vertical gradient', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                direction: 'vertical'
+            },
+            colorLabels: true,
+            orientation: 'vertical',
+        });
+        const output = chart.create();
+
+        // All labels should be pink (position 1) - labels are at bottom
+        // Labels are on the last line before structure
+        expect(output).to.include('\x1b[38;2;255;192;203m1');
+        expect(output).to.include('\x1b[38;2;255;192;203m5');
+        await snap(output, 'gradient labels vertical chart vertical gradient');
+    });
+
+    // Case 6: Vertical chart + vertical gradient + reverse - all labels should be cyan
+    it('should color all labels cyan for vertical chart with vertical gradient reversed', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                direction: 'vertical',
+                reverse: true
+            },
+            colorLabels: true,
+            orientation: 'vertical',
+        });
+        const output = chart.create();
+
+        // All labels should be cyan (position 1 reversed = 0) - labels are at bottom
+        expect(output).to.include('\x1b[38;2;0;255;255m1');
+        expect(output).to.include('\x1b[38;2;0;255;255m5');
+        await snap(output, 'gradient labels vertical chart vertical gradient reversed');
+    });
+
+    // Case 7: Vertical chart + horizontal gradient - labels vary by bar index (cyan to pink)
+    it('should color labels by bar position for vertical chart with horizontal gradient', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink']
+            },
+            colorLabels: true,
+            orientation: 'vertical',
+        });
+        const output = chart.create();
+
+        // Labels vary by bar index (column position)
+        // First bar label should be cyan
+        expect(output).to.include('\x1b[38;2;0;255;255m1');
+        // Last bar label should be pink
+        expect(output).to.include('\x1b[38;2;255;192;203m5');
+        await snap(output, 'gradient labels vertical chart horizontal gradient');
+    });
+
+    // Case 8: Vertical chart + horizontal gradient + reverse - labels vary by bar index (pink to cyan)
+    it('should color labels by bar position reversed for vertical chart with horizontal gradient reversed', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                reverse: true
+            },
+            colorLabels: true,
+            orientation: 'vertical',
+        });
+        const output = chart.create();
+
+        // Labels vary by bar index reversed
+        // First bar label should be pink (reversed)
+        expect(output).to.include('\x1b[38;2;255;192;203m1');
+        // Last bar label should be cyan (reversed)
+        expect(output).to.include('\x1b[38;2;0;255;255m5');
+        await snap(output, 'gradient labels vertical chart horizontal gradient reversed');
+    });
 });
