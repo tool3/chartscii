@@ -367,4 +367,135 @@ describe('gradient', () => {
         expect(output).to.include('\x1b[38;2;0;255;255m5');
         await snap(output, 'gradient labels vertical chart horizontal gradient reversed');
     });
+
+    // Value label color tests - value labels should match the color at the actual bar end position
+    // cyan = (0, 255, 255), pink = (255, 192, 203)
+
+    // Case 1: Horizontal chart + horizontal gradient - value labels match actual bar end position
+    it('should color value labels by actual bar end position for horizontal chart with horizontal gradient', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink']
+            },
+            colorLabels: true,
+            valueLabels: true,
+        });
+        const output = chart.create();
+        const lines = output.split('\n');
+
+        // Value labels should match where each bar actually ends
+        // Shortest bar (value 1) ends near start -> closer to cyan
+        // Longest bar (value 5) ends at full width -> pink
+        // We don't check exact colors because they depend on the bar's actual end position
+        await snap(output, 'gradient value labels horizontal chart horizontal gradient');
+    });
+
+    // Case 2: Horizontal chart + horizontal gradient + reverse - value labels match actual bar end position (reversed)
+    it('should color value labels by actual bar end position for horizontal chart with horizontal gradient reversed', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                reverse: true
+            },
+            colorLabels: true,
+            valueLabels: true,
+        });
+        const output = chart.create();
+        const lines = output.split('\n');
+
+        // With reverse, shortest bar ends closer to pink, longest bar ends at cyan
+        await snap(output, 'gradient value labels horizontal chart horizontal gradient reversed');
+    });
+
+    // Case 3: Horizontal chart + vertical gradient - value labels vary by bar index (same as labels)
+    it('should color value labels by bar position for horizontal chart with vertical gradient', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                direction: 'vertical'
+            },
+            colorLabels: true,
+            valueLabels: true,
+            fill: '░',
+            fillColor: 'auto',
+        });
+        const output = chart.create();
+        const lines = output.split('\n');
+
+        // First value label should be cyan (bar index 0)
+        expect(lines[1]).to.include('\x1b[38;2;0;255;255m1\x1b[0m');
+        // Last value label should be pink (bar index 4)
+        expect(lines[9]).to.include('\x1b[38;2;255;192;203m5\x1b[0m');
+        await snap(output, 'gradient value labels horizontal chart vertical gradient');
+    });
+
+    // Case 4: Vertical chart + vertical gradient - value labels match actual bar top position
+    it('should color value labels by actual bar top position for vertical chart with vertical gradient', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                direction: 'vertical'
+            },
+            colorLabels: true,
+            valueLabels: true,
+            orientation: 'vertical',
+        });
+        const output = chart.create();
+
+        // Value labels match where each bar's top is (shorter bars are lower, closer to pink)
+        // We use snapshot testing since exact colors depend on bar heights
+        await snap(output, 'gradient value labels vertical chart vertical gradient');
+    });
+
+    // Case 5: Vertical chart + vertical gradient + reverse - value labels match actual bar top position (reversed)
+    it('should color value labels by actual bar top position for vertical chart with vertical gradient reversed', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink'],
+                direction: 'vertical',
+                reverse: true
+            },
+            colorLabels: true,
+            valueLabels: true,
+            orientation: 'vertical',
+        });
+        const output = chart.create();
+
+        // With reverse, shorter bars (top closer to bottom) are more cyan
+        await snap(output, 'gradient value labels vertical chart vertical gradient reversed');
+    });
+
+    // Case 6: Vertical chart + horizontal gradient - value labels vary by bar index
+    it('should color value labels by bar position for vertical chart with horizontal gradient', async () => {
+        const data = [1, 2, 3, 4, 5];
+        const chart = new Chartscii(data, {
+            color: {
+                type: 'gradient',
+                colors: ['cyan', 'pink']
+            },
+            colorLabels: true,
+            valueLabels: true,
+            fill: '░',
+            fillColor: 'auto',
+            orientation: 'vertical',
+        });
+        const output = chart.create();
+
+        // Value labels vary by bar index (column position)
+        // First bar value label should be cyan
+        expect(output).to.include('\x1b[38;2;0;255;255m1\x1b[0m');
+        // Last bar value label should be pink
+        expect(output).to.include('\x1b[38;2;255;192;203m5\x1b[0m');
+        await snap(output, 'gradient value labels vertical chart horizontal gradient');
+    });
 });
