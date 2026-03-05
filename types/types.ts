@@ -15,6 +15,15 @@ export type Structure = {
 
 export type VerticalChartAlignment = 'left' | 'center' | 'right' | 'justify';
 export type HorizontalChartAlignment = 'top' | 'center' | 'bottom' | 'justify';
+export type TitleAlignment = 'left' | 'center' | 'right';
+export type TitlePadding = number | [number, number] | [number, number, number, number];
+
+export type TitleConfig = {
+    text: string;
+    align?: TitleAlignment;
+    color?: string | 'gradient';
+    padding?: TitlePadding;
+}
 
 type BaseOptions = {
     sort?: boolean;
@@ -27,7 +36,7 @@ type BaseOptions = {
     naked?: boolean;
     labels?: boolean;
     color?: string | 'auto' | Gradient;
-    title?: string;
+    title?: string | TitleConfig;
     char?: string;
     fill?: string;
     fillColor?: string | 'auto';

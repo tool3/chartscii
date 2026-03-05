@@ -1,5 +1,5 @@
 import style from 'styl3';
-import { ChartOptions, ChartPoint, Gradient } from '../types/types';
+import { ChartOptions, ChartPoint, Gradient, TitleConfig, TitlePadding } from '../types/types';
 import {
     isGradient as isGradientUtil,
     parseColorToRgb,
@@ -270,6 +270,95 @@ abstract class ChartFormatter {
 
     protected stripStyle(label: string): string {
         return label.replace(/\x1b\[[0-9;]*m/g, '');
+    }
+
+    protected getTitleConfig(): TitleConfig | undefined {
+        const { title } = this.options;
+        if (!title) return undefined;
+        if (typeof title === 'string') {
+            return { text: title };
+        }
+        return title;
+    }
+
+    protected parseTitlePadding(padding?: TitlePadding): { top: number; right: number; bottom: number; left: number } {
+        if (padding === undefined) {
+            return { top: 0, right: 0, bottom: 0, left: 0 };
+        }
+        if (typeof padding === 'number') {
+            return { top: padding, right: padding, bottom: padding, left: padding };
+        }
+        if (padding.length === 2) {
+            const [vertical, horizontal] = padding;
+            return { top: vertical, right: horizontal, bottom: vertical, left: horizontal };
+        }
+        const [top, right, bottom, left] = padding;
+        return { top, right, bottom, left };
+    }
+
+    protected formatTitle(width?: number): string {
+        const titleConfig = this.getTitleConfig();
+        if (!titleConfig) return '';
+
+        const { text, align = 'left', color, padding: titlePadding } = titleConfig;
+        const { top, right, bottom, left } = this.parseTitlePadding(titlePadding);
+
+        let formattedText = text;
+
+        // Apply color
+        if (color === 'gradient') {
+            // Use gradient if the chart has a gradient color
+            if (this.isGradient(this.options.color)) {
+                formattedText = this.colorify(text, this.options.color);
+            }
+            // If no gradient is present, leave uncolored (per user spec)
+        } else if (color) {
+            // Apply the specified color (string or ANSI)
+            formattedText = this.colorify(text, color);
+        }
+
+        // Apply horizontal padding (left/right) only if no alignment is specified
+        // If align is specified, it takes precedence over left/right padding
+        if (align === 'left' && !titlePadding) {
+            // Default left alignment, no padding adjustments needed
+        } else if (align !== 'left') {
+            // Alignment specified - use alignment logic, ignore left/right padding
+            if (width && width > text.length) {
+                const availableSpace = width - text.length;
+                switch (align) {
+                    case 'center': {
+                        const leftPad = Math.floor(availableSpace / 2);
+                        const rightPad = availableSpace - leftPad;
+                        formattedText = ' '.repeat(leftPad) + formattedText + ' '.repeat(rightPad);
+                        break;
+                    }
+                    case 'right':
+                        formattedText = ' '.repeat(availableSpace) + formattedText;
+                        break;
+                }
+            }
+        } else if (titlePadding) {
+            // No alignment override but padding specified - apply left/right padding
+            formattedText = ' '.repeat(left) + formattedText + ' '.repeat(right);
+        }
+
+        // Build result with top/bottom padding
+        const lines: string[] = [];
+
+        // Add top padding lines
+        for (let i = 0; i < top; i++) {
+            lines.push('');
+        }
+
+        // Add title line
+        lines.push(formattedText);
+
+        // Add bottom padding lines
+        for (let i = 0; i < bottom; i++) {
+            lines.push('');
+        }
+
+        return lines.join('\n');
     }
 }
 
