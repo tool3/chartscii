@@ -1,5 +1,11 @@
 import style from 'styl3';
-import { ChartOptions, ChartPoint } from '../types/types';
+import { ChartOptions, ChartPoint, Gradient } from '../types/types';
+import {
+    isGradient as isGradientUtil,
+    parseColorToRgb,
+    getColorAtPosition as getColorAtPositionUtil,
+    applyGradientToText
+} from '../utils/color';
 
 export type BarDimensions = {
     barSize: number;
@@ -101,10 +107,13 @@ abstract class ChartFormatter {
         return this.options.percentage ? `(${point.percentage.toFixed(2)}%)` : '';
     }
 
-    protected colorify(txt: string, color?: string | number[]): string {
+    protected colorify(txt: string, color?: string | number[] | Gradient): string {
         if (!color) return txt;
 
-        // Check array first before calling string methods
+        if (this.isGradient(color)) {
+            return this.applyGradient(txt, color);
+        }
+
         if (Array.isArray(color)) {
             return this.colors.rgb(...color)`${txt}`;
         }
@@ -115,6 +124,55 @@ abstract class ChartFormatter {
             return this.colors.ansi(color)`${txt}`;
         }
         return this.colors[color]`${txt}`;
+    }
+
+    protected isGradient(color: any): color is Gradient {
+        return isGradientUtil(color);
+    }
+
+    protected getColorAtPosition(gradient: Gradient, position: number): [number, number, number] {
+        return getColorAtPositionUtil(gradient, position);
+    }
+
+    protected applyGradientWithContext(
+        text: string,
+        gradient: Gradient,
+        charIndex: number,
+        totalChars: number,
+        barIndex: number,
+        totalBars: number,
+        rowIndex: number = 0,
+        totalRows: number = 1
+    ): string {
+        const { colors, direction = 'horizontal', reverse = false } = gradient;
+        if (colors.length === 0 || text.length === 0) return text;
+
+        const chars = [...text];
+        let result = '';
+
+        for (let i = 0; i < chars.length; i++) {
+            let position: number;
+
+            if (direction === 'vertical') {
+                position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+            } else {
+                const globalCharIndex = charIndex + i;
+                position = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;
+            }
+
+            if (reverse) {
+                position = 1 - position;
+            }
+
+            const [r, g, b] = this.getColorAtPosition(gradient, position);
+            result += `\x1b[38;2;${r};${g};${b}m${chars[i]}\x1b[39m`;
+        }
+
+        return result;
+    }
+
+    private applyGradient(text: string, gradient: Gradient): string {
+        return applyGradientToText(text, gradient);
     }
 
     protected stripStyle(label: string): string {
