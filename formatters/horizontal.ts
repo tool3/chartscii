@@ -36,11 +36,12 @@ class HorizontalChartFormatter extends ChartFormatter {
 
         const lines = Array.from(chart.entries()).map(([i, point]) => {
             const isLast = Number(i) === chart.size - 1;
-            labels.push(this.formatLabel(point, this.options.structure.y));
+            const barIndex = Number(i);
+            labels.push(this.formatLabel(point, this.options.structure.y, barIndex, barCount));
             const ctx: HorizontalBarContext = {
                 chart: chartArray,
                 point,
-                index: Number(i),
+                index: barIndex,
                 barSize,
                 padding: isLast ? 0 : padding
             };
@@ -87,7 +88,7 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     private formatLineWithContext(ctx: HorizontalBarContext): string {
-        const label = this.formatLabel(ctx.point, this.options.structure.y);
+        const label = this.formatLabel(ctx.point, this.options.structure.y, ctx.index, ctx.chart.length);
         const bar = this.formatBarWithContext(ctx, label);
         return `${label}${bar}`;
     }
@@ -266,17 +267,18 @@ class HorizontalChartFormatter extends ChartFormatter {
         return fillStr;
     }
 
-    private formatLabel(point: ChartPoint, key: string): string {
+    private formatLabel(point: ChartPoint, key: string, barIndex: number, totalBars: number): string {
         const percentage = this.formatPercentage(point);
         const label = percentage ? `${point.label} ${percentage}` : point.label;
-        const color = point.color || this.options.color || '';
         const space = this.formatLabelSpace(label);
 
         if (!this.options.labels) {
             return this.formatStructure(this.options.structure.axis);
         }
 
-        const coloredLabel = this.options.colorLabels ? this.colorify(label, color) : label;
+        const pointColor = point.color || this.options.color;
+        const labelColor = this.getLabelColorForBar(pointColor, barIndex, totalBars);
+        const coloredLabel = this.options.colorLabels && labelColor ? this.colorify(label, labelColor) : label;
         return `${coloredLabel}${space}${this.formatStructure(key)}`;
     }
 

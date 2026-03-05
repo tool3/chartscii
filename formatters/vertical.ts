@@ -137,7 +137,7 @@ class VerticalChartFormatter extends ChartFormatter {
         const isBarRow = row >= barStartRow;
 
         if (isValueLabelRow) {
-            return this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding);
+            return this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length);
         }
         if (isAboveBar) {
             return this.formatEmptyCell(ctx.barSize, ctx.padding, ctx.point.color);
@@ -236,7 +236,7 @@ class VerticalChartFormatter extends ChartFormatter {
         const shouldShowLabel = this.options.valueLabels && !this.options.fill && emptyStartRow >= 0;
 
         if (shouldShowLabel) {
-            ctx.verticalChart[emptyStartRow][ctx.index] = this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding);
+            ctx.verticalChart[emptyStartRow][ctx.index] = this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length);
         }
     }
 
@@ -244,8 +244,8 @@ class VerticalChartFormatter extends ChartFormatter {
         return Math.round((scaled / maxHeight) * maxHeight);
     }
 
-    private formatValueLabelCell(point: ChartPoint, barSize: number, padding: number): string {
-        const label = this.formatValueLabel(point);
+    private formatValueLabelCell(point: ChartPoint, barSize: number, padding: number, barIndex: number, totalBars: number): string {
+        const label = this.formatValueLabel(point, barIndex, totalBars);
         const space = Math.max(0, barSize - this.stripStyle(label).length + padding);
         return label + ' '.repeat(space);
     }
@@ -300,22 +300,24 @@ class VerticalChartFormatter extends ChartFormatter {
         return fillColor ? this.colorify(value, fillColor) : value;
     }
 
-    private formatLabel(point: ChartPoint): string {
+    private formatLabel(point: ChartPoint, barIndex: number, totalBars: number): string {
         const label = point.percentage ? `${point.label} ${this.formatPercentage(point)}` : point.label;
 
         if (!this.options.colorLabels) return label;
 
-        const color = point.color || this.options.color || '';
-        return color ? this.colorify(label, color) : label;
+        const pointColor = point.color || this.options.color;
+        const labelColor = this.getLabelColorForBar(pointColor, barIndex, totalBars);
+        return labelColor ? this.colorify(label, labelColor) : label;
     }
 
-    private formatValueLabel(point: ChartPoint): string {
+    private formatValueLabel(point: ChartPoint, barIndex: number, totalBars: number): string {
         const value = this.formatValueWithDecimals(point.value);
 
         if (!this.options.colorLabels) return value;
 
-        const color = point.color || this.options.color || '';
-        return color ? this.colorify(value, color) : value;
+        const pointColor = point.color || this.options.color;
+        const labelColor = this.getLabelColorForBar(pointColor, barIndex, totalBars);
+        return labelColor ? this.colorify(value, labelColor) : value;
     }
 
     private formatLabels(chart: ChartPoint[], barSize: number, padding: number): string {
@@ -323,13 +325,13 @@ class VerticalChartFormatter extends ChartFormatter {
 
         const { leftPad } = this.getHorizontalAlignmentPadding(chart.length, barSize, padding);
         const labels = chart
-            .map((point, i) => this.formatLabelEntry(point, barSize, padding, i))
+            .map((point, i) => this.formatLabelEntry(point, barSize, padding, i, chart.length))
             .join('');
         return ' '.repeat(leftPad) + labels;
     }
 
-    private formatLabelEntry(point: ChartPoint, barSize: number, padding: number, index: number): string {
-        return this.formatEntryWithLabel(this.formatLabel(point), barSize, padding, index);
+    private formatLabelEntry(point: ChartPoint, barSize: number, padding: number, index: number, totalBars: number): string {
+        return this.formatEntryWithLabel(this.formatLabel(point, index, totalBars), barSize, padding, index);
     }
 
     private formatValueLabels(chart: ChartPoint[], barSize: number, padding: number): string {
@@ -337,13 +339,13 @@ class VerticalChartFormatter extends ChartFormatter {
 
         const { leftPad } = this.getHorizontalAlignmentPadding(chart.length, barSize, padding);
         const labels = chart
-            .map((point, i) => this.formatValueLabelEntry(point, barSize, padding, i))
+            .map((point, i) => this.formatValueLabelEntry(point, barSize, padding, i, chart.length))
             .join('');
         return ' '.repeat(leftPad) + labels;
     }
 
-    private formatValueLabelEntry(point: ChartPoint, barSize: number, padding: number, index: number): string {
-        return this.formatEntryWithLabel(this.formatValueLabel(point), barSize, padding, index);
+    private formatValueLabelEntry(point: ChartPoint, barSize: number, padding: number, index: number, totalBars: number): string {
+        return this.formatEntryWithLabel(this.formatValueLabel(point, index, totalBars), barSize, padding, index);
     }
 
     private formatEntryWithLabel(formattedLabel: string, barSize: number, padding: number, index: number): string {
