@@ -39,11 +39,77 @@ export function isGradient(color: any): color is Gradient {
     return typeof color === 'object' && color !== null && color.type === 'gradient' && Array.isArray(color.colors);
 }
 
-export function extractRgbFromAnsi(ansiCode: string): [number, number, number] | null {
-    const match = ansiCode.match(/\x1b\[38;2;(\d+);(\d+);(\d+)m/);
-    if (match) {
-        return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)];
+// Convert 256-color index to RGB
+// Based on the standard 256-color palette
+function ansi256ToRgb(index: number): [number, number, number] {
+    // Standard colors (0-15)
+    if (index < 16) {
+        const standard: [number, number, number][] = [
+            [0, 0, 0],       // 0: black
+            [128, 0, 0],     // 1: red
+            [0, 128, 0],     // 2: green
+            [128, 128, 0],   // 3: yellow
+            [0, 0, 128],     // 4: blue
+            [128, 0, 128],   // 5: magenta
+            [0, 128, 128],   // 6: cyan
+            [192, 192, 192], // 7: white
+            [128, 128, 128], // 8: bright black (gray)
+            [255, 0, 0],     // 9: bright red
+            [0, 255, 0],     // 10: bright green
+            [255, 255, 0],   // 11: bright yellow
+            [0, 0, 255],     // 12: bright blue
+            [255, 0, 255],   // 13: bright magenta
+            [0, 255, 255],   // 14: bright cyan
+            [255, 255, 255], // 15: bright white
+        ];
+        return standard[index];
     }
+
+    // 216-color cube (16-231)
+    if (index < 232) {
+        const i = index - 16;
+        const r = Math.floor(i / 36);
+        const g = Math.floor((i % 36) / 6);
+        const b = i % 6;
+        return [
+            r === 0 ? 0 : 55 + r * 40,
+            g === 0 ? 0 : 55 + g * 40,
+            b === 0 ? 0 : 55 + b * 40
+        ];
+    }
+
+    // Grayscale (232-255)
+    const gray = (index - 232) * 10 + 8;
+    return [gray, gray, gray];
+}
+
+export function extractRgbFromAnsi(ansiCode: string): [number, number, number] | null {
+    // Try RGB format first: \x1b[38;2;R;G;Bm
+    const rgbMatch = ansiCode.match(/\x1b\[38;2;(\d+);(\d+);(\d+)m/);
+    if (rgbMatch) {
+        return [parseInt(rgbMatch[1], 10), parseInt(rgbMatch[2], 10), parseInt(rgbMatch[3], 10)];
+    }
+
+    // Try 256-color format: \x1b[38;5;Xm
+    const ansi256Match = ansiCode.match(/\x1b\[38;5;(\d+)m/);
+    if (ansi256Match) {
+        return ansi256ToRgb(parseInt(ansi256Match[1], 10));
+    }
+
+    // Try basic ANSI colors: \x1b[30-37m or \x1b[90-97m
+    const basicMatch = ansiCode.match(/\x1b\[(\d+)m/);
+    if (basicMatch) {
+        const code = parseInt(basicMatch[1], 10);
+        // Basic foreground colors (30-37)
+        if (code >= 30 && code <= 37) {
+            return ansi256ToRgb(code - 30);
+        }
+        // Bright foreground colors (90-97)
+        if (code >= 90 && code <= 97) {
+            return ansi256ToRgb(code - 90 + 8);
+        }
+    }
+
     return null;
 }
 

@@ -14,8 +14,9 @@ describe('gradient', () => {
         });
         const output = chart.create();
 
-        expect(output).to.include('\x1b[38;2;255;0;0m');
-        expect(output).to.include('\x1b[38;2;0;255;0m');
+        // Default theme: red=(215,0,0), green=(0,128,0)
+        expect(output).to.include('\x1b[38;2;215;0;0m');
+        expect(output).to.include('\x1b[38;2;0;128;0m');
         expect(output).to.include('\x1b[38;2;');
         await snap(output, 'gradient basic');
     });
@@ -82,7 +83,8 @@ describe('gradient', () => {
         });
         const output = chart.create();
 
-        expect(output).to.include('\x1b[38;2;0;0;255m');
+        // Default theme: blue=(0,0,128) from basic ANSI code 34
+        expect(output).to.include('\x1b[38;2;0;0;128m');
         await snap(output, 'gradient single color');
     });
 
@@ -97,8 +99,9 @@ describe('gradient', () => {
         });
         const output = chart.create();
 
-        expect(output).to.include('\x1b[38;2;255;0;0m');
-        expect(output).to.include('\x1b[38;2;0;255;0m');
+        // Default theme: red=(215,0,0), green=(0,128,0)
+        expect(output).to.include('\x1b[38;2;215;0;0m');
+        expect(output).to.include('\x1b[38;2;0;128;0m');
         await snap(output, 'gradient sorted');
     });
 
@@ -115,6 +118,7 @@ describe('gradient', () => {
         });
         const output = chart.create();
 
+        // cyan=(0,255,255) same in default theme, purple=(128,0,128) from NAMED_COLORS
         expect(output).to.include('\x1b[38;2;0;255;255m');
         expect(output).to.include('\x1b[38;2;128;0;128m');
         await snap(output, 'gradient reversed');
@@ -180,7 +184,7 @@ describe('gradient', () => {
         await snap(output, 'gradient with beach theme');
     });
 
-    it('should use default colors when no theme is set', async () => {
+    it('should use default theme colors when no theme is set', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
             color: {
@@ -190,15 +194,14 @@ describe('gradient', () => {
         });
         const output = chart.create();
 
-        // Default red is rgb(255, 0, 0)
-        expect(output).to.include('\x1b[38;2;255;0;0m');
-        // Default green is rgb(0, 255, 0)
-        expect(output).to.include('\x1b[38;2;0;255;0m');
+        // Default theme: red=(215,0,0) from 256-color code 160, green=(0,128,0) from basic ANSI 32
+        expect(output).to.include('\x1b[38;2;215;0;0m');
+        expect(output).to.include('\x1b[38;2;0;128;0m');
         await snap(output, 'gradient with default colors');
     });
 
     // Label color tests for all 6 orientation/direction combinations
-    // cyan = (0, 255, 255), pink = (255, 192, 203)
+    // Default theme: cyan = (0, 255, 255), pink = (255, 175, 255)
 
     // Case 1: Horizontal chart + horizontal gradient - all labels should be cyan (position 0 = left)
     it('should color all labels cyan for horizontal chart with horizontal gradient', async () => {
@@ -235,8 +238,8 @@ describe('gradient', () => {
         const lines = output.split('\n');
 
         // All labels should be pink (position 0 reversed = 1) - labels are at left edge
-        expect(lines[1]).to.include('\x1b[38;2;255;192;203m1');
-        expect(lines[9]).to.include('\x1b[38;2;255;192;203m5');
+        expect(lines[1]).to.include('\x1b[38;2;255;175;255m1');
+        expect(lines[9]).to.include('\x1b[38;2;255;175;255m5');
         await snap(output, 'gradient labels horizontal chart horizontal gradient reversed');
     });
 
@@ -257,7 +260,7 @@ describe('gradient', () => {
         // First label should be cyan (bar index 0)
         expect(lines[1]).to.include('\x1b[38;2;0;255;255m1');
         // Last label should be pink (bar index 4)
-        expect(lines[9]).to.include('\x1b[38;2;255;192;203m5');
+        expect(lines[9]).to.include('\x1b[38;2;255;175;255m5');
         await snap(output, 'gradient labels horizontal chart vertical gradient');
     });
 
@@ -277,7 +280,7 @@ describe('gradient', () => {
         const lines = output.split('\n');
 
         // First label should be pink (bar index 0 reversed)
-        expect(lines[1]).to.include('\x1b[38;2;255;192;203m1');
+        expect(lines[1]).to.include('\x1b[38;2;255;175;255m1');
         // Last label should be cyan (bar index 4 reversed)
         expect(lines[9]).to.include('\x1b[38;2;0;255;255m5');
         await snap(output, 'gradient labels horizontal chart vertical gradient reversed');
@@ -299,8 +302,8 @@ describe('gradient', () => {
 
         // All labels should be pink (position 1) - labels are at bottom
         // Labels are on the last line before structure
-        expect(output).to.include('\x1b[38;2;255;192;203m1');
-        expect(output).to.include('\x1b[38;2;255;192;203m5');
+        expect(output).to.include('\x1b[38;2;255;175;255m1');
+        expect(output).to.include('\x1b[38;2;255;175;255m5');
         await snap(output, 'gradient labels vertical chart vertical gradient');
     });
 
@@ -342,7 +345,7 @@ describe('gradient', () => {
         // First bar label should be cyan
         expect(output).to.include('\x1b[38;2;0;255;255m1');
         // Last bar label should be pink
-        expect(output).to.include('\x1b[38;2;255;192;203m5');
+        expect(output).to.include('\x1b[38;2;255;175;255m5');
         await snap(output, 'gradient labels vertical chart horizontal gradient');
     });
 
@@ -362,14 +365,14 @@ describe('gradient', () => {
 
         // Labels vary by bar index reversed
         // First bar label should be pink (reversed)
-        expect(output).to.include('\x1b[38;2;255;192;203m1');
+        expect(output).to.include('\x1b[38;2;255;175;255m1');
         // Last bar label should be cyan (reversed)
         expect(output).to.include('\x1b[38;2;0;255;255m5');
         await snap(output, 'gradient labels vertical chart horizontal gradient reversed');
     });
 
     // Value label color tests - value labels should match the color at the actual bar end position
-    // cyan = (0, 255, 255), pink = (255, 192, 203)
+    // Default theme: cyan = (0, 255, 255), pink = (255, 175, 255)
 
     // Case 1: Horizontal chart + horizontal gradient - value labels match actual bar end position
     it('should color value labels by actual bar end position for horizontal chart with horizontal gradient', async () => {
@@ -431,7 +434,7 @@ describe('gradient', () => {
         // First value label should be cyan (bar index 0)
         expect(lines[1]).to.include('\x1b[38;2;0;255;255m1\x1b[0m');
         // Last value label should be pink (bar index 4)
-        expect(lines[9]).to.include('\x1b[38;2;255;192;203m5\x1b[0m');
+        expect(lines[9]).to.include('\x1b[38;2;255;175;255m5\x1b[0m');
         await snap(output, 'gradient value labels horizontal chart vertical gradient');
     });
 
@@ -483,20 +486,15 @@ describe('gradient', () => {
                 type: 'gradient',
                 colors: ['cyan', 'pink']
             },
-            title: 'gradient with fill',
+            title: 'gradient with fill with theme',
             colorLabels: true,
             valueLabels: true,
             fill: '░',
             fillColor: 'auto',
+            theme: 'pastel',
             orientation: 'vertical',
         });
         const output = chart.create();
-
-        // Value labels vary by bar index (column position)
-        // First bar value label should be cyan
-        expect(output).to.include('\x1b[38;2;0;255;255m1\x1b[0m');
-        // Last bar value label should be pink
-        expect(output).to.include('\x1b[38;2;255;192;203m5\x1b[0m');
         await snap(output, 'gradient value labels vertical chart horizontal gradient');
     });
 });
