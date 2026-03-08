@@ -1,11 +1,11 @@
-import Chartscii from '../chartscii';
 import snap from 'snaptdout';
-import { expect } from 'chai';
+import { describe, expect, test } from 'vitest';
+import Chartscii from '../chartscii';
 
 describe('title configuration', () => {
     const data = [1, 2, 3, 4, 5];
 
-    it('should support simple string title', async () => {
+    test('should support simple string title', async () => {
         const chart = new Chartscii(data, {
             title: 'Simple Title',
             width: 40
@@ -15,7 +15,7 @@ describe('title configuration', () => {
         await snap(output, 'simple title');
     });
 
-    it('should support title with color', async () => {
+    test('should support title with color', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Colored Title',
@@ -29,7 +29,7 @@ describe('title configuration', () => {
         await snap(output, 'colored title');
     });
 
-    it('should support title with center alignment', async () => {
+    test('should support title with center alignment', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Center',
@@ -45,7 +45,7 @@ describe('title configuration', () => {
         await snap(output, 'center aligned title');
     });
 
-    it('should support title with right alignment', async () => {
+    test('should support title with right alignment', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Right',
@@ -63,7 +63,7 @@ describe('title configuration', () => {
         await snap(output, 'right aligned title');
     });
 
-    it('should support title with gradient color', async () => {
+    test('should support title with gradient color', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Gradient Title',
@@ -81,7 +81,7 @@ describe('title configuration', () => {
         await snap(output, 'gradient title');
     });
 
-    it('should not color title with gradient when no gradient color is set', async () => {
+    test('should not color title with gradient when no gradient color is set', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'No Gradient',
@@ -98,7 +98,7 @@ describe('title configuration', () => {
         await snap(output, 'no gradient title when color is not gradient');
     });
 
-    it('should support title configuration in vertical charts', async () => {
+    test('should support title configuration in vertical charts', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Vertical Title',
@@ -114,7 +114,7 @@ describe('title configuration', () => {
         await snap(output, 'vertical chart title');
     });
 
-    it('should support hex color for title', async () => {
+    test('should support hex color for title', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Hex Color',
@@ -126,7 +126,7 @@ describe('title configuration', () => {
         await snap(output, 'hex color title');
     });
 
-    it('should support title with single number padding', async () => {
+    test('should support title with single number padding', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Padded',
@@ -145,7 +145,7 @@ describe('title configuration', () => {
         await snap(output, 'single number padding');
     });
 
-    it('should support title with 2-number padding (vertical, horizontal)', async () => {
+    test('should support title with 2-number padding (vertical, horizontal)', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Padded',
@@ -163,7 +163,7 @@ describe('title configuration', () => {
         await snap(output, 'two number padding');
     });
 
-    it('should support title with 4-number padding (top, right, bottom, left)', async () => {
+    test('should support title with 4-number padding (top, right, bottom, left)', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Padded',
@@ -183,7 +183,7 @@ describe('title configuration', () => {
         await snap(output, 'four number padding');
     });
 
-    it('should support title aligned with padding', async () => {
+    test('should support title aligned with padding', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Padded',
@@ -196,7 +196,7 @@ describe('title configuration', () => {
         await snap(output, 'aligned and padded');
     });
 
-    it('should ignore horizontal padding when alignment is specified', async () => {
+    test('should ignore horizontal padding when alignment is specified', async () => {
         const chart = new Chartscii(data, {
             title: {
                 text: 'Right',

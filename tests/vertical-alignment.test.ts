@@ -1,5 +1,6 @@
-import Chartscii from '../chartscii';
 import snap from 'snaptdout';
+import { describe, test } from 'vitest';
+import Chartscii from '../chartscii';
 import { InputData } from '../types/types';
 
 describe('vertical alignment', () => {
@@ -9,7 +10,7 @@ describe('vertical alignment', () => {
         { label: 'C', value: 5 },
     ];
 
-    it('should justify bars by default (current behavior)', async () => {
+    test('should justify bars by default (current behavior)', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 10,
@@ -20,7 +21,7 @@ describe('vertical alignment', () => {
         await snap(chart.create(), 'vertical align justify default');
     });
 
-    it('should justify bars explicitly', async () => {
+    test('should justify bars explicitly', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 10,
@@ -32,7 +33,7 @@ describe('vertical alignment', () => {
         await snap(chart.create(), 'vertical align justify explicit');
     });
 
-    it('should align bars left', async () => {
+    test('should align bars left', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 10,
@@ -44,7 +45,7 @@ describe('vertical alignment', () => {
         await snap(chart.create(), 'vertical align left');
     });
 
-    it('should align bars right', async () => {
+    test('should align bars right', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 10,
@@ -56,7 +57,7 @@ describe('vertical alignment', () => {
         await snap(chart.create(), 'vertical align right');
     });
 
-    it('should align bars center', async () => {
+    test('should align bars center', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 10,
@@ -68,7 +69,7 @@ describe('vertical alignment', () => {
         await snap(chart.create(), 'vertical align center');
     });
 
-    it('should align stacked bars correctly', async () => {
+    test('should align stacked bars correctly', async () => {
         const stackedData: InputData[] = [
             { label: 'Q1', value: [3, 5, 2] },
             { label: 'Q2', value: [4, 3, 3] },
