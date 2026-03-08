@@ -1,5 +1,6 @@
-import Chartscii from '../chartscii';
 import snap from 'snaptdout';
+import { describe, test } from 'vitest';
+import Chartscii from '../chartscii';
 import { InputData } from '../types/types';
 
 /**
@@ -45,7 +46,7 @@ describe('scale options', () => {
     ];
 
     describe('auto scaling (default)', () => {
-        it('should scale bars from 0 to max value', async () => {
+        test('should scale bars from 0 to max value', async () => {
             // With auto scaling, value 90 will be 90% of max, 95 will be 95%, etc.
             const chart = new Chartscii(closeRangeData, {
                 width: 50,
@@ -55,7 +56,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale auto horizontal');
         });
 
-        it('should use auto scaling by default when scale is not specified', async () => {
+        test('should use auto scaling by default when scale is not specified', async () => {
             const chart = new Chartscii(closeRangeData, {
                 width: 50,
                 colorLabels: true,
@@ -63,7 +64,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale auto default');
         });
 
-        it('should support auto scaling in vertical orientation', async () => {
+        test('should support auto scaling in vertical orientation', async () => {
             const chart = new Chartscii(wideRangeData, {
                 width: 50,
                 height: 15,
@@ -76,7 +77,7 @@ describe('scale options', () => {
     });
 
     describe('relative scaling (with baseline)', () => {
-        it('should emphasize differences between close values', async () => {
+        test('should emphasize differences between close values', async () => {
             // With relative scaling, the range 90-100 is mapped to show meaningful differences
             // The min value (90) will show a small bar, max (100) fills the width
             const chart = new Chartscii(closeRangeData, {
@@ -87,7 +88,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale relative horizontal');
         });
 
-        it('should show minimum value with a small bar (not zero)', async () => {
+        test('should show minimum value with a small bar (not zero)', async () => {
             // In relative mode, even the minimum value gets a visible bar
             const chart = new Chartscii(wideRangeData, {
                 width: 50,
@@ -97,7 +98,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale relative wide range');
         });
 
-        it('should support relative scaling in vertical orientation', async () => {
+        test('should support relative scaling in vertical orientation', async () => {
             const chart = new Chartscii(closeRangeData, {
                 width: 50,
                 height: 15,
@@ -108,7 +109,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale relative vertical');
         });
 
-        it('should work with stacked bars', async () => {
+        test('should work with stacked bars', async () => {
             const stackedData: InputData[] = [
                 { label: 'Q1', value: [30, 35, 25] },
                 { label: 'Q2', value: [32, 33, 30] },
@@ -125,7 +126,7 @@ describe('scale options', () => {
     });
 
     describe('relative-zero scaling (without baseline)', () => {
-        it('should map minimum value to zero-length bar', async () => {
+        test('should map minimum value to zero-length bar', async () => {
             // With relative-zero, the minimum value (90) produces no bar,
             // maximum (100) fills the width
             const chart = new Chartscii(closeRangeData, {
@@ -136,7 +137,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale relative-zero horizontal');
         });
 
-        it('should show relative differences with min at zero', async () => {
+        test('should show relative differences with min at zero', async () => {
             const chart = new Chartscii(wideRangeData, {
                 width: 50,
                 scale: 'relative-zero',
@@ -145,7 +146,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale relative-zero wide range');
         });
 
-        it('should support relative-zero scaling in vertical orientation', async () => {
+        test('should support relative-zero scaling in vertical orientation', async () => {
             const chart = new Chartscii(closeRangeData, {
                 width: 50,
                 height: 15,
@@ -156,7 +157,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale relative-zero vertical');
         });
 
-        it('should work with fill character', async () => {
+        test('should work with fill character', async () => {
             const chart = new Chartscii(closeRangeData, {
                 width: 50,
                 scale: 'relative-zero',
@@ -168,7 +169,7 @@ describe('scale options', () => {
     });
 
     describe('numeric scale factor', () => {
-        it('should divide values by the scale factor', async () => {
+        test('should divide values by the scale factor', async () => {
             // With scale: 10, a value of 100 becomes 10 characters
             // Bar lengths are absolute: 10->1, 50->5, 100->10 chars
             const chart = new Chartscii(wideRangeData, {
@@ -179,7 +180,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale numeric horizontal');
         });
 
-        it('should allow precise control over bar lengths', async () => {
+        test('should allow precise control over bar lengths', async () => {
             // Smaller scale factor = longer bars
             // With scale: 5, values become: 10->2, 50->10, 100->20 chars
             const chart = new Chartscii(wideRangeData, {
@@ -190,7 +191,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale numeric small factor');
         });
 
-        it('should respect width option and cap bar lengths', async () => {
+        test('should respect width option and cap bar lengths', async () => {
             // Even with numeric scale, bars should not exceed chart width
             // With scale: 2 and width: 20, value 100 would be 50 chars
             // but gets capped at 20
@@ -202,7 +203,7 @@ describe('scale options', () => {
             await snap(chart.create(), 'scale numeric capped');
         });
 
-        it('should support numeric scaling in vertical orientation', async () => {
+        test('should support numeric scaling in vertical orientation', async () => {
             const chart = new Chartscii(wideRangeData, {
                 height: 20,
                 scale: 10,
@@ -221,7 +222,7 @@ describe('scale options', () => {
             { label: '100', value: 100, color: 'yellow' },
         ];
 
-        it('should demonstrate auto vs relative vs relative-zero', async () => {
+        test('should demonstrate auto vs relative vs relative-zero', async () => {
             // This test creates three charts to visually compare the scaling modes
             const autoChart = new Chartscii(comparisonData, {
                 width: 40,

@@ -1,10 +1,9 @@
-import chai from 'chai';
-const expect = chai.expect;
 import Chartscii from '../chartscii';
 import snap from 'snaptdout';
+import { describe, test, expect } from 'vitest';
 
 describe('auto color', () => {
-    it('should apply auto colors to numeric data', async () => {
+    test('should apply auto colors to numeric data', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, { color: 'auto', naked: true });
         const output = chart.create();
@@ -18,7 +17,7 @@ describe('auto color', () => {
         await snap(output, 'auto color numeric data');
     });
 
-    it('should apply auto colors cycling through all colors', async () => {
+    test('should apply auto colors cycling through all colors', async () => {
         const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         const chart = new Chartscii(data, { color: 'auto', naked: true, width: 20 });
         const output = chart.create();
@@ -36,7 +35,7 @@ describe('auto color', () => {
         await snap(output, 'auto color cycling');
     });
 
-    it('should respect existing colors when using auto', async () => {
+    test('should respect existing colors when using auto', async () => {
         const data = [
             { value: 10, color: 'red' },
             20,
@@ -54,7 +53,7 @@ describe('auto color', () => {
         await snap(output, 'auto color with existing colors');
     });
 
-    it('should apply auto colors with labels', async () => {
+    test('should apply auto colors with labels', async () => {
         const data = [
             { value: 10, label: 'A' },
             { value: 20, label: 'B' },
@@ -75,7 +74,7 @@ describe('auto color', () => {
         await snap(output, 'auto color with labels');
     });
 
-    it('should apply auto stack colors to stacked data', async () => {
+    test('should apply auto stack colors to stacked data', async () => {
         const data = [
             { label: 'A', value: [10, 20, 30] },
             { label: 'B', value: [15, 25, 35] },
@@ -91,7 +90,7 @@ describe('auto color', () => {
         await snap(output, 'auto color stacked data');
     });
 
-    it('should apply auto stack colors to vertical stacked data', async () => {
+    test('should apply auto stack colors to vertical stacked data', async () => {
         const data = [
             { label: 'A', value: [10, 20, 30] },
             { label: 'B', value: [15, 25, 35] },
@@ -107,7 +106,7 @@ describe('auto color', () => {
         await snap(output, 'auto color stacked data vertical');
     });
 
-    it('should not override user-provided stackColors', async () => {
+    test('should not override user-provided stackColors', async () => {
         const data = [
             { label: 'A', value: [10, 20, 30] },
             { label: 'B', value: [15, 25, 35] },
@@ -126,7 +125,7 @@ describe('auto color', () => {
         await snap(output, 'auto color user stackColors');
     });
 
-    it('should work with vertical orientation', async () => {
+    test('should work with vertical orientation', async () => {
         const data = [10, 20, 30, 40, 50];
         const chart = new Chartscii(data, {
             color: 'auto',
@@ -147,7 +146,7 @@ describe('auto color', () => {
         await snap(output, 'auto color vertical');
     });
 
-    it('should work with sorted data', async () => {
+    test('should work with sorted data', async () => {
         const data = [50, 10, 30, 20, 40];
         const chart = new Chartscii(data, {
             color: 'auto',
@@ -163,7 +162,7 @@ describe('auto color', () => {
         await snap(output, 'auto color sorted');
     });
 
-    it('should work with reversed data', async () => {
+    test('should work with reversed data', async () => {
         const data = [10, 20, 30, 40, 50];
         const chart = new Chartscii(data, {
             color: 'auto',

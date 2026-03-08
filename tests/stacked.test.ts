@@ -1,12 +1,11 @@
-import chai from 'chai';
-const expect = chai.expect;
-import Chartscii from '../chartscii';
 import snap from 'snaptdout';
+import { describe, expect, test } from 'vitest';
+import Chartscii from '../chartscii';
 import { InputData } from '../types/types';
 
 describe('stacked bar charts', () => {
     describe('horizontal stacked', () => {
-        it('should render stacked bars with number arrays', async () => {
+        test('should render stacked bars with number arrays', async () => {
             const data: InputData[] = [
                 { label: 'abc123', value: [5, 12, 3] },
                 { label: 'def456', value: [2, 8, 1] },
@@ -21,7 +20,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal basic');
         });
 
-        it('should render stacked bars with fillColor', async () => {
+        test('should render stacked bars with fillColor', async () => {
             const data: InputData[] = [
                 { label: 'abc123', value: [1, 2, 10] },
                 { label: 'def456', value: [1, 3, 2] },
@@ -39,7 +38,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal custom fill fillColor');
         });
 
-        it('should render stacked bars with segment objects', async () => {
+        test('should render stacked bars with segment objects', async () => {
             const data: InputData[] = [
                 { label: 'Q1', value: [{ value: 100 }, { value: 50 }, { value: 30 }] },
                 { label: 'Q2', value: [{ value: 120 }, { value: 60 }, { value: 40 }] },
@@ -51,7 +50,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal segment objects');
         });
 
-        it('should apply stackColors correctly', async () => {
+        test('should apply stackColors correctly', async () => {
             const data: InputData[] = [
                 { label: 'commit1', value: [10, 20, 5] },
                 { label: 'commit2', value: [8, 15, 3] },
@@ -63,7 +62,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal stackColors');
         });
 
-        it('should allow per-segment color override', async () => {
+        test('should allow per-segment color override', async () => {
             const data: InputData[] = [
                 { label: 'Q1', value: [{ value: 100, color: 'blue' }, { value: 50 }, { value: 30 }] },
                 { label: 'Q2', value: [{ value: 120 }, { value: 60, color: 'purple' }, { value: 40 }] },
@@ -75,7 +74,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal color override');
         });
 
-        it('should allow per-bar color array override', async () => {
+        test('should allow per-bar color array override', async () => {
             const data: InputData[] = [
                 { label: 'default', value: [5, 12, 3] },
                 { label: 'full', value: [5, 12, 3], color: ['red', 'blue', 'green'] },
@@ -89,7 +88,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal per-bar color array');
         });
 
-        it('should show total value by default', async () => {
+        test('should show total value by default', async () => {
             const data: InputData[] = [
                 { label: 'A', value: [5, 10, 15] },
                 { label: 'B', value: [3, 6, 9] },
@@ -102,7 +101,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal total value');
         });
 
-        it('should show per-segment values with stackValueLabels', async () => {
+        test('should show per-segment values with stackValueLabels', async () => {
             const data: InputData[] = [
                 { label: 'A', value: [5, 10, 15] },
                 { label: 'B', value: [3, 6, 9] },
@@ -116,7 +115,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal segment values');
         });
 
-        it('should apply fill correctly', async () => {
+        test('should apply fill correctly', async () => {
             const data: InputData[] = [
                 { label: 'A', value: [10, 20] },
                 { label: 'B', value: [5, 10] },
@@ -129,7 +128,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked horizontal fill');
         });
 
-        it('should apply fillColor correctly', async () => {
+        test('should apply fillColor correctly', async () => {
             const data: InputData[] = [
                 { label: 'A', value: [10, 20] },
                 { label: 'B', value: [5, 10] },
@@ -145,7 +144,7 @@ describe('stacked bar charts', () => {
     });
 
     describe('vertical stacked', () => {
-        it('should stack segments bottom-to-top', async () => {
+        test('should stack segments bottom-to-top', async () => {
             const data: InputData[] = [
                 { label: 'A', value: [3, 5, 2] },
                 { label: 'B', value: [2, 4, 1] },
@@ -160,7 +159,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked vertical basic');
         });
 
-        it('should render stacked bars with number arrays', async () => {
+        test('should render stacked bars with number arrays', async () => {
             const data: InputData[] = [
                 { label: 'Q1', value: [10, 20, 5] },
                 { label: 'Q2', value: [15, 10, 10] },
@@ -175,7 +174,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked vertical number arrays');
         });
 
-        it('should apply stackColors correctly', async () => {
+        test('should apply stackColors correctly', async () => {
             const data: InputData[] = [
                 { label: 'Jan', value: [5, 10, 3] },
                 { label: 'Feb', value: [7, 8, 5] },
@@ -192,7 +191,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked vertical stackColors');
         });
 
-        it('should apply stackColors with theme', async () => {
+        test('should apply stackColors with theme', async () => {
             const data: InputData[] = [
                 { label: 'Jan', value: [5, 10, 3] },
                 { label: 'Feb', value: [7, 8, 5] },
@@ -211,7 +210,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked vertical stackColors with theme');
         });
 
-        it('should apply stackColors with theme justified', async () => {
+        test('should apply stackColors with theme justified', async () => {
             const data: InputData[] = [
                 { label: 'Jan', value: [5, 10, 3] },
                 { label: 'Feb', value: [7, 8, 5] },
@@ -230,7 +229,7 @@ describe('stacked bar charts', () => {
             await snap(chart.create(), 'stacked vertical stackColors with theme justified');
         });
 
-        it('should apply stackColors with fill', async () => {
+        test('should apply stackColors with fill', async () => {
             const data: InputData[] = [
                 { label: 'Jan', value: [2, 3, 3] },
                 { label: 'Feb', value: [1, 3, 2] },
@@ -251,13 +250,13 @@ describe('stacked bar charts', () => {
     });
 
     describe('backward compatibility', () => {
-        it('should handle single number values unchanged', async () => {
+        test('should handle single number values unchanged', async () => {
             const data: InputData[] = [1, 2, 3, 4, 5];
             const chart = new Chartscii(data, { width: 50 });
             await snap(chart.create(), 'backward compat numbers');
         });
 
-        it('should handle InputPoint with single value unchanged', async () => {
+        test('should handle InputPoint with single value unchanged', async () => {
             const data: InputData[] = [
                 { value: 10, label: 'A', color: 'red' },
                 { value: 20, label: 'B', color: 'green' },
@@ -269,7 +268,7 @@ describe('stacked bar charts', () => {
     });
 
     describe('validation', () => {
-        it('should throw error for mismatched segment counts', () => {
+        test('should throw error for mismatched segment counts', () => {
             const data: InputData[] = [
                 { label: 'A', value: [1, 2, 3] },
                 { label: 'B', value: [1, 2] },

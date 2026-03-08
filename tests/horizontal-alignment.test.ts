@@ -1,5 +1,6 @@
-import Chartscii from '../chartscii';
 import snap from 'snaptdout';
+import { describe, test } from 'vitest';
+import Chartscii from '../chartscii';
 import { InputData } from '../types/types';
 
 describe('horizontal alignment', () => {
@@ -9,7 +10,7 @@ describe('horizontal alignment', () => {
         { label: 'C', value: 5 },
     ];
 
-    it('should align bars top', async () => {
+    test('should align bars top', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 15,
@@ -20,7 +21,7 @@ describe('horizontal alignment', () => {
         await snap(chart.create(), 'horizontal align top');
     });
 
-    it('should align bars bottom', async () => {
+    test('should align bars bottom', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 15,
@@ -31,7 +32,7 @@ describe('horizontal alignment', () => {
         await snap(chart.create(), 'horizontal align bottom');
     });
 
-    it('should align bars center', async () => {
+    test('should align bars center', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 15,
@@ -42,7 +43,7 @@ describe('horizontal alignment', () => {
         await snap(chart.create(), 'horizontal align center');
     });
 
-    it('should justify bars by default (current behavior)', async () => {
+    test('should justify bars by default (current behavior)', async () => {
         const chart = new Chartscii(data, {
             width: 50,
             height: 15,

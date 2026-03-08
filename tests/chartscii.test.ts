@@ -1,5 +1,4 @@
-import chai from 'chai';
-const expect = chai.expect;
+import { beforeEach, describe, expect, test } from 'vitest';
 import Chartscii from '../chartscii';
 import { InputData } from '../types/types';
 
@@ -34,17 +33,17 @@ describe('chartscii tests', () => {
         chart = new Chartscii(data);
     });
 
-    it('should initialize chart array with all values', () => {
+    test('should initialize chart array with all values', () => {
         const result = [...chart.chart.values()];
         expect(result.length).to.equal(10);
     });
 
-    it('should support 0 values', () => {
+    test('should support 0 values', () => {
         const result = [...chart.chart.values()][0]
         expect(result).to.deep.equal({ value: 0, color: undefined, label: '0', scaled: 0, percentage: 0 });
     });
 
-    it('should support { value }', () => {
+    test('should support { value }', () => {
         const data = [...Array(10).keys()].map((key) => {
             return { value: key };
         });
@@ -53,7 +52,7 @@ describe('chartscii tests', () => {
         expect(result.value).to.equal(0);
     });
 
-    it('should support { value, label }', () => {
+    test('should support { value, label }', () => {
         let counter = 0;
         const data = [...Array(10).keys()].map((key) => {
             return { value: key, label: labels[counter++] };
@@ -63,7 +62,7 @@ describe('chartscii tests', () => {
         expect(result.label).to.equal('c');
     });
 
-    it('should support percentage', () => {
+    test('should support percentage', () => {
         const data = generateChartData();
         chart = new Chartscii(data, { percentage: true });
         const result = [...chart.chart.values()][0];
