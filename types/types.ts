@@ -109,3 +109,11 @@ export type ChartPoint = {
 export type InputData = InputPoint | number;
 export type ChartData = Map<string, ChartPoint>
 export type ChartOutput = Map<string, string>
+
+export type EasingFunction = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
+
+export type AnimationOptions = {
+    duration?: number;
+    fps?: number;
+    easing?: EasingFunction;
+}

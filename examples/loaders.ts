@@ -16,7 +16,7 @@ const createAsciiCharts = () => {
         naked: true,
         fill: '░',
         colorLabels: true,
-        theme: 'pastel'
+        theme: 'pastel',
     });
 
     //print chart

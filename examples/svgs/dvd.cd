@@ -1,0 +1,12 @@
+# Lolcat Animation Test
+# Tests animated rainbow text with lolcat -fa
+Output chartscii-sine.svg
+
+Set Theme dark
+Set Template macos
+Set Title "Chartscii Sine"
+
+Type "npx ts-node examples/sine.ts"
+Sleep 500ms
+Enter
+Sleep 2s
