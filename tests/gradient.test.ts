@@ -358,6 +358,13 @@ describe('gradient', () => {
                 reverse: true
             },
             colorLabels: true,
+            padding: 4,
+            title: {
+                text: 'chartscii gradient chart',
+                color: 'gradient',
+                align: 'center',
+                padding: [2, 0]
+            },
             orientation: 'vertical',
         });
         const output = chart.create();

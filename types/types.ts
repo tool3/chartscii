@@ -116,4 +116,5 @@ export type AnimationOptions = {
     duration?: number;
     fps?: number;
     easing?: EasingFunction;
+    step?: number;
 }

@@ -131,26 +131,49 @@ class Chartscii {
     }
 
     async animate(options: AnimationOptions = {}): Promise<void> {
-        const { duration = 1000, fps = 30, easing = 'easeOut' } = options;
-        const frameTime = 1000 / fps;
-        const totalFrames = Math.ceil(duration / frameTime);
+        const { duration = 1000, fps = 30, easing = 'easeOut', step } = options;
         const easingFn = easings[easing];
 
         const output = this.create();
         const lineCount = output.split('\n').length;
 
-        for (let frame = 0; frame <= totalFrames; frame++) {
-            const t = frame / totalFrames;
-            const progress = easingFn(t);
-            const frameOutput = this.createAt(progress);
+        // If step is provided, use step-based animation
+        // Otherwise use fps-based animation
+        if (step !== undefined && step > 0) {
+            const steps = Math.ceil(1 / step);
+            const frameTime = duration / steps;
 
-            if (frame > 0) {
-                process.stdout.write(`\x1b[${lineCount}A`);
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const progress = easingFn(t);
+                const frameOutput = this.createAt(progress);
+
+                if (i > 0) {
+                    process.stdout.write(`\x1b[${lineCount}A`);
+                }
+                process.stdout.write(frameOutput + '\n');
+
+                if (i < steps) {
+                    await new Promise(resolve => setTimeout(resolve, frameTime));
+                }
             }
-            process.stdout.write(frameOutput + '\n');
+        } else {
+            const frameTime = 1000 / fps;
+            const totalFrames = Math.ceil(duration / frameTime);
 
-            if (frame < totalFrames) {
-                await new Promise(resolve => setTimeout(resolve, frameTime));
+            for (let frame = 0; frame <= totalFrames; frame++) {
+                const t = frame / totalFrames;
+                const progress = easingFn(t);
+                const frameOutput = this.createAt(progress);
+
+                if (frame > 0) {
+                    process.stdout.write(`\x1b[${lineCount}A`);
+                }
+                process.stdout.write(frameOutput + '\n');
+
+                if (frame < totalFrames) {
+                    await new Promise(resolve => setTimeout(resolve, frameTime));
+                }
             }
         }
     }

@@ -159,6 +159,31 @@ describe('animation', () => {
             expect(hasEscapeCodes).to.be.true;
             writeSpy.mockRestore();
         });
+
+        test('should use step-based animation when step is provided', async () => {
+            const chart = new Chartscii(data, { width: 40 });
+            const writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+
+            // With step 0.2, we should have 6 steps: 0, 0.2, 0.4, 0.6, 0.8, 1.0
+            await chart.animate({ duration: 100, step: 0.2 });
+
+            // Should have written output
+            expect(writeSpy).toHaveBeenCalled();
+            writeSpy.mockRestore();
+        });
+
+        test('should override fps when step is provided', async () => {
+            const chart = new Chartscii(data, { width: 40 });
+            const writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+
+            // Step should take precedence over fps
+            await chart.animate({ duration: 100, fps: 1000, step: 0.5 });
+
+            // With step 0.5, should have 3 steps: 0, 0.5, 1.0
+            // Don't check exact count as it includes cursor codes
+            expect(writeSpy).toHaveBeenCalled();
+            writeSpy.mockRestore();
+        });
     });
 
     describe('AnimationOptions type', () => {
@@ -171,11 +196,13 @@ describe('animation', () => {
             const options2: AnimationOptions = { duration: 500 };
             const options3: AnimationOptions = { fps: 60 };
             const options4: AnimationOptions = { easing: 'easeInOut' };
+            const options5: AnimationOptions = { step: 0.1 };
 
             expect(options1).to.be.an('object');
             expect(options2.duration).to.equal(500);
             expect(options3.fps).to.equal(60);
             expect(options4.easing).to.equal('easeInOut');
+            expect(options5.step).to.equal(0.1);
 
             writeSpy.mockRestore();
         });
