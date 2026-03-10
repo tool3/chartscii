@@ -1,27 +1,47 @@
-name: release
+name: Release
 
 on:
   push:
-    branches:
-      - release
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
-  tag:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - uses: tool3/bump@master
-        with:
-          github_token: ${{ secrets.GP_TOKEN }}
-          unrelated: true
-
   publish:
-    needs: tag
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v1
-      - uses: tool3/publisher@master
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          github_token: ${{ secrets.GP_TOKEN }}
-          npm_token: ${{ secrets.NPM_TOKEN }}
-          scope: "tool3"
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Trigger chartscii-cli update
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.REPO_DISPATCH_TOKEN }}
+          repository: tool3/chartscii-cli
+          event-type: dependency-update
+          client-payload: '{"package": "chartscii", "version": "${{ steps.version.outputs.version }}"}'
