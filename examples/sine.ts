@@ -21,7 +21,7 @@ const render = () => {
     const phase = (frame / totalFrames) * Math.PI * 2;
 
     const data: InputData[] = labels.map((label, i) => ({
-        value: Math.sin(phase + (i * 0.6)) * 0.5 + 0.5, // Normalize to 0-1
+        value: Math.sin(phase + (i * 0.6)) * 0.5 + 0.4, // Normalize to 0-1
         label
     }));
 
