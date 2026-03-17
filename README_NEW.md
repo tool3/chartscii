@@ -1,7 +1,7 @@
 # Chartscii
 Beautiful ASCII charts for your terminal
 
-![](./shellfies/chartscii_main.png)
+![](./examples/svgs/sine.svg)
 
 Transform your data into stunning ASCII bar charts with full color support, stacked bars, vertical layouts, and rich text formatting.
 
@@ -554,3 +554,6 @@ MIT © [tool3](https://github.com/tool3)
 <p align="center">
   Made with ❤️ and ASCII art
 </p>
+
+
+npx ts-node examples/sine.ts | npx ts-node ../dvd/src/cli.ts -o bbb.svg --playbackSpeed 2 -p -1 --background "gradient(pink,cyan:horizontal)" --background-padding 10

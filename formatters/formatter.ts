@@ -1,10 +1,9 @@
 import style from 'styl3';
 import { ChartOptions, ChartPoint, Gradient, TitleConfig, TitlePadding } from '../types/types';
 import {
-    isGradient as isGradientUtil,
-    parseColorToRgb,
-    getColorAtPosition as getColorAtPositionUtil,
     applyGradientToText,
+    getColorAtPosition as getColorAtPositionUtil,
+    isGradient as isGradientUtil,
     ThemeColors
 } from '../utils/color';
 

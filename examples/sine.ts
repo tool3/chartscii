@@ -13,8 +13,8 @@ process.stdout.on('error', (err: NodeJS.ErrnoException) => {
 const labels = ['S', 'I', 'N', 'E', ' ', 'W', 'A', 'V', 'E', '😎'];
 
 let frame = 0;
-const totalFrames = 120; // One full sine cycle
-const fps = 90;
+const totalFrames = 60; // One full sine cycle
+const fps = 30;
 let intervalId: NodeJS.Timeout;
 
 const render = () => {
@@ -38,7 +38,7 @@ const render = () => {
         fill: '░',
         fillColor: 'auto',
         orientation: 'vertical',
-        labels: true,
+        labels: false,
         color: {
             type: 'gradient',
             colors: ['pink', 'cyan'],
