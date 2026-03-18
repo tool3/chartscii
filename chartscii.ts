@@ -121,9 +121,18 @@ class Chartscii {
             : (this.processedOptions.width || 80);
         const fixedScale = originalMax / size;
 
+        // Calculate the final max bar length (what it would be at 100% progress)
+        const charLength = this.processedOptions.char?.length || 1;
+        const finalMaxBarLength = Math.floor(this.processedOptions.max.scaled / charLength);
+
+        // Use processed dimensions and max.label to ensure consistent sizing during animation
         const fixedOptions: CustomizationOptions = {
             ...this.options,
-            scale: fixedScale
+            scale: fixedScale,
+            width: this.processedOptions.width,
+            height: this.processedOptions.height,
+            _maxLabel: this.processedOptions.max.label,  // Internal: preserve label width for animation
+            _finalMaxBarLength: finalMaxBarLength  // Internal: preserve max bar length for gradient fill
         };
 
         const chart = new Chartscii(scaledData, fixedOptions);

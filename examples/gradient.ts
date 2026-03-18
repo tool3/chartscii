@@ -5,24 +5,27 @@ const render = () => {
     // generate random chart data
     const data: InputData[] = [];
 
-    for (let i = 1; i <= 10; i++) {
-        const value = Math.floor(Math.random() * 10) + 1;
-        const color = value % 2 === 0 ? 'orange' : 'green';
-        const label = color === 'orange' ? 'trick' : 'treat';
-        data.push({ value , label, color });
+    for (let i = 1; i <= 5; i++) {
+        data.push({ value: i });
     }
 
     // create chart
     const chart = new Chartscii(data, {
         title: {
-            text: 'Halloween 💀',
-            align: 'right'
+            text: 'gradients',
+            align: 'center',
+            color: 'gradient',
+            padding: [2, 0]
         },
+        padding: 2,
         sort: false,
-        fill: '🎃',
-        char: '👻',
+        fill: '▒',
+        fillColor: 'auto',
         colorLabels: true,
-        color: 'red',
+        color: {
+            type: 'gradient',
+            colors: ['pink', 'cyan'],
+        },
         theme: 'pastel',
         percentage: true,
         labels: true

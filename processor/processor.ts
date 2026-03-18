@@ -107,11 +107,16 @@ class ChartProcessor {
             const value = this.getPointValue(point);
             const label = this.getPointLabel(point, value);
             const percentage = this.percentage(value, total);
-            const percentageLength = percentage ? percentage.toFixed(2).length + 5 : 0;
+            const percentageLength = this.options.percentage ? (isNaN(percentage) ? 3 : percentage.toFixed(2).length) + 5 : 0;
             const maxLabelLength = this.options.percentage ? label.length + percentageLength : label.length;
 
             if (this.options.labels) {
-                this.options.max.label = Math.max(maxLabelLength, this.options.max.label);
+                // Use _maxLabel if provided (for animation consistency), otherwise calculate
+                if (this.options._maxLabel !== undefined) {
+                    this.options.max.label = this.options._maxLabel;
+                } else {
+                    this.options.max.label = Math.max(maxLabelLength, this.options.max.label);
+                }
             }
 
             this.options.max.scaled = Math.max(this.scale(value), this.options.max.scaled);

@@ -140,7 +140,7 @@ class VerticalChartFormatter extends ChartFormatter {
             return this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length, ctx.chart, ctx.maxHeight);
         }
         if (isAboveBar) {
-            return this.formatEmptyCell(ctx.barSize, ctx.padding, ctx.point.color);
+            return this.formatEmptyCell(ctx.barSize, ctx.padding, ctx.point.color, row, ctx.index, ctx.chart.length, ctx.maxHeight);
         }
         if (isBarRow) {
             return this.formatBarCellWithContext(ctx, row, barStartRow);
@@ -227,7 +227,7 @@ class VerticalChartFormatter extends ChartFormatter {
         const emptyStartRow = ctx.maxHeight - totalHeight - 1;
 
         for (let row = emptyStartRow; row >= 0; row--) {
-            ctx.verticalChart[row][ctx.index] = this.formatEmptyCell(ctx.barSize, ctx.padding, color);
+            ctx.verticalChart[row][ctx.index] = this.formatEmptyCell(ctx.barSize, ctx.padding, color, row, ctx.index, ctx.chart.length, ctx.maxHeight);
         }
     }
 
@@ -250,9 +250,9 @@ class VerticalChartFormatter extends ChartFormatter {
         return label + ' '.repeat(space);
     }
 
-    private formatEmptyCell(barSize: number, padding: number, color: string): string {
+    private formatEmptyCell(barSize: number, padding: number, color: string, row?: number, barIndex?: number, totalBars?: number, maxHeight?: number): string {
         return this.options.fill
-            ? this.formatFillCell(barSize, padding, color)
+            ? this.formatFillCell(barSize, padding, color, row, barIndex, totalBars, maxHeight)
             : this.formatSpace(barSize, padding);
     }
 
@@ -274,23 +274,48 @@ class VerticalChartFormatter extends ChartFormatter {
         return effectiveColor ? this.colorify(value, effectiveColor) : value;
     }
 
-    private formatFillCell(barSize: number, padding: number, color: string): string {
+    private formatFillCell(barSize: number, padding: number, color: string, row?: number, barIndex?: number, totalBars?: number, maxHeight?: number): string {
         const character = this.getFillChar();
         if (!character) return '';
 
         const barWidth = this.getScaledBarSize(barSize);
-        const value = character.repeat(barWidth) + ' '.repeat(padding);
+        const paddingStr = ' '.repeat(padding);
+
+        const effectiveColor = color || this.options.color;
+
+        // Apply gradient to fill if fillColor is 'auto' and color is a gradient
+        if (this.options.fillColor === 'auto' && this.isGradient(effectiveColor)) {
+            const gradient = effectiveColor;
+            const direction = gradient.direction || 'horizontal';
+            const reverse = gradient.reverse || false;
+
+            // Use final max height if available (for animation consistency)
+            const finalMaxHeight = this.options._finalMaxBarLength ?? maxHeight ?? this.options.height;
+
+            let result = '';
+            for (let i = 0; i < barWidth; i++) {
+                let position: number;
+                if (direction === 'vertical') {
+                    // Vertical gradient: position based on row
+                    position = finalMaxHeight > 1 ? (row ?? 0) / (finalMaxHeight - 1) : 0;
+                } else {
+                    // Horizontal gradient: position based on char index across all bars
+                    const charIndex = (barIndex ?? 0) * barWidth + i;
+                    const totalChars = barWidth * (totalBars ?? 1);
+                    position = totalChars > 1 ? charIndex / (totalChars - 1) : 0;
+                }
+                if (reverse) position = 1 - position;
+                const [r, g, b] = this.getColorAtPosition(gradient, position);
+                result += `\x1b[38;2;${r};${g};${b}m${character}\x1b[39m`;
+            }
+            return result + paddingStr;
+        }
+
+        const value = character.repeat(barWidth) + paddingStr;
 
         let fillColor: string | number[] | undefined;
         if (this.options.fillColor === 'auto') {
-            const effectiveColor = color || this.options.color;
-            if (this.isGradient(effectiveColor)) {
-                // For auto with gradient, use the middle color of the gradient
-                const midPosition = 0.5;
-                fillColor = this.getColorAtPosition(effectiveColor, midPosition);
-            } else {
-                fillColor = effectiveColor as string;
-            }
+            fillColor = effectiveColor as string;
         } else if (this.options.fillColor) {
             fillColor = this.options.fillColor;
         } else {

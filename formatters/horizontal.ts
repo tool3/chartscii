@@ -110,40 +110,30 @@ class HorizontalChartFormatter extends ChartFormatter {
         const color = ctx.point.color || this.options.color || '';
         const barChars = this.options.char?.repeat(repeat);
         const totalBars = ctx.chart.length;
-        const maxBarLength = Math.max(...ctx.chart.map(p => Math.floor(p.scaled / this.options.char.length)));
+        const currentMaxBarLength = Math.max(...ctx.chart.map(p => Math.floor(p.scaled / this.options.char.length)));
+        // Use final max bar length if available (for animation), otherwise use current
+        const finalMaxBarLength = this.options._finalMaxBarLength ?? currentMaxBarLength;
 
-        // Calculate bar end position for value label coloring (0-1 scale relative to max bar)
-        const barEndPosition = maxBarLength > 1 ? (repeat - 1) / (maxBarLength - 1) : 0;
+        // Calculate bar end position for value label coloring (0-1 scale relative to final max bar)
+        const barEndPosition = finalMaxBarLength > 1 ? (repeat - 1) / (finalMaxBarLength - 1) : 0;
 
         if (this.isGradient(color)) {
             const gradient = color;
             const direction = gradient.direction || 'horizontal';
             const reverse = gradient.reverse || false;
 
-            // Calculate the last bar color for auto fillColor
-            let lastBarColorRgb: string | undefined;
-            if (this.options.fillColor === 'auto') {
-                let lastPosition: number;
-                if (direction === 'vertical') {
-                    const totalChars = maxBarLength * totalBars;
-                    const lastCharIndex = ctx.index * maxBarLength + (repeat - 1);
-                    lastPosition = totalChars > 1 ? lastCharIndex / (totalChars - 1) : 0;
-                } else {
-                    lastPosition = barEndPosition;
-                }
-                if (reverse) lastPosition = 1 - lastPosition;
-                const [r, g, b] = this.getColorAtPosition(gradient, lastPosition);
-                lastBarColorRgb = `${r};${g};${b}`;
-            }
-
-            const fill = this.formatFill(ctx.point, lastBarColorRgb);
+            // For gradient fill, apply gradient to fill characters based on their final positions
+            const fill = this.options.fillColor === 'auto'
+                ? this.formatGradientFill(ctx.point, gradient, ctx.index, totalBars, finalMaxBarLength, repeat)
+                : this.formatFill(ctx.point);
 
             if (direction === 'vertical') {
-                const totalChars = maxBarLength * totalBars;
+                // Use finalMaxBarLength for consistent gradient positioning
+                const totalChars = finalMaxBarLength * totalBars;
                 const chars = [...barChars];
                 let result = '';
                 for (let i = 0; i < chars.length; i++) {
-                    const globalCharIndex = ctx.index * maxBarLength + i;
+                    const globalCharIndex = ctx.index * finalMaxBarLength + i;
                     let position = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;
                     if (reverse) position = 1 - position;
                     const [r, g, b] = this.getColorAtPosition(gradient, position);
@@ -152,8 +142,7 @@ class HorizontalChartFormatter extends ChartFormatter {
                 const barContent = result + fill;
                 return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, undefined, barEndPosition);
             } else {
-                const totalChars = maxBarLength;
-                const coloredBar = this.applyGradientWithContext(barChars, gradient, 0, totalChars, ctx.index, totalBars);
+                const coloredBar = this.applyGradientWithContext(barChars, gradient, 0, finalMaxBarLength, ctx.index, totalBars);
                 const barContent = coloredBar + fill;
                 return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, undefined, barEndPosition);
             }
@@ -259,13 +248,16 @@ class HorizontalChartFormatter extends ChartFormatter {
         if (!this.options.fill) return '';
 
         const diff = this.options.width - point.scaled;
+        const fillLength = this.options.fill.length;
         let fillStr = '';
 
         if (this.options.scale) {
             const width = Math.floor(this.options.width - Math.floor(point.scaled));
-            fillStr = width > 0 ? this.options.fill.repeat(width) : '';
+            const fillCount = Math.floor(width / fillLength);
+            fillStr = fillCount > 0 ? this.options.fill.repeat(fillCount) : '';
         } else {
-            fillStr = diff > 0 ? this.options.fill.repeat(diff / this.options.fill.length) : '';
+            const fillCount = Math.floor(diff / fillLength);
+            fillStr = fillCount > 0 ? this.options.fill.repeat(fillCount) : '';
         }
 
         if (!fillStr) return '';
@@ -285,6 +277,47 @@ class HorizontalChartFormatter extends ChartFormatter {
         }
 
         return fillStr;
+    }
+
+    private formatGradientFill(point: ChartPoint, gradient: Gradient, barIndex: number, totalBars: number, finalMaxBarLength: number, currentBarLength: number): string {
+        if (!this.options.fill) return '';
+
+        const diff = this.options.width - point.scaled;
+        const fillLength = this.options.fill.length;
+        let fillCount = 0;
+
+        if (this.options.scale) {
+            const width = Math.floor(this.options.width - Math.floor(point.scaled));
+            fillCount = Math.floor(width / fillLength);
+        } else {
+            fillCount = Math.floor(diff / fillLength);
+        }
+
+        if (fillCount <= 0) return '';
+
+        const direction = gradient.direction || 'horizontal';
+        const reverse = gradient.reverse || false;
+
+        // Apply gradient to each fill character based on its FINAL position
+        let result = '';
+        for (let i = 0; i < fillCount; i++) {
+            // Calculate position as if this fill char were part of the final bar
+            const charIndexInBar = Math.floor(currentBarLength) + i;
+            let position: number;
+            if (direction === 'vertical') {
+                const totalChars = finalMaxBarLength * totalBars;
+                const globalCharIndex = barIndex * finalMaxBarLength + charIndexInBar;
+                position = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;
+            } else {
+                // Horizontal: position based on char position within the final bar width
+                position = finalMaxBarLength > 1 ? charIndexInBar / (finalMaxBarLength - 1) : 0;
+            }
+            if (reverse) position = 1 - position;
+            const [r, g, b] = this.getColorAtPosition(gradient, position);
+            result += `\x1b[38;2;${r};${g};${b}m${this.options.fill}\x1b[39m`;
+        }
+
+        return result;
     }
 
     private formatLabel(point: ChartPoint, key: string, barIndex: number, totalBars: number): string {

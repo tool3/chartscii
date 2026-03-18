@@ -26,25 +26,23 @@ const render = () => {
     }));
 
     const chart = new Chartscii(data, {
-        title: {
-            text: 'Sine Wave',
-            color: 'gradient',
-            align: 'center',
-            padding: [2, 0]
-        },
+        // title: {
+        //     text: 'Sine Wave',
+        //     color: 'gradient',
+        //     align: 'center',
+        //     padding: [2, 0]
+        // },
         width: 50,
         barSize: 2,
         padding: 2,
-        fill: '░',
+        fill: '▒',
         fillColor: 'auto',
         orientation: 'vertical',
         labels: false,
         color: {
             type: 'gradient',
             colors: ['pink', 'cyan'],
-            direction: 'horizontal'  
         },
-        // theme: 'beach'
     });
 
     process.stdout.write('\x1Bc');

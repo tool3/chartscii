@@ -1,22 +1,25 @@
 import Chartscii from '../chartscii';
 import { InputData } from '../types/types';
 
-
-const createAsciiCharts = () => {
+const render = () => {
     // generate random chart data
     const data: InputData[] = [];
     let count = 0;
 
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= 10; i++) {
         const value = Math.floor(Math.random() * 10) + 1;
         const threshold = value > 2;
         const label = threshold ? '✓' : 'X';
-        data.push({ value , label, color: threshold ? 'green' : 'red' });
+        data.push({ value, label, color: threshold ? 'green' : 'red' });
     }
 
     // create chart
     const chart = new Chartscii(data, {
-        title: 'Conditional Colors',
+        title: {
+            text: 'Conditional Colors',
+            align: 'center',
+            padding: [2, 0],
+        },
         color: 'green',
         width: 100,
         sort: false,
@@ -27,12 +30,8 @@ const createAsciiCharts = () => {
         labels: true
     });
 
-    //print chart
-    process.stdout.write('\x1Bc');
-    process.stdout.write(`${chart.create()}\n`);
-    
+    chart.animate()
 };
 
-
-setInterval(() => createAsciiCharts(), 200);
+render()
 
