@@ -3,7 +3,8 @@ import { ChartOptions, ChartPoint, Gradient, TitleConfig, TitlePadding } from '.
 import {
     applyGradientToText,
     getColorAtPosition as getColorAtPositionUtil,
-    isGradient as isGradientUtil,
+    isGradientObject,
+    normalizeColor,
     ThemeColors
 } from '../utils/color';
 
@@ -110,24 +111,38 @@ abstract class ChartFormatter {
     protected colorify(txt: string, color?: string | number[] | Gradient): string {
         if (!color) return txt;
 
-        if (this.isGradient(color)) {
-            return this.applyGradient(txt, color);
+        // Normalize gradient strings to Gradient objects
+        const normalizedColor = typeof color === 'string' ? normalizeColor(color) : color;
+
+        if (isGradientObject(normalizedColor)) {
+            return this.applyGradient(txt, normalizedColor);
         }
 
-        if (Array.isArray(color)) {
-            return this.colors.rgb(...color)`${txt}`;
+        if (Array.isArray(normalizedColor)) {
+            return this.colors.rgb(...normalizedColor)`${txt}`;
         }
-        if (color.includes('#')) {
-            return this.colors.hex(color)`${txt}`;
+        if (typeof normalizedColor === 'string') {
+            if (normalizedColor.includes('#')) {
+                return this.colors.hex(normalizedColor)`${txt}`;
+            }
+            if (normalizedColor.match(/[0-9]/)) {
+                return this.colors.ansi(normalizedColor)`${txt}`;
+            }
+            return this.colors[normalizedColor]`${txt}`;
         }
-        if (color.match(/[0-9]/)) {
-            return this.colors.ansi(color)`${txt}`;
-        }
-        return this.colors[color]`${txt}`;
+        return txt;
     }
 
     protected isGradient(color: any): color is Gradient {
-        return isGradientUtil(color);
+        const normalized = typeof color === 'string' ? normalizeColor(color) : color;
+        return isGradientObject(normalized);
+    }
+
+    protected normalizeGradient(color: any): Gradient | string | undefined {
+        if (typeof color === 'string') {
+            return normalizeColor(color);
+        }
+        return color;
     }
 
     protected getThemeColors(): ThemeColors {
@@ -144,9 +159,12 @@ abstract class ChartFormatter {
         totalBars: number
     ): string | undefined {
         if (!color) return undefined;
-        if (!this.isGradient(color)) return color as string;
 
-        const { direction = 'horizontal', reverse = false } = color;
+        // Normalize gradient string to object
+        const normalizedColor = typeof color === 'string' ? normalizeColor(color) : color;
+        if (!isGradientObject(normalizedColor)) return normalizedColor as string;
+
+        const { direction = 'horizontal', reverse = false } = normalizedColor;
         const chartOrientation = this.options.orientation || 'horizontal';
 
         let position: number;
@@ -159,6 +177,10 @@ abstract class ChartFormatter {
             if (direction === 'horizontal') {
                 // Horizontal gradient on horizontal chart: labels at left = position 0
                 position = 0;
+            } else if (direction === 'diagonal') {
+                // Diagonal gradient: combine left position (0) with bar index
+                const vPos = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+                position = vPos / 2; // hPos = 0 for left edge
             } else {
                 // Vertical gradient on horizontal chart: labels vary by row (bar index)
                 position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
@@ -168,6 +190,10 @@ abstract class ChartFormatter {
             if (direction === 'vertical') {
                 // Vertical gradient on vertical chart: labels at bottom = position 1
                 position = 1;
+            } else if (direction === 'diagonal') {
+                // Diagonal gradient: combine bar index with bottom position (1)
+                const hPos = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+                position = (hPos + 1) / 2; // vPos = 1 for bottom edge
             } else {
                 // Horizontal gradient on vertical chart: labels vary by column (bar index)
                 position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
@@ -178,7 +204,7 @@ abstract class ChartFormatter {
             position = 1 - position;
         }
 
-        const [r, g, b] = this.getColorAtPosition(color, position);
+        const [r, g, b] = this.getColorAtPosition(normalizedColor, position);
         return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     }
 
@@ -189,9 +215,12 @@ abstract class ChartFormatter {
         barEndPosition?: number
     ): string | undefined {
         if (!color) return undefined;
-        if (!this.isGradient(color)) return color as string;
 
-        const { direction = 'horizontal', reverse = false } = color;
+        // Normalize gradient string to object
+        const normalizedColor = typeof color === 'string' ? normalizeColor(color) : color;
+        if (!isGradientObject(normalizedColor)) return normalizedColor as string;
+
+        const { direction = 'horizontal', reverse = false } = normalizedColor;
         const chartOrientation = this.options.orientation || 'horizontal';
 
         let position: number;
@@ -203,6 +232,11 @@ abstract class ChartFormatter {
             if (direction === 'horizontal') {
                 // Horizontal gradient on horizontal chart: use actual bar endpoint
                 position = barEndPosition !== undefined ? barEndPosition : 1;
+            } else if (direction === 'diagonal') {
+                // Diagonal gradient: combine bar endpoint with bar index
+                const hPos = barEndPosition !== undefined ? barEndPosition : 1;
+                const vPos = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+                position = (hPos + vPos) / 2;
             } else {
                 // Vertical gradient on horizontal chart: value labels vary by row (bar index)
                 position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
@@ -212,6 +246,11 @@ abstract class ChartFormatter {
             if (direction === 'vertical') {
                 // Vertical gradient on vertical chart: use actual bar top position
                 position = barEndPosition !== undefined ? barEndPosition : 0;
+            } else if (direction === 'diagonal') {
+                // Diagonal gradient: combine bar index with bar top position
+                const hPos = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+                const vPos = barEndPosition !== undefined ? barEndPosition : 0;
+                position = (hPos + vPos) / 2;
             } else {
                 // Horizontal gradient on vertical chart: value labels vary by column (bar index)
                 position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
@@ -222,7 +261,7 @@ abstract class ChartFormatter {
             position = 1 - position;
         }
 
-        const [r, g, b] = this.getColorAtPosition(color, position);
+        const [r, g, b] = this.getColorAtPosition(normalizedColor, position);
         return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     }
 
@@ -247,6 +286,12 @@ abstract class ChartFormatter {
 
             if (direction === 'vertical') {
                 position = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+            } else if (direction === 'diagonal') {
+                // Combine horizontal and vertical positions for diagonal effect
+                const globalCharIndex = charIndex + i;
+                const hPos = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;
+                const vPos = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+                position = (hPos + vPos) / 2;
             } else {
                 const globalCharIndex = charIndex + i;
                 position = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;

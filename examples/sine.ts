@@ -39,10 +39,7 @@ const render = () => {
         fillColor: 'auto',
         orientation: 'vertical',
         labels: false,
-        color: {
-            type: 'gradient',
-            colors: ['pink', 'cyan'],
-        },
+        color: 'gradient(pink,cyan)',
     });
 
     process.stdout.write('\x1Bc');

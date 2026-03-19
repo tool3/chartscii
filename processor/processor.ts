@@ -1,6 +1,6 @@
 import { InputData, ChartOptions, ChartData, InputPoint, StackedValue, ChartSegment, SegmentValue, Gradient } from '../types/types';
 import ChartValidator from '../validator/validator';
-import { isGradient, interpolateGradientColor } from '../utils/color';
+import { isGradientObject, interpolateGradientColor, normalizeColor } from '../utils/color';
 
 const AUTO_COLORS = [
     'red',
@@ -20,6 +20,10 @@ class ChartProcessor {
 
     constructor(options: ChartOptions) {
         this.validator = new ChartValidator(options);
+        // Normalize gradient strings in options
+        if (options.color) {
+            options.color = normalizeColor(options.color) as typeof options.color;
+        }
         this.options = options;
     }
 
@@ -28,7 +32,9 @@ class ChartProcessor {
     }
 
     isGradient(color: any): color is Gradient {
-        return isGradient(color);
+        // Normalize gradient strings before checking
+        const normalized = typeof color === 'string' ? normalizeColor(color) : color;
+        return isGradientObject(normalized);
     }
 
     interpolateGradient(gradient: Gradient, index: number, total: number): string {

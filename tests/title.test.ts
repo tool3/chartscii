@@ -69,10 +69,7 @@ describe('title configuration', () => {
                 text: 'Gradient Title',
                 color: 'gradient'
             },
-            color: {
-                type: 'gradient',
-                colors: ['red', 'blue']
-            },
+            color: 'gradient(red,blue)',
             width: 40
         });
         const output = chart.create();

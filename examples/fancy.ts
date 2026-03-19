@@ -27,11 +27,7 @@ const render = () => {
         // width: 100,
         padding: 1,
         percentage: true,
-        color: {
-            type: 'gradient',
-            colors: ['purple', 'lime'],
-            direction: 'vertical'
-        },
+        color: 'gradient(purple,lime:vertical)',
         fill: '░',
         // orientation: 'vertical',
         colorLabels: true,

@@ -22,10 +22,7 @@ const render = () => {
         fill: '▒',
         fillColor: 'auto',
         colorLabels: true,
-        color: {
-            type: 'gradient',
-            colors: ['pink', 'cyan'],
-        },
+        color: 'gradient(pink,cyan)',
         theme: 'pastel',
         percentage: true,
         labels: true

@@ -1,4 +1,4 @@
-import { ChartData, ChartOptions, ChartPoint, ChartSegment } from '../types/types';
+import { ChartData, ChartOptions, ChartPoint, ChartSegment, Gradient } from '../types/types';
 import ChartFormatter, { BarDimensions } from './formatter';
 
 type ColumnContext = {
@@ -156,9 +156,10 @@ class VerticalChartFormatter extends ChartFormatter {
         const effectiveColor = ctx.point.color || this.options.color;
 
         if (this.isGradient(effectiveColor)) {
-            const gradient = effectiveColor;
+            const gradient = this.normalizeGradient(effectiveColor) as Gradient;
             const direction = gradient.direction || 'horizontal';
             const reverse = gradient.reverse || false;
+            const totalBars = ctx.chart.length;
 
             if (direction === 'vertical') {
                 // For vertical gradient on vertical chart: gradient flows top to bottom
@@ -166,7 +167,6 @@ class VerticalChartFormatter extends ChartFormatter {
                 // and horizontal position adds subtle variation within the row
                 const chars = [...value];
                 let result = '';
-                const totalBars = ctx.chart.length;
                 const charsPerRow = barWidth * totalBars;
 
                 for (let i = 0; i < chars.length; i++) {
@@ -188,8 +188,24 @@ class VerticalChartFormatter extends ChartFormatter {
                     result += `\x1b[38;2;${r};${g};${b}m${chars[i]}\x1b[39m`;
                 }
                 return result + padding;
+            } else if (direction === 'diagonal') {
+                // For diagonal gradient: combine row position with horizontal bar position
+                const chars = [...value];
+                let result = '';
+                const totalChars = barWidth * totalBars;
+
+                for (let i = 0; i < chars.length; i++) {
+                    const charIndex = ctx.index * barWidth + i;
+                    const hPos = totalChars > 1 ? charIndex / (totalChars - 1) : 0;
+                    const vPos = ctx.maxHeight > 1 ? row / (ctx.maxHeight - 1) : 0;
+                    let position = (hPos + vPos) / 2;
+
+                    if (reverse) position = 1 - position;
+                    const [r, g, b] = this.getColorAtPosition(gradient, position);
+                    result += `\x1b[38;2;${r};${g};${b}m${chars[i]}\x1b[39m`;
+                }
+                return result + padding;
             } else {
-                const totalBars = ctx.chart.length;
                 const totalChars = barWidth * totalBars;
                 const charIndex = ctx.index * barWidth;
                 return this.applyGradientWithContext(value, gradient, charIndex, totalChars, ctx.index, totalBars) + padding;
@@ -285,7 +301,7 @@ class VerticalChartFormatter extends ChartFormatter {
 
         // Apply gradient to fill if fillColor is 'auto' and color is a gradient
         if (this.options.fillColor === 'auto' && this.isGradient(effectiveColor)) {
-            const gradient = effectiveColor;
+            const gradient = this.normalizeGradient(effectiveColor) as Gradient;
             const direction = gradient.direction || 'horizontal';
             const reverse = gradient.reverse || false;
 
@@ -298,6 +314,13 @@ class VerticalChartFormatter extends ChartFormatter {
                 if (direction === 'vertical') {
                     // Vertical gradient: position based on row
                     position = finalMaxHeight > 1 ? (row ?? 0) / (finalMaxHeight - 1) : 0;
+                } else if (direction === 'diagonal') {
+                    // Diagonal gradient: combine row and char index
+                    const charIndex = (barIndex ?? 0) * barWidth + i;
+                    const totalChars = barWidth * (totalBars ?? 1);
+                    const hPos = totalChars > 1 ? charIndex / (totalChars - 1) : 0;
+                    const vPos = finalMaxHeight > 1 ? (row ?? 0) / (finalMaxHeight - 1) : 0;
+                    position = (hPos + vPos) / 2;
                 } else {
                     // Horizontal gradient: position based on char index across all bars
                     const charIndex = (barIndex ?? 0) * barWidth + i;
@@ -345,7 +368,7 @@ class VerticalChartFormatter extends ChartFormatter {
         // For vertical gradients on vertical charts, calculate the actual bar top position
         let barEndPosition: number | undefined;
         if (chart && maxHeight && this.isGradient(pointColor)) {
-            const gradient = pointColor;
+            const gradient = this.normalizeGradient(pointColor) as Gradient;
             if (gradient.direction === 'vertical') {
                 // Calculate where the bar top is as a position (0 = top, 1 = bottom)
                 const barHeight = this.calculateBarHeight(point.scaled, maxHeight);

@@ -14,10 +14,7 @@ const render = () => {
     const chart = new Chartscii(data, {
         width: 50,
         padding: 2,
-        color: {
-            type: 'gradient',
-            colors: ['red', 'lime']
-        },
+        color: 'gradient(red,lime)',
         naked: true,
         fill: '░',
         fillColor: 'auto',

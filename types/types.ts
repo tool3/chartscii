@@ -84,13 +84,13 @@ export type StackedValue = number[] | SegmentValue[];
 export type Gradient = {
     type: 'gradient';
     colors: string[];
-    direction?: 'horizontal' | 'vertical';
+    direction?: 'horizontal' | 'vertical' | 'diagonal';
     reverse?: boolean;
 }
 
 export type InputPoint = {
     value: number | StackedValue;
-    color?: string | string[] | Gradient;
+    color?: string | string[];
     label?: string;
 }
 
