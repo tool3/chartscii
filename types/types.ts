@@ -50,6 +50,10 @@ type BaseOptions = {
     stackColors?: string[];
     stackLabels?: string[];
     stackValueLabels?: boolean;
+    /** Format function for labels */
+    labelFormat?: (label: string) => string;
+    /** Format function for value labels */
+    valueLabelFormat?: (value: string) => string;
     /** @internal Used to preserve label width during animation */
     _maxLabel?: number;
     /** @internal Used to preserve max bar length for gradient fill during animation */

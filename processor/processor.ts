@@ -114,14 +114,26 @@ class ChartProcessor {
             const label = this.getPointLabel(point, value);
             const percentage = this.percentage(value, total);
             const percentageLength = this.options.percentage ? (isNaN(percentage) ? 3 : percentage.toFixed(2).length) + 5 : 0;
-            const maxLabelLength = this.options.percentage ? label.length + percentageLength : label.length;
+
+            // Calculate base label length (before labelFormat)
+            let baseLabelLength = this.options.percentage ? label.length + percentageLength : label.length;
+
+            // If labelFormat is provided, calculate how much extra length it adds
+            // by testing it on a sample label
+            if (this.options.labelFormat) {
+                const fullLabel = this.options.percentage ? `${label} (${percentage.toFixed(2)}%)` : label;
+                const formattedLabel = this.options.labelFormat(fullLabel);
+                // Strip ANSI codes for accurate length measurement
+                const strippedFormatted = formattedLabel.replace(/\x1b\[[0-9;]*m/g, '');
+                baseLabelLength = strippedFormatted.length;
+            }
 
             if (this.options.labels) {
                 // Use _maxLabel if provided (for animation consistency), otherwise calculate
                 if (this.options._maxLabel !== undefined) {
                     this.options.max.label = this.options._maxLabel;
                 } else {
-                    this.options.max.label = Math.max(maxLabelLength, this.options.max.label);
+                    this.options.max.label = Math.max(baseLabelLength, this.options.max.label);
                 }
             }
 

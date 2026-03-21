@@ -336,7 +336,9 @@ class HorizontalChartFormatter extends ChartFormatter {
 
     private formatLabel(point: ChartPoint, key: string, barIndex: number, totalBars: number): string {
         const percentage = this.formatPercentage(point);
-        const label = percentage ? `${point.label} ${percentage}` : point.label;
+        const baseLabel = percentage ? `${point.label} ${percentage}` : point.label;
+        // Apply labelFormat if provided
+        const label = this.options.labelFormat ? this.options.labelFormat(baseLabel) : baseLabel;
         const space = this.formatLabelSpace(label);
 
         if (!this.options.labels) {

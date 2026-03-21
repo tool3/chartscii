@@ -99,9 +99,15 @@ abstract class ChartFormatter {
             ? value.toFixed(this.options.valueLabelsFloatingPoint)
             : String(value);
 
-        return this.options.valueLabelsPrefix
+        // Apply valueLabelsPrefix for backwards compatibility
+        const prefixedValue = this.options.valueLabelsPrefix
             ? `${this.options.valueLabelsPrefix}${formattedValue}`
             : formattedValue;
+
+        // Apply valueLabelFormat if provided
+        return this.options.valueLabelFormat
+            ? this.options.valueLabelFormat(prefixedValue)
+            : prefixedValue;
     }
 
     protected formatPercentage(point: ChartPoint): string {
