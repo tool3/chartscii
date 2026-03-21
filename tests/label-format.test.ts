@@ -94,13 +94,12 @@ describe('valueLabelFormat', () => {
         await snap(chart.create(), 'valueLabelFormat with floating point');
     });
 
-    test('should apply valueLabelFormat with prefix (both work together)', async () => {
+    test('should apply valueLabelFormat with custom prefix', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, {
             width: 50,
             valueLabels: true,
-            valueLabelsPrefix: '#',
-            valueLabelFormat: (value) => `(${value})`,
+            valueLabelFormat: (value) => `(#${value})`,
             colorLabels: true
         });
         await snap(chart.create(), 'valueLabelFormat with prefix');

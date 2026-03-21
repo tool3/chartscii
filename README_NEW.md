@@ -239,8 +239,9 @@ const options = {
   labels: true,            // Show labels
   colorLabels: false,      // Color the labels
   valueLabels: false,      // Show values on bars
-  valueLabelsPrefix: '',   // Prefix for values (e.g., '$')
   valueLabelsFloatingPoint: undefined,  // Decimal precision
+  labelFormat: undefined,  // Format function for labels
+  valueLabelFormat: undefined,  // Format function for value labels
 
   // Data
   percentage: false,       // Show percentages
@@ -284,8 +285,9 @@ const options = {
 | `labels` | `boolean` | `true` | Show bar labels |
 | `colorLabels` | `boolean` | `false` | Color the labels |
 | `valueLabels` | `boolean` | `false` | Show values on bars |
-| `valueLabelsPrefix` | `string` | `undefined` | Prefix for value labels |
 | `valueLabelsFloatingPoint` | `number` | `undefined` | Decimal precision |
+| `labelFormat` | `(label: string) => string` | `undefined` | Format function for labels |
+| `valueLabelFormat` | `(value: string) => string` | `undefined` | Format function for value labels |
 | `percentage` | `boolean` | `false` | Show percentage values |
 | `sort` | `boolean` | `false` | Sort data ascending |
 | `reverse` | `boolean` | `false` | Reverse data order |
@@ -464,7 +466,7 @@ const chart = new Chartscii([
   { label: 'Product C', value: 2100.00 }
 ], {
   valueLabels: true,
-  valueLabelsPrefix: '$',
+  valueLabelFormat: (v) => `$${v}`,
   valueLabelsFloatingPoint: 2
 });
 ```
@@ -556,4 +558,4 @@ MIT © [tool3](https://github.com/tool3)
 </p>
 
 
-npx ts-node examples/sine.ts | npx ts-node ../dvd/src/cli.ts -o bbb.svg --playbackSpeed 2 -p -1 --background "gradient(pink,cyan:horizontal)" --background-padding 10
+npx ts-node examples/sine.ts | npx ts-node ../dvd/src/cli.ts -o bbb.svg -t "chartscii sine wave" --watermark "made with dvd" --playbackSpeed 2 -p -1 --background "gradient(#d2a8ff,cyan:horizontal)" --background-padding 20
