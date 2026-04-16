@@ -251,14 +251,15 @@ export function getColorAtPosition(gradient: Gradient, position: number, themeCo
 export function applyGradientToText(text: string, gradient: Gradient, themeColors?: ThemeColors): string {
     const { colors } = gradient;
     if (colors.length === 0 || text.length === 0) return text;
+
+    const chars = [...text];
+
     if (colors.length === 1) {
         const [r, g, b] = parseColorToRgb(colors[0], themeColors);
         return `\x1b[38;2;${r};${g};${b}m${text}\x1b[0m`;
     }
 
-    const chars = [...text];
     let result = '';
-
     for (let i = 0; i < chars.length; i++) {
         const position = chars.length > 1 ? i / (chars.length - 1) : 0;
         const [r, g, b] = getColorAtPosition(gradient, position, themeColors);

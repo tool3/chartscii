@@ -367,23 +367,35 @@ class VerticalChartFormatter extends ChartFormatter {
 
         const pointColor = point.color || this.options.color;
 
-        // For vertical gradients on vertical charts, calculate the actual bar top position
-        let barEndPosition: number | undefined;
-        if (chart && maxHeight && this.isGradient(pointColor)) {
-            const gradient = this.normalizeGradient(pointColor) as Gradient;
-            if (gradient.direction === 'vertical') {
-                // Calculate where the bar top is as a position (0 = top, 1 = bottom)
-                const barHeight = this.calculateBarHeight(point.scaled, maxHeight);
-                const barStartRow = maxHeight - barHeight;
-                // Position 0 is top of chart, position 1 is bottom
-                // barStartRow = 0 means full height bar (position 0)
-                // barStartRow = maxHeight - 1 means shortest bar (position close to 1)
-                barEndPosition = maxHeight > 1 ? barStartRow / (maxHeight - 1) : 0;
+        // If fill is present with fillColor, value labels should follow fillColor
+        let valueLabelColor: string | undefined;
+        if (this.options.fill && this.options.fillColor) {
+            if (this.options.fillColor === 'auto') {
+                // Fill with auto color follows the gradient to the end, so value label should use end position (0 = top for vertical)
+                valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, 0);
+            } else {
+                valueLabelColor = this.options.fillColor;
             }
+        } else {
+            // For vertical gradients on vertical charts, calculate the actual bar top position
+            let barEndPosition: number | undefined;
+            if (chart && maxHeight && this.isGradient(pointColor)) {
+                const gradient = this.normalizeGradient(pointColor) as Gradient;
+                if (gradient.direction === 'vertical') {
+                    // Calculate where the bar top is as a position (0 = top, 1 = bottom)
+                    const barHeight = this.calculateBarHeight(point.scaled, maxHeight);
+                    const barStartRow = maxHeight - barHeight;
+                    // Position 0 is top of chart, position 1 is bottom
+                    // barStartRow = 0 means full height bar (position 0)
+                    // barStartRow = maxHeight - 1 means shortest bar (position close to 1)
+                    barEndPosition = maxHeight > 1 ? barStartRow / (maxHeight - 1) : 0;
+                }
+            }
+
+            // Value labels use opposite position from regular labels (top vs bottom for vertical charts)
+            valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, barEndPosition);
         }
 
-        // Value labels use opposite position from regular labels (top vs bottom for vertical charts)
-        const valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, barEndPosition);
         return valueLabelColor ? this.colorify(value, valueLabelColor) : value;
     }
 
@@ -429,11 +441,11 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private composeFinalChart(chart: ChartPoint[], verticalChart: string[][], barSize: number, padding: number, maxHeight: number): string {
         const chartRows = this.buildChartRows(chart.length, verticalChart, barSize, padding);
-        const header = this.buildHeader();
+        const header = this.buildHeader(chart.length, barSize, padding);
         const footer = this.buildFooter(chart, barSize, padding);
         const valueLabelsHeader = this.buildValueLabelsHeader(chart, barSize, padding, maxHeight);
 
-        return [...valueLabelsHeader, ...header, ...chartRows, ...footer].join('\n');
+        return [...header, ...valueLabelsHeader, ...chartRows, ...footer].join('\n');
     }
 
     private buildChartRows(chartLength: number, verticalChart: string[][], barSize: number, padding: number): string[] {
@@ -445,8 +457,8 @@ class VerticalChartFormatter extends ChartFormatter {
         });
     }
 
-    private buildHeader(): string[] {
-        return this.options.title ? [this.formatChartTitle()] : [];
+    private buildHeader(chartLength: number, barSize: number, padding: number): string[] {
+        return this.options.title ? [this.formatChartTitle(chartLength, barSize, padding)] : [];
     }
 
     private buildFooter(chart: ChartPoint[], barSize: number, padding: number): string[] {
@@ -470,8 +482,15 @@ class VerticalChartFormatter extends ChartFormatter {
         return [this.formatValueLabels(chart, barSize, padding, maxHeight)];
     }
 
-    private formatChartTitle(): string {
-        // Add 1 for the axis/structure character on the left
+    private formatChartTitle(chartLength: number, barSize: number, padding: number): string {
+        const alignment = this.options.alignBars || 'justify';
+        if (alignment === 'justify') {
+            const charLength = this.getCharWidth();
+            const barWidth = this.getScaledBarSize(barSize);
+            const barsWidth = ((barWidth * charLength + padding) * chartLength) - padding;
+            // Add 1 for the axis/structure character on the left
+            return this.formatTitle(barsWidth + 1);
+        }
         return this.formatTitle(this.options.width + 1);
     }
 

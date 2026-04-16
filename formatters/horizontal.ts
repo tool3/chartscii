@@ -235,8 +235,20 @@ class HorizontalChartFormatter extends ChartFormatter {
 
         let lineContent: string;
         if (shouldShowValue) {
-            const pointColor = point.color || this.options.color;
-            const valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, barEndPosition);
+            // If fill is present with fillColor, value labels should follow fillColor
+            let valueLabelColor: string | undefined;
+            if (this.options.fill && this.options.fillColor) {
+                if (this.options.fillColor === 'auto') {
+                    // Fill with auto color follows the gradient to the end, so value label should use end position
+                    const pointColor = point.color || this.options.color;
+                    valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, 1);
+                } else {
+                    valueLabelColor = this.options.fillColor;
+                }
+            } else {
+                const pointColor = point.color || this.options.color;
+                valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, barEndPosition);
+            }
             const coloredValueLabel = valueLabelColor ? this.colorify(valueLabel, valueLabelColor) : valueLabel;
             lineContent = barContent + this.pad(1) + coloredValueLabel;
         } else {

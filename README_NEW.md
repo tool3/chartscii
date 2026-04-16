@@ -1,35 +1,23 @@
 # Chartscii
 Beautiful ASCII charts for your terminal
 
-![](./examples/svgs/sine.svg)
+![chartscii](./examples/svgs/intro.svg)
 
 Transform your data into stunning ASCII bar charts with full color support, stacked bars, vertical layouts, and rich text formatting.
 
-
 ---
 
-## Features
+# What's New in v4
 
-- **Horizontal & Vertical Charts** — Full control over chart orientation
-- **Stacked Bar Charts** — Multi-segment bars with individual colors
-- **Rich Theming** — Built-in themes via [styl3](https://github.com/tool3/styl3) integration
-- **Full Customization** — Colors, padding, bar size, alignment, and more
-- **Value Labels** — Display values with currency prefixes and decimal precision
-- **Emoji Support** — Use Unicode character as your bar character
-- **TypeScript First** — Complete type definitions included
-
----
-
-## What's New in 3.x
-
-| Feature | Description |
-|---------|-------------|
-| **Stacked Bars** | Create multi-segment bars with individual colors per segment |
-| **Bar Alignment** | Align bars to `top`, `center`, `bottom`, `justify` (horizontal) or `left`, `center`, `right`, `justify` (vertical) |
-| **Fill Color** | Style the fill character separately from the bar character |
-| **Full Dimension Control** | Complete `width`, `height`, `padding`, and `barSize` options |
-| **Vertical Charts** | Full-featured vertical bar chart support |
-| **Rich Formatting** | Bold, italic, underline, strikethrough, and inverted labels via styl3 |
+✅ Stacked charts - create multi value bar charts.    
+✅ Label format - full label format control.    
+✅ Title - alignment, padding and centering options.    
+✅ Bar alignment - justify, center, left/right/top/bottom (depending on orientation).   
+✅ Gradient charts - create vertical/horizontal/diagonal gradient charts.      
+✅ Fill color - automatically follow gradient/color or separately.      
+✅ Relative scaling control - relative and absoslute.   
+✅ Auto color mode - cycle through colors automatically.   
+✅ Animate - create scaling animations (using cursor reset animation).   
 
 ---
 
@@ -48,18 +36,19 @@ For CLI usage, see [chartscii-cli](https://github.com/tool3/chartscii-cli).
 ```typescript
 import Chartscii from 'chartscii';
 
-const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const data = Array.from({ length: 10 }, (_, i) => i + 1);
 const chart = new Chartscii(data, {
-  title: 'My Chart',
   width: 50,
   theme: 'pastel',
+  barSize: 2,
+  orientation: 'vertical',
   color: 'pink'
 });
 
 console.log(chart.create());
 ```
 
-![](./shellfies/chartscii_simple.png)
+![](./examples/svgs/basic.svg)
 
 ---
 
@@ -558,4 +547,4 @@ MIT © [tool3](https://github.com/tool3)
 </p>
 
 
-npx ts-node examples/sine.ts | npx ts-node ../dvd/src/cli.ts -o bbb.svg -t "chartscii sine wave" --watermark "made with dvd" --playbackSpeed 2 -p -1 --background "gradient(#d2a8ff,cyan:horizontal)" --background-padding 20
+npx ts-node examples/sine.ts | npx ts-node ../dvd-cli/src/cli.ts -o bbb.svg -t "chartscii sine wave" --watermark "made with dvd" --playbackSpeed 2 -p -1 --background "gradient(#d2a8ff,cyan:horizontal)" --background-padding 20

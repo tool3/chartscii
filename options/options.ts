@@ -2,7 +2,7 @@ import { ChartOptions, CustomizationOptions } from '../types/types';
 
 export const defaultOptions: CustomizationOptions = {
     percentage: false,
-    colorLabels: false,
+    colorLabels: true,
     sort: false,
     reverse: false,
     color: undefined,
