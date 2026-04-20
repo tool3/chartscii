@@ -116,7 +116,11 @@ class ChartProcessor {
             const percentageLength = this.options.percentage ? (isNaN(percentage) ? 3 : percentage.toFixed(2).length) + 5 : 0;
 
             // Calculate base label length (before labelFormat)
-            let baseLabelLength = this.options.percentage ? label.length + percentageLength : label.length;
+            // Strip decorator markers (*bold*, %italic%, etc.) for accurate visual length
+            const visualLabel = this.options.richLabels !== false
+                ? label.replace(/([*~%!^@#$])(.+?)\1/g, '$2')
+                : label;
+            let baseLabelLength = this.options.percentage ? visualLabel.length + percentageLength : visualLabel.length;
 
             // If labelFormat is provided, calculate how much extra length it adds
             // by testing it on a sample label

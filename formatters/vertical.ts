@@ -350,8 +350,9 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private formatLabel(point: ChartPoint, barIndex: number, totalBars: number): string {
         const baseLabel = point.percentage ? `${point.label} ${this.formatPercentage(point)}` : point.label;
-        // Apply labelFormat if provided
-        const label = this.options.labelFormat ? this.options.labelFormat(baseLabel) : baseLabel;
+        // Apply labelFormat if provided, then rich text decorators
+        const formatted = this.options.labelFormat ? this.options.labelFormat(baseLabel) : baseLabel;
+        const label = this.applyDecorators(formatted);
 
         if (!this.options.colorLabels) return label;
 

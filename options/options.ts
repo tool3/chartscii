@@ -28,6 +28,7 @@ export const defaultOptions: CustomizationOptions = {
     stackValueLabels: false,
     alignBars: 'justify',
     fillColor: undefined,
+    richLabels: true,
 };
 
 /**

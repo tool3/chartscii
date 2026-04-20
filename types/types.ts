@@ -53,6 +53,8 @@ type BaseOptions = {
     labelFormat?: (label: string) => string;
     /** Format function for value labels */
     valueLabelFormat?: (value: string) => string;
+    /** Enable styl3 rich text decorators in labels (*bold*, %italic%, !underline!, @invert@) */
+    richLabels?: boolean;
     /** @internal Used to preserve label width during animation */
     _maxLabel?: number;
     /** @internal Used to preserve max bar length for gradient fill during animation */

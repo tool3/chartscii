@@ -53,6 +53,16 @@ describe('labelFormat', () => {
         });
         await snap(chart.create(), 'labelFormat with percentage');
     });
+
+      test('should apply labelFormat with styl3', async () => {
+        const data = generateChartData();
+        const chart = new Chartscii(data, {
+            width: 50,
+            labelFormat: (label) => `@!inverted ${label}!@`,
+            colorLabels: true
+        });
+        await snap(chart.create(), 'labelFormat with styl3');
+    });
 });
 
 describe('valueLabelFormat', () => {

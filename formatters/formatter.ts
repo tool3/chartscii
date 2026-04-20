@@ -313,6 +313,29 @@ abstract class ChartFormatter {
         return applyGradientToText(text, gradient, this.getThemeColors());
     }
 
+    protected applyDecorators(text: string): string {
+        if (!this.options.richLabels) return text;
+
+        const decorators: Record<string, { symbol: number; reset: number }> = {
+            '*': { symbol: 1, reset: 22 },   // bold
+            '~': { symbol: 2, reset: 22 },   // dim
+            '%': { symbol: 3, reset: 23 },   // italic
+            '!': { symbol: 4, reset: 24 },   // underline
+            '^': { symbol: 5, reset: 25 },   // blink
+            '@': { symbol: 7, reset: 27 },   // invert
+            '#': { symbol: 8, reset: 28 },   // hidden
+            '$': { symbol: 9, reset: 29 },   // strikeout
+        };
+
+        let result = text;
+        for (const [char, { symbol, reset }] of Object.entries(decorators)) {
+            const escaped = char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`${escaped}(.+?)${escaped}`, 'gs');
+            result = result.replace(regex, `\x1b[${symbol}m$1\x1b[${reset}m`);
+        }
+        return result;
+    }
+
     protected stripStyle(label: string): string {
         return label.replace(/\x1b\[[0-9;]*m/g, '');
     }
