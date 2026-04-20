@@ -112,7 +112,8 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private formatChart(chart: ChartPoint[], verticalChart: string[][], maxHeight: number, padding: number, barSize: number): void {
         chart.forEach((point, index) => {
-            const context: ColumnContext = { chart, verticalChart, point, index, maxHeight, padding, barSize };
+            const isLast = index === chart.length - 1;
+            const context: ColumnContext = { chart, verticalChart, point, index, maxHeight, padding: isLast ? 0 : padding, barSize };
 
             if (point.segments?.length) {
                 this.formatStackedColumn(context);
@@ -405,7 +406,7 @@ class VerticalChartFormatter extends ChartFormatter {
 
         const { leftPad } = this.getHorizontalAlignmentPadding(chart.length, barSize, padding);
         const labels = chart
-            .map((point, i) => this.formatLabelEntry(point, barSize, padding, i, chart.length))
+            .map((point, i) => this.formatLabelEntry(point, barSize, i === chart.length - 1 ? 0 : padding, i, chart.length))
             .join('');
         return ' '.repeat(leftPad) + labels;
     }
@@ -419,7 +420,7 @@ class VerticalChartFormatter extends ChartFormatter {
 
         const { leftPad } = this.getHorizontalAlignmentPadding(chart.length, barSize, padding);
         const labels = chart
-            .map((point, i) => this.formatValueLabelEntry(point, barSize, padding, i, chart.length, chart, maxHeight))
+            .map((point, i) => this.formatValueLabelEntry(point, barSize, i === chart.length - 1 ? 0 : padding, i, chart.length, chart, maxHeight))
             .join('');
         return ' '.repeat(leftPad) + labels;
     }
