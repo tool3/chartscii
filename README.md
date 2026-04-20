@@ -1,241 +1,531 @@
-# Chartscii 3.0!
+<h1 align="center"> 
+Chartscii
+</h1>
+<p align="center">
+Beautiful ASCII charts for your terminal
+<img src="./examples/svgs/intro.svg">
 
-![](./shellfies/chartscii_main.png)
+</p>
+Transform your data into stunning ASCII bar charts with full color support, stacked bars, vertical layouts, and rich text formatting.
 
-[![](https://img.shields.io/static/v1?label=created%20with%20shellfie&message=📸&color=pink)](https://github.com/tool3/shellfie)
+---
 
-for command line usage see: [chartscii-cli](https://github.com/tool3/chartscii-cli)
+# What's New in v4
 
-Chartscii was rewritten from scratch in TypeScript!
-It includes many new features, improvements and rich formatting capabilities.
+✅ Stacked charts - create multi value bar charts.  
+✅ Label format - full label format control.  
+✅ Title - alignment, padding and centering options.  
+✅ Bar alignment - justify, center, left/right/top/bottom (depending on orientation).  
+✅ Gradient charts - create vertical/horizontal/diagonal gradient charts.  
+✅ Fill color - automatically follow gradient/color or separately.  
+✅ Relative scaling control - relative and absolute.  
+✅ Auto color mode - cycle through colors automatically.  
+✅ Animate - create chart animations (using cursor reset).
 
-# What’s new
+---
 
-✅ Full width and height control.  
-✅ New `padding` and `barSize` options!  
-✅ New `orientation` option! vertical charts are here!  
-✅ New rich styl3 formatting support!  
-✅ New Emoji characters support! [\*](#unicode-issues)
-
-# install
+## Installation
 
 ```bash
 npm install chartscii
 ```
 
-# usage
+For CLI usage, see [chartscii-cli](https://github.com/tool3/chartscii-cli).
 
-`chartscii` accepts an array of data objects, with optional labels, and outputs an ascii bar chart.
+---
 
-## usage example
+## Quick Start
 
 ```typescript
 import Chartscii from "chartscii";
 
-const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const options = {
-  title: "chartscii",
+const data = Array.from({ length: 10 }, (_, i) => i + 1);
+const chart = new Chartscii(data, {
   width: 50,
   theme: "pastel",
-  color: "pink",
-  colorLabels: true,
   barSize: 2,
-  orientation: "vertical"
-};
-const chart = new Chartscii(data, options);
-console.log(char.create());
-```
-
-![](./shellfies/chartscii_simple.png)
-
-# Input
-
-Chartscii accepts an array of data points to draw the chart.
-
-This can be an array of numbers, or an array of chart points as explained below.
-
-## number[]
-
-If you provide an array of numbers, chartscii will draw each bar using the provided values.
-
-Value is scaled to width/height of chart, depending on the orientation option.
-
-### example
-
-```tsx
-import Chartscii from "chartscii";
-
-const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const chart = new Chartscii(data);
-console.log(chart.create());
-```
-
-![](./shellfies//chartscii_dead_simple.png)
-
-## ChartPoint[]
-
-For maximum flexibility, provide an array of chart points. This will allow you to customize the following properties:
-
-| name  | description | type   | default       |
-| ----- | ----------- | ------ | ------------- |
-| label | bar label   | string | point.value   |
-| value | bar value   | number | N/A           |
-| color | bar color   | string | options.color |
-
-### example
-
-```tsx
-import Chartscii from "chartscii";
-
-const data = [
-  { label: "label", value: 2, color: "pink" },
-  { label: "label", value: 2, color: "purple" },
-  { label: "label", value: 2, color: "marine" }
-];
-const chart = new Chartscii(data, { colorLabels: true, valueLabels: true });
-console.log(chart.create());
-```
-
-![](./shellfies/chartscii_chartpoint.png)
-
-# Options
-
-You can customize the look and size of the chart, as well as rich formatting for labels provided by `styl3`.
-
-## default options
-
-Chartscii accepts customization options as a second argument and will merge the provided options with the following one:
-
-```tsx
-const options: ChartOptions = {
-  percentage: false,
-  colorLabels: false,
-  sort: false,
-  reverse: false,
-  naked: false,
-  labels: true,
-  color: undefined,
-  fill: undefined,
-  width: 100,
-  height: 10,
-  padding: 0,
-  barSize: 1,
-  title: "",
-  char: "█",
-  orientation: "horizontal",
-  theme: "",
-  structure: {
-    x: "═",
-    y: "╢",
-    axis: "║",
-    topLeft: "╔",
-    bottomLeft: "╚"
-  }
-};
-```
-
-## customization options
-
-| name                     | description                                                                                                 | type                 | default                                                        |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------- |
-| percentage               | calculate and show percentage data                                                                          | `boolean`            | `false`                                                        |
-| colorLabels              | color labels with provided color per label, or color provided to option                                     | `boolean`            | `false`                                                        |
-| valueLabels              | show values of each bar                                                                                     | `boolean`            | `false`                                                        |
-| valueLabelsFloatingPoint | sets decimal place precision for value labels; defaults to printing entire number, excluding extra zeroes   | `number`             | `undefined`                                                    |
-| labelFormat              | format function for labels                                                                                  | `(label: string) => string` | `undefined`                                               |
-| valueLabelFormat         | format function for value labels (e.g., for currency prefix)                                                | `(value: string) => string` | `undefined`                                               |
-| sort                     | sort the input data                                                                                         | `boolean`            | `false`                                                        |
-| reverse                  | reverse the input data                                                                                      | `boolean`            | `false`                                                        |
-| naked                    | don’t print chart structure ascii characters                                                                | `boolean`            | `false`                                                        |
-| labels                   | show labels                                                                                                 | `boolean`            | `true`                                                         |
-| color                    | fallback color or unified char bars color                                                                   | `string`             | `undefined`                                                    |
-| fill                     | use this character to fill remaining chart bar space                                                        | `string`             | `undefined`                                                    |
-| scale                    | values are scaled proportionate to this value. otherwise the max will be calculated from the provided data. | `number` or `string` | `auto`                                                         |
-| width                    | width of chart                                                                                              | `number`             | `100`                                                          |
-| height                   | height of chart                                                                                             | `number`             | `10`                                                           |
-| padding                  | padding between bars                                                                                        | `number`             | `0`                                                            |
-| barSize                  | size of each bar                                                                                            | `number`             | `1`                                                            |
-| title                    | chart title                                                                                                 | `string`             | `undefined`                                                    |
-| char                     | use this character to draw the chart bars                                                                   | `string`             | `█`                                                            |
-| orientation              | horizontal or vertical                                                                                      | `string`             | `horizontal`                                                   |
-| theme                    | `styl3`'s [themes](https://github.com/tool3/styl3?tab=readme-ov-file#themes)                                | `string`             | `undefined`                                                    |
-| structure                | use these characters to draw the enclosing chart borders.                                                   | `object`             | `{ x: '═', y: '╢', bottomLeft: '╚', axis: '║', topLeft: '╔' }` |
-
-## chartscii + styl3 = ❤️
-
-You can use `styl3`’s [formatting](https://github.com/tool3/styl3?tab=readme-ov-file#map) for cool themes, built-in color names and rich label formatting.
-
-You should check out `styl3` for a full list of customization options.
-
-### example
-
-```tsx
-const colors = [
-  "red",
-  "green",
-  "yellow",
-  "blue",
-  "purple",
-  "pink",
-  "cyan",
-  "orange"
-];
-
-const data = [];
-for (let i = 0; i < colors.length; i++) {
-  const color = colors[i];
-  data.push({ value: i + 1, color, label: `@invert ${i}@`, theme: "pastel" });
-}
-
-const chart = new Chartscii(data, {
-  fill: "░",
-  colorLabels: true,
-  orientation: "vertical"
+  orientation: "vertical",
+  color: "pink",
 });
 
 console.log(chart.create());
 ```
 
-![](./shellfies/chartscii_styl3.png)
+![](./examples/svgs/basic.svg)
 
-# examples
+---
 
-here are some examples of charts using `styl3`'s formatting on the chart labels.
+## Input Formats
 
-> [!TIP]  
-> you can run more examples from the `./examples/` directory of this repository using `ts-node`.  
-> for example `npx ts-node examples/loaders.ts`
+### Simple Numbers
 
-## vertical
+```typescript
+const chart = new Chartscii([1, 2, 3, 4, 5]);
+```
 
-| options                                                                     | chart                                                                            |
-| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| beach theme with italic and bold labels with a bar size of 2                | ![](./shellfies/vertical/chartscii_beach_italic_bold_barsize.png)                |
-| pastel theme with bold and underlined labels with padding of 2              | ![](./shellfies/vertical/chartscii_pastel_bold_underline_padding.png)            |
-| lush theme with strikedout labels no padding and emoji                      | ![](./shellfies/vertical/chartscii_lush_strikeout_emoji.png)                     |
-| lush theme with underlined labels no padding and no axis structure char     | ![](./shellfies/vertical/chartscii_lush_underline_no_axis_structure.png)         |
-| standard theme with dimmed and italic labels and padding 1                  | ![](./shellfies/vertical/chartscii_standard_dimmed_italic_padding_structure.png) |
-| pastel theme with inverted and underlined labels with a dark fill character | ![](./shellfies/vertical/chartscii_pastel_inverted_underline_dark_fill.png)      |
+### Chart Points
 
-## horizontal
+```typescript
+const data = [
+  { label: "Sales", value: 100, color: "green" },
+  { label: "Returns", value: 25, color: "red" },
+  { label: "Pending", value: 40, color: "yellow" },
+];
+```
 
-| options                                                               | chart                                                               |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| pastel theme with bold labels and percentage                          | ![](./shellfies/horizontal/chartscii_pastel_bold_percentage.png)    |
-| lush theme with inverted labels and naked chart                       | ![](./shellfies/horizontal/chartscii_pastel_lush_invert_naked.png)  |
-| beach theme with underlined labels and different structure characters | ![](./shellfies/horizontal/chartscii_beach_underline_structure.png) |
-| pastel theme with padding of 1 and custom char                        | ![](./shellfies/horizontal/chartscii_pastel_char.png)               |
-| pastel theme with naked chart to create multiple loaders              | ![](./shellfies/horizontal/chartscii_loaders.png)                   |
+### Stacked Chart Points
 
-# Unicode issues
+```typescript
+const data = [ 
+  { label: "Jan", value: [25, 25, 50], color: ["green", "yellow", "red"] },
+  { label: "Feb", value: [22, 68, 10], color: ["green", "yellow", "red"] },
+  { label: "Mar", value: [40, 10, 50], color: ["green", "yellow", "red"] },
+];
+```
 
-Unfortunately, there are some known issues with specific unicode characters width.  
-This means that some emoji/unicode characters renders as 2 characters wide (or more) instead of 1, which is not a problem in itself.  
-The problem is that Javscript determines this length as 1, which creates an issue with label alignment, or drawing the chart bars correctly.
+```typescript
+const chart = new Chartscii(data, { colorLabels: true, valueLabels: true });
+```
 
-> [!WARNING]  
-> If you have issues with label alignment, or the chart bars aren't spaced correctly - you are probably using an emoji/unicode character which produce the wrong width in javascript.
+| Property | Type                   | Description                         |
+| -------- | ---------------------- | ----------------------------------- |
+| `label`  | `string`               | Bar label (defaults to value)       |
+| `value`  | `number` or `array`    | Bar value or array for stacked bars |
+| `color`  | `string` or `string[]` | Bar color or per-segment colors     |
 
-If you encounter this issue unfortunately the current solution is to simply use a different emoji.  
-(For example: 🔥 works well while ✅ will result in a misaligned chart).  
-PRs for this problem are more than welcome.
+---
+
+## Configuration
+
+<details>
+<summary><strong>All Options</strong></summary>
+
+| Option                     | Type                    | Default        | Description                                          |
+| -------------------------- | ----------------------- | -------------- | ---------------------------------------------------- |
+| `width`                    | `number`                | `100`          | Chart width in characters                            |
+| `height`                   | `number`                | `10`           | Chart height in lines                                |
+| `padding`                  | `number`                | `0`            | Space between bars                                   |
+| `barSize`                  | `number`                | `1`            | Thickness of each bar                                |
+| `orientation`              | `string`                | `'horizontal'` | `'horizontal'` or `'vertical'`                       |
+| `alignBars`                | `string`                | `'justify'`    | Bar alignment                                        |
+| `title`                    | `string \| TitleConfig` | `''`           | Chart title                                          |
+| `char`                     | `string`                | `'█'`          | Character used for bars                              |
+| `fill`                     | `string`                | —              | Fill character for empty space                       |
+| `fillColor`                | `string`                | —              | Fill color or `'auto'`                               |
+| `color`                    | `string`                | —              | Bar color, gradient string, or `'auto'`              |
+| `theme`                    | `string`                | `''`           | Theme name from styl3                                |
+| `naked`                    | `boolean`               | `false`        | Hide borders                                         |
+| `labels`                   | `boolean`               | `true`         | Show bar labels                                      |
+| `colorLabels`              | `boolean`               | `true`         | Color the labels                                     |
+| `valueLabels`              | `boolean`               | `false`        | Show values on bars                                  |
+| `valueLabelsFloatingPoint` | `number`                | —              | Decimal precision                                    |
+| `labelFormat`              | `function`              | —              | Custom label formatter                               |
+| `valueLabelFormat`         | `function`              | —              | Custom value label formatter                         |
+| `percentage`               | `boolean`               | `false`        | Show percentages                                     |
+| `sort`                     | `boolean`               | `false`        | Sort ascending                                       |
+| `reverse`                  | `boolean`               | `false`        | Reverse order                                        |
+| `scale`                    | `string \| number`      | `'auto'`       | `'auto'`, `'relative'`, `'relative-zero'`, or number |
+| `stackColors`              | `string[]`              | —              | Stacked segment colors                               |
+| `stackLabels`              | `string[]`              | —              | Stacked segment labels                               |
+| `stackValueLabels`         | `boolean`               | `false`        | Show segment values                                  |
+| `richLabels`               | `boolean`               | `true`         | Enable styl3 rich text decorators in labels           |
+| `structure`                | `object`                | —              | Custom border characters                             |
+
+</details>
+
+<details>
+<summary><strong>Scaling Modes</strong></summary>
+
+| Mode              | Behavior                                                 |
+| ----------------- | -------------------------------------------------------- |
+| `'auto'`          | Absolute scaling from 0 to max                           |
+| `'relative'`      | Maps `[min, max]` → `[1, size]` — emphasizes differences |
+| `'relative-zero'` | Maps `[min, max]` → `[0, size]` — max contrast           |
+| `number`          | Fixed scale factor: `value / scale`                      |
+
+</details>
+
+<details>
+<summary><strong>Structure Characters</strong></summary>
+
+```typescript
+structure: {
+  x: '═',        // horizontal axis
+  y: '╢',        // tick mark
+  axis: '║',     // vertical axis
+  topLeft: '╔',  // top-left corner
+  bottomLeft: '╚' // bottom-left corner
+}
+```
+
+</details>
+
+---
+
+## API
+
+```typescript
+const chart = new Chartscii(data: InputData[], options?: ChartOptions);
+chart.create(); // returns the chart as a string
+```
+
+```typescript
+type InputData =
+  | number
+  | {
+      value: number | number[] | { value: number; color?: string }[];
+      label?: string;
+      color?: string | string[];
+    };
+```
+
+# Examples and features
+## Auto Color
+
+Automatically cycle through a curated color palette — no manual color assignments needed.
+
+```typescript
+const data = Array.from({ length: 9 }, (_, i) => ({
+  value: (i + 1) * 5,
+  label: `item ${i + 1}`,
+}));
+
+const chart = new Chartscii(data, {
+  width: 50,
+  color: "auto",
+  colorLabels: true,
+  valueLabels: true,
+  theme: "pastel",
+});
+```
+
+![](./examples/svgs/auto-color.svg)
+
+---
+
+## Gradients
+
+Create eye-catching multi-color gradients in any direction.
+
+```typescript
+const data = Array.from({ length: 20 }, (_, i) => ({
+  value: Math.round(Math.sin(i / 3) * 10 + 15),
+  label: `${i}`,
+}));
+
+const chart = new Chartscii(data, {
+  width: 60,
+  title: {
+    text: "Gradient Aligned Right",
+    align: "right",
+    color: "gradient",
+    padding: [1, 0],
+  },
+  orientation: "vertical",
+  color: "gradient(pink,cyan)",
+  theme: "beach",
+  fill: "░",
+  fillColor: "auto",
+  padding: 1,
+  valueLabels: true,
+});
+```
+
+![](examples/svgs/gradient-right.svg)
+
+<!-- SHELLFIE: gradient_wave -->
+
+### Gradient Directions
+
+```typescript
+// Horizontal — left to right
+color: "gradient(red,yellow,green)";
+
+// Vertical — top to bottom
+color: "gradient(purple,cyan:vertical)";
+
+// Diagonal — corner to corner
+color: "gradient(pink,orange,yellow:diagonal)";
+
+// All gradients can be reversed for opposite direction gradient
+color: "gradient(purple,cyan:vertical:reverse)";
+color: "gradient(pink,orange,yellow:diagonal:reverse)";
+color: "gradient(purple,cyan:vertical:reverse)";
+```
+
+```typescript
+const chart = new Chartscii(data, {
+    orientation: 'vertical',
+    barSize: 10,
+    sort: false,
+    fill: '▒',
+    fillColor: 'auto',
+    colorLabels: true,
+    color: 'gradient(pink,cyan:diagonal:reverse)',
+    theme: 'pinkish',
+    percentage: true,
+    labels: true
+});
+
+```
+
+![](examples/svgs/gradient-diagonal.svg)
+
+---
+
+## Stacked Bars
+
+Visualize multi-dimensional data with stacked segments.
+
+```typescript
+const data: InputData[] = [
+  { label: "Mon", value: [5, 10, 5] },
+  { label: "Tue", value: [7, 3, 10] },
+  { label: "Wed", value: [10, 6, 4] },
+  { label: "Thu", value: [3, 6, 11] },
+  { label: "Fri", value: [8, 6, 6] },
+  { label: "Sat", value: [11, 5, 6] },
+  { label: "Sun", value: [9, 6, 5] },
+];
+const chart = new Chartscii(data, {
+  height: 10,
+  barSize: 1,
+  width: 50,
+  padding: 5,
+  theme: "pastel",
+  alignBars: "justify",
+  orientation: "vertical",
+  stackColors: ["red", "orange", "yellow"],
+});
+```
+
+![](examples/svgs/stacked.svg)
+
+### Vertical Horizontal
+
+```typescript
+const chart = new Chartscii(data, {
+  barSize: 2,
+  width: 60,
+  padding: 1,
+  theme: "pastel",
+  alignBars: "justify",
+  colorLabels: true,
+  color: "green",
+  stackColors: ["green", "pink", "blue"],
+});
+```
+
+![](examples/svgs/stacked-horizontal.svg)
+
+## Auto stacked
+Stacked charts also support auto colors.
+
+```typescript
+const chart = new Chartscii(data, {
+ ...
+  color: "auto",
+  ...
+});
+```
+
+![](examples/svgs/stacked-auto.svg)
+
+And partial overrides
+
+```typescript
+const data: InputData[] = [
+  ...
+  { label: 'Thu', value: [3, 6, 11], color: ['cyan', 'pink', 'purple'] },
+  ...
+];
+```
+
+![](examples/svgs/stacked-override.svg)
+
+---
+
+## Themes
+
+Chartscii integrates with [styl3](https://github.com/tool3/styl3) for 20+ built-in color themes.
+
+```typescript
+// Just set the theme name
+const chart = new Chartscii(data, { theme: "lush" });
+```
+
+| Theme    | Vibe                  |
+| -------- | --------------------- |
+| `pastel` | Soft, muted tones     |
+| `lush`   | Vibrant, saturated    |
+| `beach`  | Warm coastal palette  |
+| `neon`   | Electric, bright      |
+| `sunset` | Warm orange/red tones |
+| `nature` | Earthy greens         |
+| `mint`   | Cool mint/teal        |
+
+See all themes in [styl3 docs](https://github.com/tool3/styl3/tree/master?tab=readme-ov-file#themes).
+
+<!-- SHELLFIE: themes_showcase (same data rendered with 4 different themes in a 2x2 grid) -->
+
+---
+
+## Label Formatting
+
+Full control over labels with custom format functions and rich text via [styl3](https://github.com/tool3/styl3).
+
+```typescript
+const data = Array.from({ length: 10 }, (_, i) => i + 1);
+const chart = new Chartscii(data, {
+  fill: "░",
+  labelFormat: (label) => `\x1b[7mlabel ${label}`,
+  fillColor: "auto",
+  padding: 1,
+  theme: "beach",
+  valueLabels: true,
+  orientation: "vertical",
+  color: "gradient(lime,purple)",
+});
+```
+
+![](./examples/svgs/label-format.svg)
+
+### Rich Text Labels
+
+```typescript
+const data = [
+  { value: 10, label: "*bold* Sales", color: "green" },
+  { value: 5, label: "%italic% Returns", color: "red" },
+  { value: 8, label: "!underline! Pending", color: "yellow" },
+  { value: 3, label: "@invert@ Cancelled", color: "purple" },
+];
+
+const chart = new Chartscii(data, {
+  barSize: 16,
+  theme: "pastel",
+  alignBars: "justify",
+  orientation: "vertical",
+  stackColors: ["red", "orange", "yellow"],
+});
+```
+
+![](examples/svgs/styl3.svg)
+
+---
+
+## Orientation & Alignment
+
+### Horizontal
+
+```typescript
+const chart = new Chartscii(data, {
+  width: 80,
+  padding: 1,
+  barSize: 1,
+  color: "auto",
+  theme: "beach",
+  alignBars: "center", // 'top' | 'center' | 'bottom' | 'justify'
+});
+```
+
+| top                              | bottom                              | center                              | justify                              |
+| -------------------------------- | ----------------------------------- | ----------------------------------- | ------------------------------------ |
+| ![](examples/svgs/align-top.svg) | ![](examples/svgs/align-bottom.svg) | ![](examples/svgs/align-center.svg) | ![](examples/svgs/align-justify.svg) |
+
+### Vertical
+
+```typescript
+const chart = new Chartscii(data, {
+  orientation: 'vertical'
+  width: 80,
+  padding: 1,
+  barSize: 1,
+  color: "auto",
+  theme: "beach",
+  alignBars: "justify", // 'left' | 'center' | 'right' | 'justify'
+});
+```
+
+| left                                | right                                | center                                | justify                                |
+| ----------------------------------- | ------------------------------------ | ------------------------------------- | -------------------------------------- |
+| ![](examples/svgs/align-v-left.svg) | ![](examples/svgs/align-v-right.svg) | ![](examples/svgs/align-v-center.svg) | ![](examples/svgs/align-v-justify.svg) |
+
+---
+
+## Animation
+
+Create smooth terminal animations with easing support.
+
+```typescript
+const data = Array.from({ length: 20 }, (_, i) => ({
+  value: Math.round(Math.sin(i / 3) * 10 + 15),
+  label: `${i}`,
+}));
+
+const chart = new Chartscii(data, {
+  width: 60,
+  title: {
+    text: "Gradient Aligned Center",
+    align: "center",
+    color: "gradient",
+  },
+  orientation: "vertical",
+  color: "gradient(pink,cyan)",
+  theme: "beach",
+  fill: "░",
+  padding: 1,
+  fillColor: "auto",
+  valueLabelsFloatingPoint: 0,
+  valueLabels: true,
+});
+
+chart.animate({ duration: 1500, easing: "easeInOut", fps: 60 });
+```
+
+![](examples/svgs/animation.svg)
+
+---
+
+### Sine Wave
+
+```typescript
+const frames = 120;
+for (let frame = 0; frame < frames; frame++) {
+  const data = Array.from({ length: 40 }, (_, i) => {
+    const value = Math.sin((i + frame) / 4) * 10 + 12;
+    return { value: Math.round(value), label: "" };
+  });
+
+  const chart = new Chartscii(data, {
+    orientation: "vertical",
+    height: 24,
+    naked: true,
+    labels: false,
+    color: "gradient(cyan,purple,pink:vertical)",
+    fill: "░",
+    fillColor: "auto",
+  });
+
+  process.stdout.write("\x1B[H" + chart.create());
+}
+```
+
+![](./examples/svgs/sine.svg)
+
+## Unicode Notes
+
+Some emoji/unicode characters render as 2+ characters wide but JavaScript reports their length as 1. This can cause alignment issues.
+
+> **Tip:** If you experience alignment issues, try a different emoji. For example, 🔥 works well while ✅ may cause misalignment.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT © [tool3](https://github.com/tool3)
+
+---
