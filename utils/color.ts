@@ -35,8 +35,79 @@ export const NAMED_COLORS: Record<string, [number, number, number]> = {
     skyblue: [135, 206, 235]
 };
 
-export function isGradient(color: any): color is Gradient {
+export function isGradientObject(color: any): color is Gradient {
     return typeof color === 'object' && color !== null && color.type === 'gradient' && Array.isArray(color.colors);
+}
+
+export function isGradientString(color: any): boolean {
+    return typeof color === 'string' && color.startsWith('gradient(') && color.endsWith(')');
+}
+
+export function isGradient(color: any): color is Gradient {
+    return isGradientObject(color) || isGradientString(color);
+}
+
+/**
+ * Parse a gradient string into a Gradient object.
+ * Format: "gradient(color1,color2,...:option1:option2:...)"
+ *
+ * Examples:
+ *   - "gradient(pink,cyan)" - Simple two-color gradient
+ *   - "gradient(pink,cyan:reverse)" - Reversed gradient
+ *   - "gradient(red,yellow,green:vertical)" - Vertical 3-color gradient
+ *   - "gradient(#FF0000,#00FF00:diagonal:reverse)" - Hex colors with options
+ *
+ * Options:
+ *   - horizontal/vertical/diagonal: gradient direction
+ *   - reverse/reversed: reverse the gradient
+ */
+export function parseGradient(value: string): Gradient | string {
+    if (!value.startsWith('gradient(') || !value.endsWith(')')) {
+        return value;
+    }
+
+    // Extract content inside gradient()
+    const content = value.slice(9, -1); // Remove "gradient(" and ")"
+    if (!content) {
+        return value;
+    }
+
+    const parts = content.split(':');
+    const colorsPart = parts[0];
+    const options = parts.slice(1);
+
+    const colors = colorsPart.split(',').map(c => c.trim()).filter(c => c.length > 0);
+
+    if (colors.length === 0) {
+        return value;
+    }
+
+    const gradient: Gradient = {
+        type: 'gradient',
+        colors
+    };
+
+    for (const opt of options) {
+        const trimmed = opt.trim().toLowerCase();
+        if (trimmed === 'horizontal' || trimmed === 'vertical' || trimmed === 'diagonal') {
+            gradient.direction = trimmed;
+        } else if (trimmed === 'reverse' || trimmed === 'reversed') {
+            gradient.reverse = true;
+        }
+    }
+
+    return gradient;
+}
+
+/**
+ * Normalize a color value - if it's a gradient string, parse it into a Gradient object.
+ * Otherwise return as-is.
+ */
+export function normalizeColor(color: string | Gradient | undefined): string | Gradient | undefined {
+    if (typeof color === 'string' && isGradientString(color)) {
+        return parseGradient(color);
+    }
+    return color;
 }
 
 // Convert 256-color index to RGB
@@ -180,14 +251,15 @@ export function getColorAtPosition(gradient: Gradient, position: number, themeCo
 export function applyGradientToText(text: string, gradient: Gradient, themeColors?: ThemeColors): string {
     const { colors } = gradient;
     if (colors.length === 0 || text.length === 0) return text;
+
+    const chars = [...text];
+
     if (colors.length === 1) {
         const [r, g, b] = parseColorToRgb(colors[0], themeColors);
         return `\x1b[38;2;${r};${g};${b}m${text}\x1b[0m`;
     }
 
-    const chars = [...text];
     let result = '';
-
     for (let i = 0; i < chars.length; i++) {
         const position = chars.length > 1 ? i / (chars.length - 1) : 0;
         const [r, g, b] = getColorAtPosition(gradient, position, themeColors);
