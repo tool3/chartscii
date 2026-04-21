@@ -195,8 +195,8 @@ class HorizontalChartFormatter extends ChartFormatter {
     }
 
     private getStackedValueLabel(point: ChartPoint): string {
-        if (this.options.stackValueLabels && point.segments) {
-            return point.segments.map(s => this.formatValueWithDecimals(s.value)).join('|');
+        if ((this.options.valueLabels || this.options.stackValueLabels) && point.segments) {
+            return this.formatStackedValueLabel(point.segments);
         }
         return this.formatValueWithDecimals(point.value);
     }
@@ -230,7 +230,7 @@ class HorizontalChartFormatter extends ChartFormatter {
         const axisChar = this.formatStructure(this.options.structure.axis);
         const linePad = index !== 0 ? this.pad(space) + axisChar : '';
 
-        const shouldShowValue = this.options.valueLabels && index === 0;
+        const shouldShowValue = (this.options.valueLabels || this.options.stackValueLabels) && index === 0;
         const barContent = color ? this.colorify(bar, color) : bar;
 
         let lineContent: string;

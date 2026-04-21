@@ -51,8 +51,8 @@ type BaseOptions = {
     stackValueLabels?: boolean;
     /** Format function for labels */
     labelFormat?: (label: string) => string;
-    /** Format function for value labels */
-    valueLabelFormat?: (value: string) => string;
+    /** Format function for value labels. Receives an array of values (single element for regular bars, multiple for stacked). */
+    valueLabelFormat?: (values: string[]) => string;
     /** Enable styl3 rich text decorators in labels (*bold*, %italic%, !underline!, @invert@) */
     richLabels?: boolean;
     /** @internal Used to preserve label width during animation */
