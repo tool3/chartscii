@@ -261,7 +261,7 @@ const chart = new Chartscii(data, {
     fill: '▒',
     fillColor: 'auto',
     colorLabels: true,
-    color: 'gradient(pink,cyan:diagonal:reverse)',
+    color: 'gradient(pink,cyan:reverse)',
     theme: 'pinkish',
     percentage: true,
     labels: true
@@ -269,7 +269,7 @@ const chart = new Chartscii(data, {
 
 ```
 
-![](examples/svgs/gradient-diagonal.svg)
+![](examples/svgs/gradient-reverse.svg)
 
 ---
 
@@ -511,12 +511,6 @@ for (let frame = 0; frame < frames; frame++) {
 ```
 
 ![](./examples/svgs/sine.svg)
-
-## Unicode Notes
-
-Some emoji/unicode characters render as 2+ characters wide but JavaScript reports their length as 1. This can cause alignment issues.
-
-> **Tip:** If you experience alignment issues, try a different emoji. For example, 🔥 works well while ✅ may cause misalignment.
 
 ---
 
