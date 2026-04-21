@@ -139,12 +139,15 @@ class Chartscii {
         return chart.create();
     }
 
-    async animate(options: AnimationOptions = {}): Promise<void> {
-        const { duration = 1000, fps = 30, easing = 'easeOut', step } = options;
+    async animate(options: AnimationOptions & { frames: true }): Promise<string[]>;
+    async animate(options?: AnimationOptions): Promise<void>;
+    async animate(options: AnimationOptions = {}): Promise<string[] | void> {
+        const { duration = 1000, fps = 30, easing = 'easeOut', step, frames: returnFrames } = options;
         const easingFn = easings[easing];
 
         const output = this.create();
         const lineCount = output.split('\n').length;
+        const collectedFrames: string[] = [];
 
         // If step is provided, use step-based animation
         // Otherwise use fps-based animation
@@ -157,13 +160,17 @@ class Chartscii {
                 const progress = easingFn(t);
                 const frameOutput = this.createAt(progress);
 
-                if (i > 0) {
-                    process.stdout.write(`\x1b[${lineCount}A`);
-                }
-                process.stdout.write(frameOutput + '\n');
+                if (returnFrames) {
+                    collectedFrames.push(frameOutput);
+                } else {
+                    if (i > 0) {
+                        process.stdout.write(`\x1b[${lineCount}A`);
+                    }
+                    process.stdout.write(frameOutput + '\n');
 
-                if (i < steps) {
-                    await new Promise(resolve => setTimeout(resolve, frameTime));
+                    if (i < steps) {
+                        await new Promise(resolve => setTimeout(resolve, frameTime));
+                    }
                 }
             }
         } else {
@@ -175,15 +182,23 @@ class Chartscii {
                 const progress = easingFn(t);
                 const frameOutput = this.createAt(progress);
 
-                if (frame > 0) {
-                    process.stdout.write(`\x1b[${lineCount}A`);
-                }
-                process.stdout.write(frameOutput + '\n');
+                if (returnFrames) {
+                    collectedFrames.push(frameOutput);
+                } else {
+                    if (frame > 0) {
+                        process.stdout.write(`\x1b[${lineCount}A`);
+                    }
+                    process.stdout.write(frameOutput + '\n');
 
-                if (frame < totalFrames) {
-                    await new Promise(resolve => setTimeout(resolve, frameTime));
+                    if (frame < totalFrames) {
+                        await new Promise(resolve => setTimeout(resolve, frameTime));
+                    }
                 }
             }
+        }
+
+        if (returnFrames) {
+            return collectedFrames;
         }
     }
 }

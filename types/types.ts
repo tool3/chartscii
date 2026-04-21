@@ -126,4 +126,5 @@ export type AnimationOptions = {
     fps?: number;
     easing?: EasingFunction;
     step?: number;
+    frames?: boolean;
 }
