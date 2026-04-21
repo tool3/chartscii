@@ -6,10 +6,7 @@ describe('gradient', () => {
     test('should apply gradient colors to numeric data', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['red', 'yellow', 'green']
-            },
+            color: 'gradient(red,yellow,green)',
         });
         const output = chart.create();
 
@@ -23,11 +20,7 @@ describe('gradient', () => {
     test('should apply gradient with two colors', async () => {
         const data = [1, 2, 3, 4, 5, 6];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical'
-            },
+            color: 'gradient(cyan,pink:vertical)',
             width: 20
         });
         const output = chart.create();
@@ -44,10 +37,7 @@ describe('gradient', () => {
             30
         ];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['red', 'green']
-            },
+            color: 'gradient(red,green)',
         });
         const output = chart.create();
 
@@ -59,10 +49,7 @@ describe('gradient', () => {
     test('should work with vertical orientation', async () => {
         const data = [10, 20, 30, 40];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['red', 'yellow', 'green']
-            },
+            color: 'gradient(red,yellow,green)',
             orientation: 'vertical',
             height: 5,
         });
@@ -75,10 +62,7 @@ describe('gradient', () => {
     test('should handle single color gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['blue']
-            },
+            color: 'gradient(blue)',
         });
         const output = chart.create();
 
@@ -90,10 +74,7 @@ describe('gradient', () => {
     test('should work with sorted data', async () => {
         const data = [50, 10, 30, 20, 40];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['red', 'yellow', 'green']
-            },
+            color: 'gradient(red,yellow,green)',
             sort: true,
         });
         const output = chart.create();
@@ -107,12 +88,7 @@ describe('gradient', () => {
     test('should work with reversed data', async () => {
         const data = [10, 20, 30, 40, 50];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'purple'],
-                direction: 'horizontal',
-                reverse: true
-            },
+            color: 'gradient(cyan,purple:horizontal:reverse)',
             reverse: true,
         });
         const output = chart.create();
@@ -126,11 +102,7 @@ describe('gradient', () => {
     test('should reverse gradient direction with reverse option', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['#9982de', '#F8C8DC'],
-                reverse: true
-            },
+            color: 'gradient(#9982de,#F8C8DC:reverse)',
             barSize: 1,
             fill: '░',
             orientation: 'vertical',
@@ -146,12 +118,7 @@ describe('gradient', () => {
     test('should apply vertical gradient in vertical orientation', async () => {
         const data = [10, 20, 30, 40, 50];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical',
-                reverse: true
-            },
+            color: 'gradient(cyan,pink:vertical:reverse)',
             fill: '░',
             fillColor: 'auto',
             orientation: 'vertical',
@@ -168,10 +135,7 @@ describe('gradient', () => {
         const data = [1, 2, 3, 4, 5];
         // Beach theme has: red: '#fe4a49' (254, 74, 73), green: '#2ab7ca' (42, 183, 202)
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['red', 'green']
-            },
+            color: 'gradient(red,green)',
             theme: 'beach',
         });
         const output = chart.create();
@@ -186,10 +150,7 @@ describe('gradient', () => {
     test('should use default theme colors when no theme is set', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['red', 'green']
-            },
+            color: 'gradient(red,green)',
         });
         const output = chart.create();
 
@@ -206,10 +167,7 @@ describe('gradient', () => {
     test('should color all labels cyan for horizontal chart with horizontal gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink']
-            },
+            color: 'gradient(cyan,pink)',
             colorLabels: true,
         });
         const output = chart.create();
@@ -226,11 +184,7 @@ describe('gradient', () => {
     test('should color all labels pink for horizontal chart with horizontal gradient reversed', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                reverse: true
-            },
+            color: 'gradient(cyan,pink:reverse)',
             colorLabels: true,
         });
         const output = chart.create();
@@ -246,11 +200,7 @@ describe('gradient', () => {
     test('should color labels by bar position for horizontal chart with vertical gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical'
-            },
+            color: 'gradient(cyan,pink:vertical)',
             colorLabels: true,
         });
         const output = chart.create();
@@ -267,12 +217,7 @@ describe('gradient', () => {
     test('should color labels by bar position reversed for horizontal chart with vertical gradient reversed', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical',
-                reverse: true
-            },
+            color: 'gradient(cyan,pink:vertical:reverse)',
             colorLabels: true,
         });
         const output = chart.create();
@@ -289,11 +234,7 @@ describe('gradient', () => {
     test('should color all labels pink for vertical chart with vertical gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical'
-            },
+            color: 'gradient(cyan,pink:vertical)',
             colorLabels: true,
             orientation: 'vertical',
         });
@@ -310,12 +251,7 @@ describe('gradient', () => {
     test('should color all labels cyan for vertical chart with vertical gradient reversed', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical',
-                reverse: true
-            },
+            color: 'gradient(cyan,pink:vertical:reverse)',
             colorLabels: true,
             orientation: 'vertical',
         });
@@ -331,10 +267,7 @@ describe('gradient', () => {
     test('should color labels by bar position for vertical chart with horizontal gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink']
-            },
+            color: 'gradient(cyan,pink)',
             colorLabels: true,
             orientation: 'vertical',
         });
@@ -352,12 +285,15 @@ describe('gradient', () => {
     test('should color labels by bar position reversed for vertical chart with horizontal gradient reversed', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                reverse: true
-            },
+            color: 'gradient(cyan,pink:reverse)',
             colorLabels: true,
+            padding: 4,
+            title: {
+                text: 'chartscii gradient chart',
+                color: 'gradient',
+                align: 'center',
+                padding: [2, 0]
+            },
             orientation: 'vertical',
         });
         const output = chart.create();
@@ -377,10 +313,7 @@ describe('gradient', () => {
     test('should color value labels by actual bar end position for horizontal chart with horizontal gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink']
-            },
+            color: 'gradient(cyan,pink)',
             colorLabels: true,
             valueLabels: true,
         });
@@ -398,11 +331,7 @@ describe('gradient', () => {
     test('should color value labels by actual bar end position for horizontal chart with horizontal gradient reversed', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                reverse: true
-            },
+            color: 'gradient(cyan,pink:reverse)',
             colorLabels: true,
             valueLabels: true,
         });
@@ -417,11 +346,7 @@ describe('gradient', () => {
     test('should color value labels by bar position for horizontal chart with vertical gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical'
-            },
+            color: 'gradient(cyan,pink:vertical)',
             colorLabels: true,
             valueLabels: true,
             fill: '░',
@@ -441,11 +366,7 @@ describe('gradient', () => {
     test('should color value labels by actual bar top position for vertical chart with vertical gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical'
-            },
+            color: 'gradient(cyan,pink:vertical)',
             colorLabels: true,
             valueLabels: true,
             orientation: 'vertical',
@@ -461,12 +382,7 @@ describe('gradient', () => {
     test('should color value labels by actual bar top position for vertical chart with vertical gradient reversed', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink'],
-                direction: 'vertical',
-                reverse: true
-            },
+            color: 'gradient(cyan,pink:vertical:reverse)',
             colorLabels: true,
             valueLabels: true,
             orientation: 'vertical',
@@ -481,10 +397,7 @@ describe('gradient', () => {
     test('should color value labels by bar position for vertical chart with horizontal gradient', async () => {
         const data = [1, 2, 3, 4, 5];
         const chart = new Chartscii(data, {
-            color: {
-                type: 'gradient',
-                colors: ['cyan', 'pink']
-            },
+            color: 'gradient(cyan,pink)',
             title: 'gradient with fill with theme',
             colorLabels: true,
             valueLabels: true,
@@ -495,5 +408,181 @@ describe('gradient', () => {
         });
         const output = chart.create();
         await snap(output, 'gradient value labels vertical chart horizontal gradient');
+    });
+
+    // Gradient string syntax tests
+    describe('gradient string syntax', () => {
+        test('should parse simple gradient string', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(red,yellow,green)',
+            });
+            const output = chart.create();
+
+            // Should contain gradient RGB colors
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient string simple');
+        });
+
+        test('should parse gradient string with reverse option', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(cyan,pink:reverse)',
+            });
+            const output = chart.create();
+
+            // Should be reversed - first bar should have more pink, last more cyan
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient string reverse');
+        });
+
+        test('should parse gradient string with vertical direction', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(cyan,pink:vertical)',
+                colorLabels: true,
+            });
+            const output = chart.create();
+            const lines = output.split('\n');
+
+            // Vertical gradient: labels vary by bar index
+            expect(lines[1]).to.include('\x1b[38;2;0;255;255m1');
+            expect(lines[9]).to.include('\x1b[38;2;255;175;255m5');
+            await snap(output, 'gradient string vertical');
+        });
+
+        test('should parse gradient string with multiple options', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(cyan,pink:vertical:reverse)',
+                colorLabels: true,
+            });
+            const output = chart.create();
+            const lines = output.split('\n');
+
+            // Vertical + reverse: first label pink, last label cyan
+            expect(lines[1]).to.include('\x1b[38;2;255;175;255m1');
+            expect(lines[9]).to.include('\x1b[38;2;0;255;255m5');
+            await snap(output, 'gradient string vertical reverse');
+        });
+
+        test('should parse gradient string with hex colors', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(#FF0000,#00FF00)',
+            });
+            const output = chart.create();
+
+            // Should contain gradient RGB colors from hex
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient string hex colors');
+        });
+
+        test('should handle gradient string in vertical chart', async () => {
+            const data = [10, 20, 30, 40];
+            const chart = new Chartscii(data, {
+                color: 'gradient(red,yellow,green:vertical)',
+                orientation: 'vertical',
+                height: 5,
+            });
+            const output = chart.create();
+
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient string vertical chart');
+        });
+
+        test('should use gradient string with fill color auto', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(cyan,pink)',
+                fill: '░',
+                fillColor: 'auto',
+            });
+            const output = chart.create();
+
+            expect(output).to.include('\x1b[38;2;');
+            expect(output).to.include('░');
+            await snap(output, 'gradient string with fill');
+        });
+
+        test('should use gradient for title when color is gradient string', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(cyan,pink)',
+                title: {
+                    text: 'Gradient Title Test',
+                    color: 'gradient',
+                },
+            });
+            const output = chart.create();
+
+            // Title should have gradient colors
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient string title');
+        });
+
+        test('should parse gradient string with diagonal direction', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(cyan,pink:diagonal)',
+            });
+            const output = chart.create();
+
+            // Diagonal gradient should have varying colors
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient string diagonal');
+        });
+
+        test('should apply diagonal gradient to horizontal chart', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(red,blue:diagonal)',
+                colorLabels: true,
+            });
+            const output = chart.create();
+
+            // Diagonal combines horizontal and vertical positions
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient diagonal horizontal chart');
+        });
+
+        test('should apply diagonal gradient to vertical chart', async () => {
+            const data = [10, 20, 30, 40];
+            const chart = new Chartscii(data, {
+                color: 'gradient(green,purple:diagonal)',
+                orientation: 'vertical',
+                height: 5,
+            });
+            const output = chart.create();
+
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient diagonal vertical chart');
+        });
+
+        test('should apply diagonal gradient with fill', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(cyan,pink:diagonal)',
+                fill: '░',
+                fillColor: 'auto',
+            });
+            const output = chart.create();
+
+            expect(output).to.include('\x1b[38;2;');
+            expect(output).to.include('░');
+            await snap(output, 'gradient diagonal with fill');
+        });
+
+        test('should apply diagonal gradient with reverse', async () => {
+            const data = [1, 2, 3, 4, 5];
+            const chart = new Chartscii(data, {
+                color: 'gradient(cyan,pink:diagonal:reverse)',
+                colorLabels: true,
+            });
+            const output = chart.create();
+
+            expect(output).to.include('\x1b[38;2;');
+            await snap(output, 'gradient diagonal reverse');
+        });
     });
 });

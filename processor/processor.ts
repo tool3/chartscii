@@ -1,6 +1,6 @@
 import { InputData, ChartOptions, ChartData, InputPoint, StackedValue, ChartSegment, SegmentValue, Gradient } from '../types/types';
 import ChartValidator from '../validator/validator';
-import { isGradient, interpolateGradientColor } from '../utils/color';
+import { isGradientObject, interpolateGradientColor, normalizeColor } from '../utils/color';
 
 const AUTO_COLORS = [
     'red',
@@ -20,6 +20,10 @@ class ChartProcessor {
 
     constructor(options: ChartOptions) {
         this.validator = new ChartValidator(options);
+        // Normalize gradient strings in options
+        if (options.color) {
+            options.color = normalizeColor(options.color) as typeof options.color;
+        }
         this.options = options;
     }
 
@@ -28,7 +32,9 @@ class ChartProcessor {
     }
 
     isGradient(color: any): color is Gradient {
-        return isGradient(color);
+        // Normalize gradient strings before checking
+        const normalized = typeof color === 'string' ? normalizeColor(color) : color;
+        return isGradientObject(normalized);
     }
 
     interpolateGradient(gradient: Gradient, index: number, total: number): string {
@@ -107,11 +113,32 @@ class ChartProcessor {
             const value = this.getPointValue(point);
             const label = this.getPointLabel(point, value);
             const percentage = this.percentage(value, total);
-            const percentageLength = percentage ? percentage.toFixed(2).length + 5 : 0;
-            const maxLabelLength = this.options.percentage ? label.length + percentageLength : label.length;
+            const percentageLength = this.options.percentage ? (isNaN(percentage) ? 3 : percentage.toFixed(2).length) + 5 : 0;
+
+            // Calculate base label length (before labelFormat)
+            // Strip decorator markers (*bold*, %italic%, etc.) for accurate visual length
+            const visualLabel = this.options.richLabels !== false
+                ? label.replace(/([*~%!^@#$])(.+?)\1/g, '$2')
+                : label;
+            let baseLabelLength = this.options.percentage ? visualLabel.length + percentageLength : visualLabel.length;
+
+            // If labelFormat is provided, calculate how much extra length it adds
+            // by testing it on a sample label
+            if (this.options.labelFormat) {
+                const fullLabel = this.options.percentage ? `${label} (${percentage.toFixed(2)}%)` : label;
+                const formattedLabel = this.options.labelFormat(fullLabel);
+                // Strip ANSI codes for accurate length measurement
+                const strippedFormatted = formattedLabel.replace(/\x1b\[[0-9;]*m/g, '');
+                baseLabelLength = strippedFormatted.length;
+            }
 
             if (this.options.labels) {
-                this.options.max.label = Math.max(maxLabelLength, this.options.max.label);
+                // Use _maxLabel if provided (for animation consistency), otherwise calculate
+                if (this.options._maxLabel !== undefined) {
+                    this.options.max.label = this.options._maxLabel;
+                } else {
+                    this.options.max.label = Math.max(baseLabelLength, this.options.max.label);
+                }
             }
 
             this.options.max.scaled = Math.max(this.scale(value), this.options.max.scaled);

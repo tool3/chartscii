@@ -110,53 +110,51 @@ class HorizontalChartFormatter extends ChartFormatter {
         const color = ctx.point.color || this.options.color || '';
         const barChars = this.options.char?.repeat(repeat);
         const totalBars = ctx.chart.length;
-        const maxBarLength = Math.max(...ctx.chart.map(p => Math.floor(p.scaled / this.options.char.length)));
+        const currentMaxBarLength = Math.max(...ctx.chart.map(p => Math.floor(p.scaled / this.options.char.length)));
+        // Use final max bar length if available (for animation), otherwise use current
+        const finalMaxBarLength = this.options._finalMaxBarLength ?? currentMaxBarLength;
 
-        // Calculate bar end position for value label coloring (0-1 scale relative to max bar)
-        const barEndPosition = maxBarLength > 1 ? (repeat - 1) / (maxBarLength - 1) : 0;
+        // Calculate bar end position for value label coloring (0-1 scale relative to final max bar)
+        const barEndPosition = finalMaxBarLength > 1 ? (repeat - 1) / (finalMaxBarLength - 1) : 0;
 
         if (this.isGradient(color)) {
-            const gradient = color;
+            const gradient = this.normalizeGradient(color) as Gradient;
             const direction = gradient.direction || 'horizontal';
             const reverse = gradient.reverse || false;
 
-            // Calculate the last bar color for auto fillColor
-            let lastBarColorRgb: string | undefined;
-            if (this.options.fillColor === 'auto') {
-                let lastPosition: number;
-                if (direction === 'vertical') {
-                    const totalChars = maxBarLength * totalBars;
-                    const lastCharIndex = ctx.index * maxBarLength + (repeat - 1);
-                    lastPosition = totalChars > 1 ? lastCharIndex / (totalChars - 1) : 0;
-                } else {
-                    lastPosition = barEndPosition;
-                }
-                if (reverse) lastPosition = 1 - lastPosition;
-                const [r, g, b] = this.getColorAtPosition(gradient, lastPosition);
-                lastBarColorRgb = `${r};${g};${b}`;
-            }
+            // For gradient fill, apply gradient to fill characters based on their final positions
+            const fill = this.options.fillColor === 'auto'
+                ? this.formatGradientFill(ctx.point, gradient, ctx.index, totalBars, finalMaxBarLength, repeat)
+                : this.formatFill(ctx.point);
 
-            const fill = this.formatFill(ctx.point, lastBarColorRgb);
-
-            if (direction === 'vertical') {
-                const totalChars = maxBarLength * totalBars;
+            // For vertical/diagonal gradients on horizontal charts, we need per-character coloring
+            // based on a global index that spans all bars
+            if (direction === 'vertical' || direction === 'diagonal') {
+                const totalChars = finalMaxBarLength * totalBars;
                 const chars = [...barChars];
                 let result = '';
                 for (let i = 0; i < chars.length; i++) {
-                    const globalCharIndex = ctx.index * maxBarLength + i;
-                    let position = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;
+                    const globalCharIndex = ctx.index * finalMaxBarLength + i;
+                    let position: number;
+                    if (direction === 'diagonal') {
+                        const hPos = finalMaxBarLength > 1 ? i / (finalMaxBarLength - 1) : 0;
+                        const vPos = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;
+                        position = (hPos + vPos) / 2;
+                    } else {
+                        position = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;
+                    }
                     if (reverse) position = 1 - position;
                     const [r, g, b] = this.getColorAtPosition(gradient, position);
                     result += `\x1b[38;2;${r};${g};${b}m${chars[i]}\x1b[39m`;
                 }
                 const barContent = result + fill;
                 return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, undefined, barEndPosition);
-            } else {
-                const totalChars = maxBarLength;
-                const coloredBar = this.applyGradientWithContext(barChars, gradient, 0, totalChars, ctx.index, totalBars);
-                const barContent = coloredBar + fill;
-                return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, undefined, barEndPosition);
             }
+
+            // Horizontal gradient uses applyGradientWithContext
+            const coloredBar = this.applyGradientWithContext(barChars, gradient, 0, finalMaxBarLength, ctx.index, totalBars);
+            const barContent = coloredBar + fill;
+            return this.scaleBar(barContent, ctx.point, label, ctx.barSize, ctx.padding, ctx.index, totalBars, undefined, barEndPosition);
         }
 
         const fill = this.formatFill(ctx.point);
@@ -237,8 +235,20 @@ class HorizontalChartFormatter extends ChartFormatter {
 
         let lineContent: string;
         if (shouldShowValue) {
-            const pointColor = point.color || this.options.color;
-            const valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, barEndPosition);
+            // If fill is present with fillColor, value labels should follow fillColor
+            let valueLabelColor: string | undefined;
+            if (this.options.fill && this.options.fillColor) {
+                if (this.options.fillColor === 'auto') {
+                    // Fill with auto color follows the gradient to the end, so value label should use end position
+                    const pointColor = point.color || this.options.color;
+                    valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, 1);
+                } else {
+                    valueLabelColor = this.options.fillColor;
+                }
+            } else {
+                const pointColor = point.color || this.options.color;
+                valueLabelColor = this.getValueLabelColorForBar(pointColor, barIndex, totalBars, barEndPosition);
+            }
             const coloredValueLabel = valueLabelColor ? this.colorify(valueLabel, valueLabelColor) : valueLabel;
             lineContent = barContent + this.pad(1) + coloredValueLabel;
         } else {
@@ -259,13 +269,16 @@ class HorizontalChartFormatter extends ChartFormatter {
         if (!this.options.fill) return '';
 
         const diff = this.options.width - point.scaled;
+        const fillLength = this.options.fill.length;
         let fillStr = '';
 
         if (this.options.scale) {
             const width = Math.floor(this.options.width - Math.floor(point.scaled));
-            fillStr = width > 0 ? this.options.fill.repeat(width) : '';
+            const fillCount = Math.floor(width / fillLength);
+            fillStr = fillCount > 0 ? this.options.fill.repeat(fillCount) : '';
         } else {
-            fillStr = diff > 0 ? this.options.fill.repeat(diff / this.options.fill.length) : '';
+            const fillCount = Math.floor(diff / fillLength);
+            fillStr = fillCount > 0 ? this.options.fill.repeat(fillCount) : '';
         }
 
         if (!fillStr) return '';
@@ -287,9 +300,58 @@ class HorizontalChartFormatter extends ChartFormatter {
         return fillStr;
     }
 
+    private formatGradientFill(point: ChartPoint, gradient: Gradient, barIndex: number, totalBars: number, finalMaxBarLength: number, currentBarLength: number): string {
+        if (!this.options.fill) return '';
+
+        const diff = this.options.width - point.scaled;
+        const fillLength = this.options.fill.length;
+        let fillCount = 0;
+
+        if (this.options.scale) {
+            const width = Math.floor(this.options.width - Math.floor(point.scaled));
+            fillCount = Math.floor(width / fillLength);
+        } else {
+            fillCount = Math.floor(diff / fillLength);
+        }
+
+        if (fillCount <= 0) return '';
+
+        const direction = gradient.direction || 'horizontal';
+        const reverse = gradient.reverse || false;
+
+        // Apply gradient to each fill character based on its FINAL position
+        let result = '';
+        for (let i = 0; i < fillCount; i++) {
+            // Calculate position as if this fill char were part of the final bar
+            const charIndexInBar = Math.floor(currentBarLength) + i;
+            let position: number;
+            if (direction === 'vertical') {
+                const totalChars = finalMaxBarLength * totalBars;
+                const globalCharIndex = barIndex * finalMaxBarLength + charIndexInBar;
+                position = totalChars > 1 ? globalCharIndex / (totalChars - 1) : 0;
+            } else if (direction === 'diagonal') {
+                // Diagonal: combine horizontal position with bar index
+                const hPos = finalMaxBarLength > 1 ? charIndexInBar / (finalMaxBarLength - 1) : 0;
+                const vPos = totalBars > 1 ? barIndex / (totalBars - 1) : 0;
+                position = (hPos + vPos) / 2;
+            } else {
+                // Horizontal: position based on char position within the final bar width
+                position = finalMaxBarLength > 1 ? charIndexInBar / (finalMaxBarLength - 1) : 0;
+            }
+            if (reverse) position = 1 - position;
+            const [r, g, b] = this.getColorAtPosition(gradient, position);
+            result += `\x1b[38;2;${r};${g};${b}m${this.options.fill}\x1b[39m`;
+        }
+
+        return result;
+    }
+
     private formatLabel(point: ChartPoint, key: string, barIndex: number, totalBars: number): string {
         const percentage = this.formatPercentage(point);
-        const label = percentage ? `${point.label} ${percentage}` : point.label;
+        const baseLabel = percentage ? `${point.label} ${percentage}` : point.label;
+        // Apply labelFormat if provided, then rich text decorators
+        const formatted = this.options.labelFormat ? this.options.labelFormat(baseLabel) : baseLabel;
+        const label = this.applyDecorators(formatted);
         const space = this.formatLabelSpace(label);
 
         if (!this.options.labels) {
@@ -306,7 +368,7 @@ class HorizontalChartFormatter extends ChartFormatter {
         if (!this.options.max.label) return '';
 
         const addOne = this.offsetPercentage();
-        const space = this.options.max.label - label.length + addOne;
+        const space = this.options.max.label - this.stripStyle(label).length + addOne;
         return this.pad(space);
     }
 

@@ -43,6 +43,7 @@
   "license": "MIT",
   "sideEffects": false,
   "devDependencies": {
+    "shellfie": "file:../shellfie",
     "snaptdout": "^2.1.0",
     "ts-node": "10.9.2",
     "typescript": "5.4.5",

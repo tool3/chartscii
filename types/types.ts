@@ -30,7 +30,6 @@ type BaseOptions = {
     percentage?: boolean;
     colorLabels?: boolean;
     valueLabels?: boolean;
-    valueLabelsPrefix?: string;
     valueLabelsFloatingPoint?: number;
     reverse?: boolean;
     naked?: boolean;
@@ -50,6 +49,16 @@ type BaseOptions = {
     stackColors?: string[];
     stackLabels?: string[];
     stackValueLabels?: boolean;
+    /** Format function for labels */
+    labelFormat?: (label: string) => string;
+    /** Format function for value labels */
+    valueLabelFormat?: (value: string) => string;
+    /** Enable styl3 rich text decorators in labels (*bold*, %italic%, !underline!, @invert@) */
+    richLabels?: boolean;
+    /** @internal Used to preserve label width during animation */
+    _maxLabel?: number;
+    /** @internal Used to preserve max bar length for gradient fill during animation */
+    _finalMaxBarLength?: number;
 }
 
 type VerticalChartOptions = BaseOptions & {
@@ -80,13 +89,13 @@ export type StackedValue = number[] | SegmentValue[];
 export type Gradient = {
     type: 'gradient';
     colors: string[];
-    direction?: 'horizontal' | 'vertical';
+    direction?: 'horizontal' | 'vertical' | 'diagonal';
     reverse?: boolean;
 }
 
 export type InputPoint = {
     value: number | StackedValue;
-    color?: string | string[] | Gradient;
+    color?: string | string[];
     label?: string;
 }
 
@@ -109,3 +118,12 @@ export type ChartPoint = {
 export type InputData = InputPoint | number;
 export type ChartData = Map<string, ChartPoint>
 export type ChartOutput = Map<string, string>
+
+export type EasingFunction = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
+
+export type AnimationOptions = {
+    duration?: number;
+    fps?: number;
+    easing?: EasingFunction;
+    step?: number;
+}

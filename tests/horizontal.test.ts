@@ -152,9 +152,9 @@ describe('horizontal', () => {
         await snap(chart.create(), 'value labels no fill');
     });
 
-    test('should support prefix for value labels', async () => {
+    test('should support valueLabelFormat for value labels', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '#', color: 'red', padding: 2, colorLabels: true });
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelFormat: (v) => `#${v}`, color: 'red', padding: 2, colorLabels: true });
         await snap(chart.create(), 'value labels prefix');
     });
 
@@ -164,7 +164,7 @@ describe('horizontal', () => {
             const color = colors[i];
             data.push({ value: i + 1.3413413413, color, label: `*bold ${i}*` });
         }
-        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '$', valueLabelsFloatingPoint: 4, color: 'red', padding: 2, colorLabels: true });
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelFormat: (v) => `$${v}`, valueLabelsFloatingPoint: 4, color: 'red', padding: 2, colorLabels: true });
         await snap(chart.create(), 'value labels floating point');
     });
 });

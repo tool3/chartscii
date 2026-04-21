@@ -26,7 +26,7 @@ function generateChartData() {
     return data;
 }
 
-describe('vertical', () => {
+describe.only('vertical', () => {
     test('should support vertical orientation', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { width: 100, color: 'pink', colorLabels: true, orientation: 'vertical', });
@@ -148,9 +148,9 @@ describe('vertical', () => {
         await snap(chart.create(), 'value labels vertical no fill');
     });
 
-    test('should support prefix for value labels', async () => {
+    test('should support valueLabelFormat for value labels', async () => {
         const data = generateChartData();
-        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '#', color: 'red', padding: 2, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelFormat: (v) => `#${v}`, color: 'red', padding: 2, colorLabels: true, orientation: 'vertical' });
         await snap(chart.create(), 'value labels prefix vertical');
     });
 
@@ -160,7 +160,7 @@ describe('vertical', () => {
             const color = colors[i];
             data.push({ value: i + 1.3413413413, color, label: `*bold ${i}*` });
         }
-        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelsPrefix: '$', valueLabelsFloatingPoint: 3, color: 'red', padding: 2, colorLabels: true, orientation: 'vertical' });
+        const chart = new Chartscii(data, { width: 80, theme: 'pastel', valueLabels: true, valueLabelFormat: (v) => `$${v}`, valueLabelsFloatingPoint: 3, color: 'red', padding: 2, colorLabels: true, orientation: 'vertical' });
         await snap(chart.create(), 'value labels floating point vertical ');
     });
 });
