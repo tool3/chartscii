@@ -117,17 +117,16 @@ const chart = new Chartscii(data, { colorLabels: true, valueLabels: true });
 | `naked`                    | `boolean`               | `false`        | Hide borders                                         |
 | `labels`                   | `boolean`               | `true`         | Show bar labels                                      |
 | `colorLabels`              | `boolean`               | `true`         | Color the labels                                     |
-| `valueLabels`              | `boolean`               | `false`        | Show values on bars                                  |
+| `valueLabels`              | `boolean`               | `false`        | Show values on bars (segment values for stacked)     |
 | `valueLabelsFloatingPoint` | `number`                | —              | Decimal precision                                    |
 | `labelFormat`              | `function`              | —              | Custom label formatter                               |
-| `valueLabelFormat`         | `function`              | —              | Custom value label formatter                         |
+| `valueLabelFormat`         | `(values: string[]) => string` | —       | Custom value label formatter                         |
 | `percentage`               | `boolean`               | `false`        | Show percentages                                     |
 | `sort`                     | `boolean`               | `false`        | Sort ascending                                       |
 | `reverse`                  | `boolean`               | `false`        | Reverse order                                        |
 | `scale`                    | `string \| number`      | `'auto'`       | `'auto'`, `'relative'`, `'relative-zero'`, or number |
 | `stackColors`              | `string[]`              | —              | Stacked segment colors                               |
 | `stackLabels`              | `string[]`              | —              | Stacked segment labels                               |
-| `stackValueLabels`         | `boolean`               | `false`        | Show segment values                                  |
 | `richLabels`               | `boolean`               | `true`         | Enable styl3 rich text decorators in labels           |
 | `structure`                | `object`                | —              | Custom border characters                             |
 
