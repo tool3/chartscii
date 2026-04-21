@@ -99,10 +99,21 @@ abstract class ChartFormatter {
             ? value.toFixed(this.options.valueLabelsFloatingPoint)
             : String(value);
 
-        // Apply valueLabelFormat if provided
         return this.options.valueLabelFormat
-            ? this.options.valueLabelFormat(formattedValue)
+            ? this.options.valueLabelFormat([formattedValue])
             : formattedValue;
+    }
+
+    protected formatStackedValueLabel(segments: { value: number }[]): string {
+        const values = segments.map(s => {
+            return this.options.valueLabelsFloatingPoint !== undefined
+                ? s.value.toFixed(this.options.valueLabelsFloatingPoint)
+                : String(s.value);
+        });
+
+        return this.options.valueLabelFormat
+            ? this.options.valueLabelFormat(values)
+            : values.join('|');
     }
 
     protected formatPercentage(point: ChartPoint): string {

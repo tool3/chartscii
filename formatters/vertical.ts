@@ -48,7 +48,7 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private getMaxHeight(): number {
-        return this.options.height + ((this.options.valueLabels && !this.options.fill) ? 1 : 0);
+        return this.options.height + (((this.options.valueLabels || this.options.stackValueLabels) && !this.options.fill) ? 1 : 0);
     }
 
     private isLongChar(): boolean {
@@ -133,7 +133,7 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private getCellContent(ctx: ColumnContext, row: number, barStartRow: number): string {
-        const isValueLabelRow = row === barStartRow - 1 && this.options.valueLabels && !this.options.fill;
+        const isValueLabelRow = row === barStartRow - 1 && (this.options.valueLabels || this.options.stackValueLabels) && !this.options.fill;
         const isAboveBar = row < barStartRow;
         const isBarRow = row >= barStartRow;
 
@@ -250,7 +250,7 @@ class VerticalChartFormatter extends ChartFormatter {
 
     private addValueLabelIfNeeded(ctx: ColumnContext, totalHeight: number): void {
         const emptyStartRow = ctx.maxHeight - totalHeight - 1;
-        const shouldShowLabel = this.options.valueLabels && !this.options.fill && emptyStartRow >= 0;
+        const shouldShowLabel = (this.options.valueLabels || this.options.stackValueLabels) && !this.options.fill && emptyStartRow >= 0;
 
         if (shouldShowLabel) {
             ctx.verticalChart[emptyStartRow][ctx.index] = this.formatValueLabelCell(ctx.point, ctx.barSize, ctx.padding, ctx.index, ctx.chart.length, ctx.chart, ctx.maxHeight);
@@ -363,7 +363,9 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private formatValueLabel(point: ChartPoint, barIndex: number, totalBars: number, chart?: ChartPoint[], maxHeight?: number): string {
-        const value = this.formatValueWithDecimals(point.value);
+        const value = point.segments
+            ? this.formatStackedValueLabel(point.segments)
+            : this.formatValueWithDecimals(point.value);
 
         if (!this.options.colorLabels) return value;
 
@@ -480,7 +482,7 @@ class VerticalChartFormatter extends ChartFormatter {
     }
 
     private buildValueLabelsHeader(chart: ChartPoint[], barSize: number, padding: number, maxHeight: number): string[] {
-        if (!this.options.valueLabels || !this.options.fill) return [];
+        if (!(this.options.valueLabels || this.options.stackValueLabels) || !this.options.fill) return [];
         return [this.formatValueLabels(chart, barSize, padding, maxHeight)];
     }
 
