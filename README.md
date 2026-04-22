@@ -76,7 +76,7 @@ const data = [
 ### Stacked Chart Points
 
 ```typescript
-const data = [ 
+const data = [
   { label: "Jan", value: [25, 25, 50], color: ["green", "yellow", "red"] },
   { label: "Feb", value: [22, 68, 10], color: ["green", "yellow", "red"] },
   { label: "Mar", value: [40, 10, 50], color: ["green", "yellow", "red"] },
@@ -90,8 +90,27 @@ const chart = new Chartscii(data, { colorLabels: true, valueLabels: true });
 | Property | Type                   | Description                         |
 | -------- | ---------------------- | ----------------------------------- |
 | `label`  | `string`               | Bar label (defaults to value)       |
-| `value`  | `number` or `array`    | Bar value or array for stacked bars |
+| `value`  | `number` or `number[]` | Bar value or array for stacked bars |
 | `color`  | `string` or `string[]` | Bar color or per-segment colors     |
+
+---
+
+## API
+
+```typescript
+const chart = new Chartscii(data: InputData[], options?: ChartOptions);
+chart.create(); // returns the chart as a string
+```
+
+```typescript
+type InputData =
+  | number
+  | {
+      value: number | number[] | { value: number; color?: string }[];
+      label?: string;
+      color?: string | string[];
+    };
+```
 
 ---
 
@@ -100,35 +119,35 @@ const chart = new Chartscii(data, { colorLabels: true, valueLabels: true });
 <details>
 <summary><strong>All Options</strong></summary>
 
-| Option                     | Type                    | Default        | Description                                          |
-| -------------------------- | ----------------------- | -------------- | ---------------------------------------------------- |
-| `width`                    | `number`                | `100`          | Chart width in characters                            |
-| `height`                   | `number`                | `10`           | Chart height in lines                                |
-| `padding`                  | `number`                | `0`            | Space between bars                                   |
-| `barSize`                  | `number`                | `1`            | Thickness of each bar                                |
-| `orientation`              | `string`                | `'horizontal'` | `'horizontal'` or `'vertical'`                       |
-| `alignBars`                | `string`                | `'justify'`    | Bar alignment                                        |
-| `title`                    | `string \| TitleConfig` | `''`           | Chart title                                          |
-| `char`                     | `string`                | `'█'`          | Character used for bars                              |
-| `fill`                     | `string`                | —              | Fill character for empty space                       |
-| `fillColor`                | `string`                | —              | Fill color or `'auto'`                               |
-| `color`                    | `string`                | —              | Bar color, gradient string, or `'auto'`              |
-| `theme`                    | `string`                | `''`           | Theme name from styl3                                |
-| `naked`                    | `boolean`               | `false`        | Hide borders                                         |
-| `labels`                   | `boolean`               | `true`         | Show bar labels                                      |
-| `colorLabels`              | `boolean`               | `true`         | Color the labels                                     |
-| `valueLabels`              | `boolean`               | `false`        | Show values on bars (segment values for stacked)     |
-| `valueLabelsFloatingPoint` | `number`                | —              | Decimal precision                                    |
-| `labelFormat`              | `function`              | —              | Custom label formatter                               |
-| `valueLabelFormat`         | `(values: string[]) => string` | —       | Custom value label formatter                         |
-| `percentage`               | `boolean`               | `false`        | Show percentages                                     |
-| `sort`                     | `boolean`               | `false`        | Sort ascending                                       |
-| `reverse`                  | `boolean`               | `false`        | Reverse order                                        |
-| `scale`                    | `string \| number`      | `'auto'`       | `'auto'`, `'relative'`, `'relative-zero'`, or number |
-| `stackColors`              | `string[]`              | —              | Stacked segment colors                               |
-| `stackLabels`              | `string[]`              | —              | Stacked segment labels                               |
-| `richLabels`               | `boolean`               | `true`         | Enable styl3 rich text decorators in labels           |
-| `structure`                | `object`                | —              | Custom border characters                             |
+| Option                     | Type                           | Default        | Description                                          |
+| -------------------------- | ------------------------------ | -------------- | ---------------------------------------------------- |
+| `width`                    | `number`                       | `100`          | Chart width in characters                            |
+| `height`                   | `number`                       | `10`           | Chart height in lines                                |
+| `padding`                  | `number`                       | `0`            | Space between bars                                   |
+| `barSize`                  | `number`                       | `1`            | Thickness of each bar                                |
+| `orientation`              | `string`                       | `'horizontal'` | `'horizontal'` or `'vertical'`                       |
+| `alignBars`                | `string`                       | `'justify'`    | Bar alignment                                        |
+| `title`                    | `string \| TitleConfig`        | `''`           | Chart title                                          |
+| `char`                     | `string`                       | `'█'`          | Character used for bars                              |
+| `fill`                     | `string`                       | —              | Fill character for empty space                       |
+| `fillColor`                | `string`                       | —              | Fill color or `'auto'`                               |
+| `color`                    | `string`                       | —              | Bar color, gradient string, or `'auto'`              |
+| `theme`                    | `string`                       | `''`           | Theme name from styl3                                |
+| `naked`                    | `boolean`                      | `false`        | Hide structure characters                            |
+| `labels`                   | `boolean`                      | `true`         | Show bar labels                                      |
+| `colorLabels`              | `boolean`                      | `true`         | Color the labels                                     |
+| `valueLabels`              | `boolean`                      | `false`        | Show values on bars (segment values for stacked)     |
+| `valueLabelsFloatingPoint` | `number`                       | —              | Decimal precision                                    |
+| `labelFormat`              | `function`                     | —              | Custom label formatter                               |
+| `valueLabelFormat`         | `(values: string[]) => string` | —              | Custom value label formatter                         |
+| `percentage`               | `boolean`                      | `false`        | Show percentages                                     |
+| `sort`                     | `boolean`                      | `false`        | Sort ascending                                       |
+| `reverse`                  | `boolean`                      | `false`        | Reverse order                                        |
+| `scale`                    | `string \| number`             | `'auto'`       | `'auto'`, `'relative'`, `'relative-zero'`, or number |
+| `stackColors`              | `string[]`                     | —              | Stacked segment colors                               |
+| `stackLabels`              | `string[]`                     | —              | Stacked segment labels                               |
+| `richLabels`               | `boolean`                      | `true`         | Enable styl3 rich text decorators in labels          |
+| `structure`                | `object`                       | —              | Custom border characters                             |
 
 </details>
 
@@ -159,26 +178,8 @@ structure: {
 
 </details>
 
----
-
-## API
-
-```typescript
-const chart = new Chartscii(data: InputData[], options?: ChartOptions);
-chart.create(); // returns the chart as a string
-```
-
-```typescript
-type InputData =
-  | number
-  | {
-      value: number | number[] | { value: number; color?: string }[];
-      label?: string;
-      color?: string | string[];
-    };
-```
-
 # Examples and features
+
 ## Auto Color
 
 Automatically cycle through a curated color palette — no manual color assignments needed.
@@ -254,18 +255,17 @@ color: "gradient(purple,cyan:vertical:reverse)";
 
 ```typescript
 const chart = new Chartscii(data, {
-    orientation: 'vertical',
-    barSize: 10,
-    sort: false,
-    fill: '▒',
-    fillColor: 'auto',
-    colorLabels: true,
-    color: 'gradient(pink,cyan:reverse)',
-    theme: 'pinkish',
-    percentage: true,
-    labels: true
+  orientation: "vertical",
+  barSize: 10,
+  sort: false,
+  fill: "▒",
+  fillColor: "auto",
+  colorLabels: true,
+  color: "gradient(pink,cyan:reverse)",
+  theme: "pinkish",
+  percentage: true,
+  labels: true,
 });
-
 ```
 
 ![](examples/svgs/gradient-reverse.svg)
@@ -277,6 +277,7 @@ const chart = new Chartscii(data, {
 Visualize multi-dimensional data with stacked segments.
 
 ### Vertical
+
 ```typescript
 const data: InputData[] = [
   { label: "Mon", value: [5, 10, 5] },
@@ -319,32 +320,35 @@ const chart = new Chartscii(data, {
 ![](examples/svgs/stacked-horizontal.svg)
 
 ### Stacked label format
+
 Stacked charts can use the same `valueLabelFormat` that will now receive an array of labels (per value)
+
 ```typescript
 const data: InputData[] = [
-    { label: 'Jan', value: [2, 8] },
-    { label: 'Feb', value: [1, 9] },
-    { label: 'Mar', value: [3, 7] },
-    { label: 'Apr', value: [6, 4] },
-    { label: 'May', value: [3, 7] },
-    { label: 'Jun', value: [9, 1] },
-    { label: 'Jul', value: [4, 6] },
+  { label: "Jan", value: [2, 8] },
+  { label: "Feb", value: [1, 9] },
+  { label: "Mar", value: [3, 7] },
+  { label: "Apr", value: [6, 4] },
+  { label: "May", value: [3, 7] },
+  { label: "Jun", value: [9, 1] },
+  { label: "Jul", value: [4, 6] },
 ];
 const chart = new Chartscii(data, {
-    barSize: 2,
-    width: 60,
-    padding: 2,
-    alignBars: 'justify',
-    color: 'gradient(#72cac6,#CA7276)',
-    valueLabels: true,
-    valueLabelFormat: (values) => values.map(v => Number(v) / 10).join(' / '),
-    stackColors: ['#72cac6', '#CA7276'],
+  barSize: 2,
+  width: 60,
+  padding: 2,
+  alignBars: "justify",
+  color: "gradient(#72cac6,#CA7276)",
+  valueLabels: true,
+  valueLabelFormat: (values) => values.map((v) => Number(v) / 10).join(" / "),
+  stackColors: ["#72cac6", "#CA7276"],
 });
 ```
 
 ![](examples/svgs/stacked-format.svg)
 
 ## Auto stacked
+
 Stacked charts also support auto colors.
 
 ```typescript
@@ -441,7 +445,7 @@ const chart = new Chartscii(data, {
 
 ## Orientation & Alignment
 
-### Horizontal
+### Horizontal bar alignment
 
 ```typescript
 const chart = new Chartscii(data, {
@@ -458,7 +462,7 @@ const chart = new Chartscii(data, {
 | -------------------------------- | ----------------------------------- | ----------------------------------- | ------------------------------------ |
 | ![](examples/svgs/align-top.svg) | ![](examples/svgs/align-bottom.svg) | ![](examples/svgs/align-center.svg) | ![](examples/svgs/align-justify.svg) |
 
-### Vertical
+### Vertical bar alignment
 
 ```typescript
 const chart = new Chartscii(data, {
@@ -476,6 +480,32 @@ const chart = new Chartscii(data, {
 | ----------------------------------- | ------------------------------------ | ------------------------------------- | -------------------------------------- |
 | ![](examples/svgs/align-v-left.svg) | ![](examples/svgs/align-v-right.svg) | ![](examples/svgs/align-v-center.svg) | ![](examples/svgs/align-v-justify.svg) |
 
+### Title alignment
+```typescript
+const data = Array.from({ length: 10 }, (_, i) => i + 1);
+
+const chart = new Chartscii(data, {
+    orientation: 'vertical',
+    title: {
+        text: 'Aligned',
+        align: 'right', // center | left | right
+        padding: [2, 0], // css padding syntax: [topBottm, leftRight] | [top, right, bottom, left] | number
+        color: 'gradient', // can follow gradient with 'gradient' or provide it's own gradient (grdient(blue, pink))
+    },
+    width: 80,
+    padding: 1,
+    barSize: 1,
+    color: 'gradient(cyan, purple)',
+    fill: '▒',
+    fillColor: 'auto',
+    theme: 'pastel',
+    alignBars: 'justify',
+});
+```
+
+| left                                | center                                | right                                |
+| ----------------------------------- | ------------------------------------ | ------------------------------------- |
+| ![](examples/svgs/align-title-left.svg) | ![](examples/svgs/align-title.svg) | ![](examples/svgs/align-title-right.svg) |
 ---
 
 ## Animation
