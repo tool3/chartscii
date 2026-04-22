@@ -276,6 +276,7 @@ const chart = new Chartscii(data, {
 
 Visualize multi-dimensional data with stacked segments.
 
+### Vertical
 ```typescript
 const data: InputData[] = [
   { label: "Mon", value: [5, 10, 5] },
@@ -300,7 +301,7 @@ const chart = new Chartscii(data, {
 
 ![](examples/svgs/stacked.svg)
 
-### Vertical Horizontal
+### Horizontal
 
 ```typescript
 const chart = new Chartscii(data, {
@@ -316,6 +317,32 @@ const chart = new Chartscii(data, {
 ```
 
 ![](examples/svgs/stacked-horizontal.svg)
+
+### Stacked label format
+Stacked charts can use the same `valueLabelFormat` that will now receive an array of labels (per value)
+```typescript
+const data: InputData[] = [
+    { label: 'Jan', value: [2, 8] },
+    { label: 'Feb', value: [1, 9] },
+    { label: 'Mar', value: [3, 7] },
+    { label: 'Apr', value: [6, 4] },
+    { label: 'May', value: [3, 7] },
+    { label: 'Jun', value: [9, 1] },
+    { label: 'Jul', value: [4, 6] },
+];
+const chart = new Chartscii(data, {
+    barSize: 2,
+    width: 60,
+    padding: 2,
+    alignBars: 'justify',
+    color: 'gradient(#72cac6,#CA7276)',
+    valueLabels: true,
+    valueLabelFormat: (values) => values.map(v => Number(v) / 10).join(' / '),
+    stackColors: ['#72cac6', '#CA7276'],
+});
+```
+
+![](examples/svgs/stacked-format.svg)
 
 ## Auto stacked
 Stacked charts also support auto colors.

@@ -140,6 +140,10 @@ abstract class ChartFormatter {
             if (normalizedColor.match(/[0-9]/)) {
                 return this.colors.ansi(normalizedColor)`${txt}`;
             }
+            if (!this.options.richLabels) {
+                const ansiCode = this.colors.colors[normalizedColor];
+                if (ansiCode) return `${ansiCode}${txt}${this.colors.colors.reset}`;
+            }
             return this.colors[normalizedColor]`${txt}`;
         }
         return txt;
