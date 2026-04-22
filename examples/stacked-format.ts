@@ -5,25 +5,23 @@ import { InputData } from '../types/types';
 
 
 const data: InputData[] = [
-    { label: 'Mon', value: [5, 10, 5] },
-    { label: 'Tue', value: [7, 3, 10] },
-    { label: 'Wed', value: [10, 6, 4] },
-    { label: 'Thu', value: [3, 6, 11] },
-    { label: 'Fri', value: [8, 6, 6] },
-    { label: 'Sat', value: [11, 5, 4] },
-    { label: 'Sun', value: [9, 6, 5] },
+    { label: 'Jan', value: [2, 8] },
+    { label: 'Feb', value: [1, 9] },
+    { label: 'Mar', value: [3, 7] },
+    { label: 'Apr', value: [6, 4] },
+    { label: 'May', value: [3, 7] },
+    { label: 'Jun', value: [9, 1] },
+    { label: 'Jul', value: [4, 6] },
 ];
 const chart = new Chartscii(data, {
     barSize: 2,
     width: 60,
-    padding: 5,
-    theme: 'pastel',
+    padding: 2,
     alignBars: 'justify',
-    orientation: 'vertical',
-    color: 'red',
+    color: 'gradient(#72cac6,#CA7276)',
     valueLabels: true,
-    valueLabelFormat: (values) => values.join('+'),
-    stackColors: ['red', 'orange', 'yellow'],
+    valueLabelFormat: (values) => values.map(v => Number(v) / 10).join(' / '),
+    stackColors: ['#72cac6', '#CA7276'],
 });
 
 const charts = chart.create();

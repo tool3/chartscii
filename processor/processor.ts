@@ -116,9 +116,11 @@ class ChartProcessor {
             const percentageLength = this.options.percentage ? (isNaN(percentage) ? 3 : percentage.toFixed(2).length) + 5 : 0;
 
             // Calculate base label length (before labelFormat)
-            // Strip decorator markers (*bold*, %italic%, etc.) for accurate visual length
+            // When richLabels is enabled, decorator markers (*bold*, etc.) become invisible ANSI codes,
+            // so strip them for accurate visual length measurement
+            const decoratorSymbols = /([*~%!^@#])(.+?)\1/g;
             const visualLabel = this.options.richLabels !== false
-                ? label.replace(/([*~%!^@#$])(.+?)\1/g, '$2')
+                ? label.replace(decoratorSymbols, '$2')
                 : label;
             let baseLabelLength = this.options.percentage ? visualLabel.length + percentageLength : visualLabel.length;
 
