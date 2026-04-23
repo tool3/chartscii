@@ -11,6 +11,10 @@ function isHeatmapData(data: any): data is HeatmapData {
     return data && typeof data === 'object' && Array.isArray(data.rows);
 }
 
+function isMultiSeriesData(data: any): data is InputData[][] {
+    return Array.isArray(data) && data.length > 0 && Array.isArray(data[0]);
+}
+
 const easings: Record<EasingFunction, (t: number) => number> = {
     linear: (t) => t,
     easeIn: (t) => t * t,
@@ -95,7 +99,7 @@ class Chartscii {
     private options: CustomizationOptions | undefined;
     private processedOptions: ChartOptions;
 
-    constructor(data: InputData[] | HeatmapData, options?: CustomizationOptions) {
+    constructor(data: InputData[] | InputData[][] | HeatmapData, options?: CustomizationOptions) {
         const config = createOptions(options || {});
         this.options = options;
         const chartType = config.type || 'bar';
@@ -109,6 +113,32 @@ class Chartscii {
             this.processedOptions = config;
             const formatter = new HeatmapChartFormatter(config, heatmapInput);
             this.asciiChart = formatter.format();
+        } else if (chartType === 'line' && isMultiSeriesData(data)) {
+            // Multi-line chart. Input is a 2D array where each OUTER element
+            // is a data point and the inner values are per-series. i.e.:
+            //   [[p1_s1, p1_s2, p1_s3], [p2_s1, p2_s2, p2_s3], ...]
+            //   point index →           series index →
+            // The i-th series is therefore `data.map(point => point[i])`.
+            // `lineColor[i]` colors series `i`.
+            const rawPoints = data as InputData[][];
+            const seriesCount = rawPoints[0]?.length ?? 0;
+            const seriesData: InputData[][] = [];
+            for (let s = 0; s < seriesCount; s++) {
+                seriesData.push(rawPoints.map(point => (point as InputData[])[s]));
+            }
+            this.originalData = seriesData.flat();
+            const processor = new ChartProcessor(config);
+            const charts: ChartData[] = [];
+            let lastOpts: ChartOptions = config;
+            for (const series of seriesData) {
+                const [chart, opts] = processor.process(series);
+                charts.push(chart);
+                lastOpts = opts;
+            }
+            this.chart = charts[0] ?? new Map();
+            this.processedOptions = lastOpts;
+            const formatter = new LineChartFormatter(lastOpts);
+            this.asciiChart = formatter.formatMulti(charts);
         } else {
             const inputData = data as InputData[];
             this.originalData = inputData;

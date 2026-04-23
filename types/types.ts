@@ -78,6 +78,12 @@ type BaseOptions = {
     points?: boolean;
     /** Character used for point markers when `points: true`. Defaults to `●`. */
     pointChar?: string;
+    /**
+     * Per-series colors for multi-line charts. When the chart data is a 2D
+     * array (`InputData[][]`), each inner array becomes its own line series
+     * and `lineColor[i]` is the color used to render series `i`.
+     */
+    lineColor?: string[];
 
     // Heatmap options
     heatmapData?: HeatmapData;
