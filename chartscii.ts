@@ -1,8 +1,15 @@
 import HorizontalChartFormatter from './formatters/horizontal';
 import ChartProcessor from './processor/processor';
 import { createOptions } from './options/options';
-import { InputData, ChartData, ChartOptions, CustomizationOptions, AnimationOptions, EasingFunction } from './types/types';
+import { InputData, ChartData, ChartOptions, CustomizationOptions, AnimationOptions, EasingFunction, HeatmapData } from './types/types';
 import VerticalChartFormatter from './formatters/vertical';
+import LineChartFormatter from './formatters/line';
+import StepChartFormatter from './formatters/step';
+import HeatmapChartFormatter from './formatters/heatmap';
+
+function isHeatmapData(data: any): data is HeatmapData {
+    return data && typeof data === 'object' && Array.isArray(data.rows);
+}
 
 const easings: Record<EasingFunction, (t: number) => number> = {
     linear: (t) => t,
@@ -88,21 +95,41 @@ class Chartscii {
     private options: CustomizationOptions | undefined;
     private processedOptions: ChartOptions;
 
-    constructor(data: InputData[], options?: CustomizationOptions) {
-        this.originalData = data;
-        this.options = options;
-
+    constructor(data: InputData[] | HeatmapData, options?: CustomizationOptions) {
         const config = createOptions(options || {});
-        const processor = new ChartProcessor(config);
-        const [chart, processedOptions] = processor.process(data);
+        this.options = options;
+        const chartType = config.type || 'bar';
 
-        this.chart = chart;
-        this.processedOptions = processedOptions;
-        const chartFormatter = config.orientation === 'vertical'
-            ? new VerticalChartFormatter(processedOptions)
-            : new HorizontalChartFormatter(processedOptions);
+        if (chartType === 'heatmap') {
+            const heatmapInput = isHeatmapData(data) ? data : config.heatmapData;
+            if (!heatmapInput) throw new Error('Heatmap requires HeatmapData as input or via heatmapData option');
+            this.originalData = [];
+            config._heatmapData = heatmapInput;
+            this.chart = new Map();
+            this.processedOptions = config;
+            const formatter = new HeatmapChartFormatter(config, heatmapInput);
+            this.asciiChart = formatter.format();
+        } else {
+            const inputData = data as InputData[];
+            this.originalData = inputData;
+            const processor = new ChartProcessor(config);
+            const [chart, processedOptions] = processor.process(inputData);
+            this.chart = chart;
+            this.processedOptions = processedOptions;
 
-        this.asciiChart = chartFormatter.format(this.chart);
+            let chartFormatter;
+            if (chartType === 'step') {
+                chartFormatter = new StepChartFormatter(processedOptions);
+            } else if (chartType === 'line') {
+                chartFormatter = new LineChartFormatter(processedOptions);
+            } else if (config.orientation === 'vertical') {
+                chartFormatter = new VerticalChartFormatter(processedOptions);
+            } else {
+                chartFormatter = new HorizontalChartFormatter(processedOptions);
+            }
+
+            this.asciiChart = chartFormatter.format(this.chart);
+        }
     }
 
     create() {

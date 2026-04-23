@@ -25,7 +25,20 @@ export type TitleConfig = {
     padding?: TitlePadding;
 }
 
+export type ChartType = 'bar' | 'line' | 'step' | 'heatmap';
+
+export type HeatmapRow = {
+    label?: string;
+    values: number[];
+}
+
+export type HeatmapData = {
+    rows: HeatmapRow[];
+    columnLabels?: string[];
+}
+
 type BaseOptions = {
+    type?: ChartType;
     sort?: boolean;
     percentage?: boolean;
     colorLabels?: boolean;
@@ -55,6 +68,23 @@ type BaseOptions = {
     valueLabelFormat?: (values: string[]) => string;
     /** Enable styl3 rich text decorators in labels (*bold*, %italic%, !underline!, @invert@) */
     richLabels?: boolean;
+    /**
+     * Chart variant. Applies to `line` and `step` chart types only.
+     * - `line`: only `'sharp'` is supported (45° diagonals). Other values are ignored.
+     * - `step`: `'sharp'` (square corners) or `'smooth'` (rounded corners).
+     */
+    variant?: 'sharp' | 'smooth';
+    /** Draw a marker at each data point on a line/step chart. */
+    points?: boolean;
+    /** Character used for point markers when `points: true`. Defaults to `●`. */
+    pointChar?: string;
+
+    // Heatmap options
+    heatmapData?: HeatmapData;
+    cellWidth?: number;
+    cellHeight?: number;
+    showCellValues?: boolean;
+
     /** @internal Used to preserve label width during animation */
     _maxLabel?: number;
     /** @internal Used to preserve max bar length for gradient fill during animation */
@@ -77,6 +107,7 @@ export type ChartOptions = BaseOptions & {
     orientation?: 'horizontal' | 'vertical';
     alignBars?: VerticalChartAlignment | HorizontalChartAlignment;
     max: Max;
+    _heatmapData?: HeatmapData;
 }
 
 export type SegmentValue = {

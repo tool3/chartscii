@@ -29,6 +29,10 @@ export const defaultOptions: CustomizationOptions = {
     alignBars: 'justify',
     fillColor: undefined,
     richLabels: true,
+    type: 'bar',
+    variant: 'sharp',
+    cellWidth: 4,
+    cellHeight: 1,
 };
 
 /**
