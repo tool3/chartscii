@@ -1,12 +1,11 @@
 import HorizontalChartFormatter from './formatters/horizontal';
 import ChartProcessor from './processor/processor';
 import { createOptions } from './options/options';
-import { InputData, ChartData, ChartOptions, CustomizationOptions, AnimationOptions, EasingFunction, HeatmapData, Gradient } from './types/types';
+import { InputData, ChartData, ChartOptions, CustomizationOptions, AnimationOptions, EasingFunction, Gradient } from './types/types';
 import VerticalChartFormatter from './formatters/vertical';
 import LineChartFormatter from './formatters/line';
 import StepChartFormatter from './formatters/step';
 import ScatterChartFormatter from './formatters/scatter';
-import HeatmapChartFormatter from './formatters/heatmap';
 
 const SERIES_AUTO_COLORS = ['red', 'green', 'yellow', 'blue', 'purple', 'cyan', 'pink', 'orange', 'marine'];
 
@@ -30,15 +29,11 @@ function resolveSeriesColors(
 /**
  * Narrow `(string | Gradient)[]` color values to a single value for chart
  * types that don't support per-series arrays. Picks the first entry so a
- * user's mistake on a bar/heatmap chart still renders.
+ * user's mistake on a bar chart still renders.
  */
 function narrowArrayColor(color: CustomizationOptions['color']): string | 'auto' | Gradient | undefined {
     if (Array.isArray(color)) return color[0];
     return color;
-}
-
-function isHeatmapData(data: any): data is HeatmapData {
-    return data && typeof data === 'object' && Array.isArray(data.rows);
 }
 
 function isMultiSeriesData(data: any): data is InputData[][] {
@@ -126,11 +121,11 @@ class Chartscii {
     private chart: ChartData;
     private asciiChart: string;
     private originalData: InputData[];
-    private originalRawData: InputData[] | InputData[][] | HeatmapData;
+    private originalRawData: InputData[] | InputData[][];
     private options: CustomizationOptions | undefined;
     private processedOptions: ChartOptions;
 
-    constructor(data: InputData[] | InputData[][] | HeatmapData, options?: CustomizationOptions) {
+    constructor(data: InputData[] | InputData[][], options?: CustomizationOptions) {
         const config = createOptions(options || {});
         this.options = options;
         this.originalRawData = data;
@@ -143,16 +138,7 @@ class Chartscii {
             config.color = narrowArrayColor((config as { color?: CustomizationOptions['color'] }).color);
         }
 
-        if (chartType === 'heatmap') {
-            const heatmapInput = isHeatmapData(data) ? data : config.heatmapData;
-            if (!heatmapInput) throw new Error('Heatmap requires HeatmapData as input or via heatmapData option');
-            this.originalData = [];
-            config._heatmapData = heatmapInput;
-            this.chart = new Map();
-            this.processedOptions = config;
-            const formatter = new HeatmapChartFormatter(config, heatmapInput);
-            this.asciiChart = formatter.format();
-        } else if (isPointChartType(chartType) && isMultiSeriesData(data)) {
+        if (isPointChartType(chartType) && isMultiSeriesData(data)) {
             // Multi-series line/step/scatter. Input is a 2D array where each
             // OUTER element is a data point and inner values are per-series:
             //   [[p1_s1, p1_s2, p1_s3], [p2_s1, p2_s2, p2_s3], ...]

@@ -25,17 +25,7 @@ export type TitleConfig = {
     padding?: TitlePadding;
 }
 
-export type ChartType = 'bar' | 'line' | 'step' | 'scatter' | 'heatmap';
-
-export type HeatmapRow = {
-    label?: string;
-    values: number[];
-}
-
-export type HeatmapData = {
-    rows: HeatmapRow[];
-    columnLabels?: string[];
-}
+export type ChartType = 'bar' | 'line' | 'step' | 'scatter';
 
 type BaseOptions = {
     type?: ChartType;
@@ -86,12 +76,6 @@ type BaseOptions = {
     /** Character used for point markers when `points: true`. Defaults to `●`. */
     pointChar?: string;
 
-    // Heatmap options
-    heatmapData?: HeatmapData;
-    cellWidth?: number;
-    cellHeight?: number;
-    showCellValues?: boolean;
-
     /** @internal Used to preserve label width during animation */
     _maxLabel?: number;
     /** @internal Used to preserve max bar length for gradient fill during animation */
@@ -135,7 +119,6 @@ export type ChartOptions = Omit<BaseOptions, 'color'> & {
     orientation?: 'horizontal' | 'vertical';
     alignBars?: VerticalChartAlignment | HorizontalChartAlignment;
     max: Max;
-    _heatmapData?: HeatmapData;
     /**
      * Internal color type — array forms (`(string | Gradient)[]`) are
      * resolved to `_seriesColors` before reaching the formatter, so the

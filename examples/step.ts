@@ -16,13 +16,15 @@ const chart = new Chartscii(data, {
     type: 'step',
     width: 100,
     theme: 'pastel',
-    variant: 'smooth', // 'smooth' (╭╮╰╯) or 'sharp' (/\)
+    variant: 'sharp', // 'smooth' (╭╮╰╯) or 'sharp' (/\)
     color: 'auto',
-    pointChar: '◈',    // custom point character
+    fill: '░',
     fillColor: 'green',
+    percentage: true,
+    pointChar: '◈',    // custom point character
     legend: true
 });
 
 //print chart
-// console.log(chart.create());
-chart.animate()
+console.log(chart.create());
+// chart.animate()
