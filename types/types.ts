@@ -25,7 +25,7 @@ export type TitleConfig = {
     padding?: TitlePadding;
 }
 
-export type ChartType = 'bar' | 'line' | 'step' | 'heatmap';
+export type ChartType = 'bar' | 'line' | 'step' | 'scatter' | 'heatmap';
 
 export type HeatmapRow = {
     label?: string;
@@ -47,7 +47,14 @@ type BaseOptions = {
     reverse?: boolean;
     naked?: boolean;
     labels?: boolean;
-    color?: string | 'auto' | Gradient;
+    /**
+     * Chart color. Accepts:
+     * - a string (named color, hex, ANSI, or `gradient(...)`)
+     * - `'auto'` (palette per series/point)
+     * - a `Gradient` object
+     * - a `(string | Gradient)[]` for per-series colors on `line` / `step` / `scatter`
+     */
+    color?: string | 'auto' | Gradient | (string | Gradient)[];
     title?: string | TitleConfig;
     char?: string;
     fill?: string;
@@ -78,12 +85,6 @@ type BaseOptions = {
     points?: boolean;
     /** Character used for point markers when `points: true`. Defaults to `●`. */
     pointChar?: string;
-    /**
-     * Per-series colors for multi-line charts. When the chart data is a 2D
-     * array (`InputData[][]`), each inner array becomes its own line series
-     * and `lineColor[i]` is the color used to render series `i`.
-     */
-    lineColor?: string[];
 
     // Heatmap options
     heatmapData?: HeatmapData;
@@ -95,6 +96,8 @@ type BaseOptions = {
     _maxLabel?: number;
     /** @internal Used to preserve max bar length for gradient fill during animation */
     _finalMaxBarLength?: number;
+    /** @internal Resolved per-series colors for line/step/scatter (set by Chartscii). */
+    _seriesColors?: (string | Gradient | undefined)[];
 }
 
 type VerticalChartOptions = BaseOptions & {
@@ -109,11 +112,17 @@ type HorizontalChartOptions = BaseOptions & {
 
 export type CustomizationOptions = VerticalChartOptions | HorizontalChartOptions;
 
-export type ChartOptions = BaseOptions & {
+export type ChartOptions = Omit<BaseOptions, 'color'> & {
     orientation?: 'horizontal' | 'vertical';
     alignBars?: VerticalChartAlignment | HorizontalChartAlignment;
     max: Max;
     _heatmapData?: HeatmapData;
+    /**
+     * Internal color type — array forms (`(string | Gradient)[]`) are
+     * resolved to `_seriesColors` before reaching the formatter, so the
+     * formatter only ever sees a scalar.
+     */
+    color?: string | 'auto' | Gradient;
 }
 
 export type SegmentValue = {

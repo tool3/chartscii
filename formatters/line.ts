@@ -2,6 +2,19 @@ import { ChartData, ChartOptions, ChartPoint, Gradient } from '../types/types';
 import ChartFormatter, { BarDimensions } from './formatter';
 import { isGradientObject, normalizeColor } from '../utils/color';
 
+/**
+ * Min column distance between two adjacent labels so they have ≥ 1 space
+ * between them. Labels are centered on their data-point col; right edge of
+ * label_i = col_i + ceil((L_i-1)/2), left edge of label_{i+1} = col_{i+1} -
+ * floor(L_{i+1}/2). Requiring ≥ 1 col gap simplifies to:
+ *
+ *     col_{i+1} - col_i >= ceil(L_i/2) + floor(L_{i+1}/2) + 1
+ */
+function labelMinColDiff(L1: number, L2: number): number {
+    if (L1 <= 0 && L2 <= 0) return 1;
+    return Math.max(1, Math.ceil(L1 / 2) + Math.floor(L2 / 2) + 1);
+}
+
 // Line chart is always drawn as sharp 45° diagonals. The `variant` option
 // only affects step charts — for line charts, smooth / any other value is
 // ignored. `‾` / `_` are used for the rare flats between equal consecutive
@@ -47,17 +60,35 @@ class LineChartFormatter extends ChartFormatter {
         const chartWidth = this.prepareLayout(points, requestedWidth);
 
         const grid = this.buildGrid(chartWidth, height);
-        const lineBottom = this.drawLine(grid, points, chartWidth);
+
+        // Single-series line/step/scatter use _seriesColors[0] (resolved upstream
+        // from `options.color`) so per-cell coloring + gradients work uniformly
+        // with the multi-series path. Falling back to the per-row color path keeps
+        // gradient(direction=vertical|diagonal) working as before.
+        const seriesColor = this.options._seriesColors?.[0];
+        let gridColors: (string | undefined)[][] | undefined;
+        let lineBottom: number[];
+        if (seriesColor !== undefined) {
+            gridColors = Array.from({ length: height }, () => new Array(chartWidth).fill(undefined));
+            lineBottom = this.drawLineColored(grid, gridColors, points, chartWidth, seriesColor);
+        } else {
+            lineBottom = this.drawLine(grid, points, chartWidth);
+        }
 
         if (this.options.fill) {
             this.drawAreaFill(grid, lineBottom, height);
         }
 
-        if (this.options.points) {
-            this.drawPoints(grid, points, this.options.pointChar || '●');
+        if (this.shouldDrawPoints()) {
+            const pointChar = this.options.pointChar || '●';
+            if (gridColors) {
+                this.drawPointsColored(grid, gridColors, points, pointChar, seriesColor);
+            } else {
+                this.drawPoints(grid, points, pointChar);
+            }
         }
 
-        return this.compose(grid, yAxisTicks, yLabelWidth, chartWidth, height, points);
+        return this.compose(grid, yAxisTicks, yLabelWidth, chartWidth, height, points, gridColors);
     }
 
     /**
@@ -98,20 +129,28 @@ class LineChartFormatter extends ChartFormatter {
             new Array(chartWidth).fill(undefined)
         );
 
-        const lineColors = this.options.lineColor || [];
+        const seriesColors = this.options._seriesColors || [];
         for (let s = 0; s < seriesPoints.length; s++) {
-            this.drawLineColored(grid, gridColors, seriesPoints[s], chartWidth, lineColors[s]);
+            this.drawLineColored(grid, gridColors, seriesPoints[s], chartWidth, seriesColors[s]);
         }
 
-        if (this.options.points) {
+        if (this.shouldDrawPoints()) {
             const pointChar = this.options.pointChar || '●';
             for (let s = 0; s < seriesPoints.length; s++) {
-                this.drawPointsColored(grid, gridColors, seriesPoints[s], pointChar, lineColors[s]);
+                this.drawPointsColored(grid, gridColors, seriesPoints[s], pointChar, seriesColors[s]);
             }
         }
 
         // X-axis labels come from the first series (series share the x-axis).
         return this.compose(grid, yAxisTicks, yLabelWidth, chartWidth, height, seriesPoints[0], gridColors);
+    }
+
+    /**
+     * Whether to render point markers. Subclasses (scatter) can override
+     * to render points unconditionally.
+     */
+    protected shouldDrawPoints(): boolean {
+        return Boolean(this.options.points);
     }
 
     /**
@@ -149,15 +188,6 @@ class LineChartFormatter extends ChartFormatter {
                 ? 1
                 : Math.max(Math.abs(yTo - yFrom), 1);
             let colDiff = natural;
-            if (isFlat) {
-                // Only bump for label spacing on equal-value segments;
-                // bumping a non-flat segment would insert `‾`/`_` between
-                // diagonals, which is visually wrong.
-                const L1 = (points[i - 1].point?.label ?? '').length;
-                const L2 = (points[i].point?.label ?? '').length;
-                const labelMin = Math.max(1, (L1 - 1 - Math.floor(L1 / 2)) + Math.floor(L2 / 2) + 2);
-                colDiff = Math.max(natural, labelMin);
-            }
             // When points are rendered, a peak/trough only occupies one cell
             // (the `●`), not the two cells of a pointy `╱╲`/`╲╱`. Shrink the
             // outgoing segment by 1 col so the next diagonal lands diagonally
@@ -173,6 +203,14 @@ class LineChartFormatter extends ChartFormatter {
                     if (isPrevPeak || isPrevTrough) colDiff = Math.max(1, colDiff - 1);
                 }
             }
+            // Enforce ≥1 space between adjacent x-axis labels on every segment.
+            // For non-flat segments this widens the chart but preserves the
+            // diagonal — `drawLine` (Bresenham over `colDiff`) emits `‾`/`_`
+            // fillers between the diagonals as needed.
+            const L1 = this.labelLength(points[i - 1].point?.label);
+            const L2 = this.labelLength(points[i].point?.label);
+            const labelMin = labelMinColDiff(L1, L2);
+            if (labelMin > colDiff) colDiff = labelMin;
             points[i].col = points[i - 1].col + colDiff;
         }
 
@@ -224,6 +262,12 @@ class LineChartFormatter extends ChartFormatter {
         const sharedCols: number[] = [0];
         for (let i = 1; i < maxLen; i++) {
             let maxColDiff = 1;
+            // Series share x-axis labels (taken from the first series), so the
+            // label-spacing constraint is computed once per segment.
+            const firstSeries = seriesPoints[0];
+            const L1 = this.labelLength(firstSeries[i - 1]?.point?.label);
+            const L2 = this.labelLength(firstSeries[i]?.point?.label);
+            const labelMin = labelMinColDiff(L1, L2);
             for (const points of seriesPoints) {
                 if (i >= points.length) continue;
                 const yFrom = points[i - 1].row + (points[i - 1].anchor ?? 0);
@@ -231,12 +275,6 @@ class LineChartFormatter extends ChartFormatter {
                 const isFlat = points[i].row === points[i - 1].row;
                 const natural = isFlat ? 1 : Math.max(Math.abs(yTo - yFrom), 1);
                 let colDiff = natural;
-                if (isFlat) {
-                    const L1 = (points[i - 1].point?.label ?? '').length;
-                    const L2 = (points[i].point?.label ?? '').length;
-                    const labelMin = Math.max(1, (L1 - 1 - Math.floor(L1 / 2)) + Math.floor(L2 / 2) + 2);
-                    colDiff = Math.max(natural, labelMin);
-                }
                 if (this.options.points && !isFlat) {
                     const prev = i - 1;
                     if (prev > 0 && prev < points.length - 1) {
@@ -250,6 +288,7 @@ class LineChartFormatter extends ChartFormatter {
                 }
                 if (colDiff > maxColDiff) maxColDiff = colDiff;
             }
+            if (labelMin > maxColDiff) maxColDiff = labelMin;
             sharedCols.push(sharedCols[i - 1] + maxColDiff);
         }
 
@@ -387,6 +426,16 @@ class LineChartFormatter extends ChartFormatter {
         });
     }
 
+    /**
+     * Visual length of a label, stripping rich-text decorator markers
+     * (`*bold*`, `%italic%`, etc.) which become invisible ANSI codes.
+     */
+    protected labelLength(label: string | undefined): number {
+        if (!label) return 0;
+        if (this.options.richLabels === false) return label.length;
+        return label.replace(/([*~%!^@#$])(.+?)\1/g, '$2').length;
+    }
+
     protected mapPointsToGrid(chart: ChartPoint[], chartWidth: number, height: number, minValue: number, maxValue: number): GridPoint[] {
         const range = maxValue - minValue || 1;
         return chart.map((point, index) => {
@@ -439,22 +488,69 @@ class LineChartFormatter extends ChartFormatter {
         }
     }
 
+    /**
+     * Resolve the cell color at column `col` for a given series color and
+     * series x-extent. Returns a flat color string for plain colors, or an
+     * RGB-encoded ANSI escape string interpolated from a gradient.
+     *
+     * For gradients, the position is the cell's normalized progress between
+     * the series' first and last cols (`direction: 'vertical'` uses the row
+     * within the chart height instead).
+     */
+    protected resolveCellColor(
+        color: string | Gradient | undefined,
+        col: number,
+        row: number,
+        seriesStart: number,
+        seriesEnd: number,
+        height: number,
+        reverseDefault = false
+    ): string | undefined {
+        if (color === undefined || color === '') return undefined;
+        const normalized = typeof color === 'string' ? normalizeColor(color) : color;
+        if (!isGradientObject(normalized)) {
+            return normalized as string;
+        }
+        const grad = normalized as Gradient;
+        const { direction = 'horizontal', reverse = false } = grad;
+        let position: number;
+        if (direction === 'vertical') {
+            position = height > 1 ? row / (height - 1) : 0;
+        } else if (direction === 'diagonal') {
+            const span = seriesEnd - seriesStart;
+            const hPos = span > 0 ? (col - seriesStart) / span : 0;
+            const vPos = height > 1 ? row / (height - 1) : 0;
+            position = (hPos + vPos) / 2;
+        } else {
+            const span = seriesEnd - seriesStart;
+            position = span > 0 ? (col - seriesStart) / span : 0;
+        }
+        if (reverse !== reverseDefault) position = 1 - position;
+        const [r, g, b] = this.getColorAtPosition(grad, position);
+        return `\x1b[38;2;${r};${g};${b}m`;
+    }
+
     /** Variant of drawLine that also writes per-cell colors (for multi-series). */
     protected drawLineColored(
         grid: string[][],
         gridColors: (string | undefined)[][],
         points: GridPoint[],
         chartWidth: number,
-        color?: string
+        color?: string | Gradient
     ): number[] {
         const chars = LINE_CHARS;
         const lineBottom: number[] = new Array(chartWidth).fill(-1);
         if (points.length === 0) return lineBottom;
 
+        const seriesStart = points[0].col;
+        const seriesEnd = points[points.length - 1].col;
+        const height = grid.length;
+
         const put = (row: number, col: number, ch: string) => {
             if (row >= 0 && row < grid.length && col >= 0 && col < chartWidth) {
                 grid[row][col] = ch;
-                if (color) gridColors[row][col] = color;
+                const cellColor = this.resolveCellColor(color, col, row, seriesStart, seriesEnd, height);
+                if (cellColor) gridColors[row][col] = cellColor;
                 lineBottom[col] = row;
             }
         };
@@ -516,12 +612,17 @@ class LineChartFormatter extends ChartFormatter {
         gridColors: (string | undefined)[][],
         points: GridPoint[],
         char: string,
-        color?: string
+        color?: string | Gradient
     ): void {
+        if (points.length === 0) return;
+        const seriesStart = points[0].col;
+        const seriesEnd = points[points.length - 1].col;
+        const height = grid.length;
         for (const { col, row } of points) {
             if (row >= 0 && row < grid.length && col >= 0 && col < grid[0].length) {
                 grid[row][col] = char;
-                if (color) gridColors[row][col] = color;
+                const cellColor = this.resolveCellColor(color, col, row, seriesStart, seriesEnd, height);
+                if (cellColor) gridColors[row][col] = cellColor;
                 const nextCol = col + 1;
                 if (nextCol < grid[row].length) {
                     const nextCh = grid[row][nextCol];
@@ -575,12 +676,19 @@ class LineChartFormatter extends ChartFormatter {
     }
 
     protected colorizeRow(row: string[], rowIndex: number, height: number, width: number, perCellColors?: (string | undefined)[]): string {
-        // Per-cell colors take precedence (used for multi-series line charts).
+        // Per-cell colors take precedence (used for line/step/scatter — single
+        // and multi-series). Values may be plain color names/hex/gradients OR
+        // pre-resolved RGB ANSI escapes (e.g. `\x1b[38;2;r;g;bm`) emitted by
+        // resolveCellColor for gradient series.
         if (perCellColors) {
             return row.map((char, colIndex) => {
                 if (char === ' ') return char;
                 const cellColor = perCellColors[colIndex];
-                return cellColor ? this.colorify(char, cellColor) : char;
+                if (!cellColor) return char;
+                if (cellColor.startsWith('\x1b[38;2;')) {
+                    return `${cellColor}${char}\x1b[39m`;
+                }
+                return this.colorify(char, cellColor);
             }).join('');
         }
 

@@ -12,18 +12,18 @@ import { InputData } from '../types/types';
 //     { label: 'Jul', value: 4 },
 // ];
 const data = []
-for (let i = 1; i <= 20; i++) {
+for (let i = 1; i <= 10; i++) {
     const value1 = Math.floor(Math.random() * (40)) + 1;
     const value2 = Math.floor(Math.random() * (40)) + 1;
     const value3 = Math.floor(Math.random() * (40)) + 1;
-    data.push([value1, value2, value3]);
+    data.push([{ value: value1, color: 'gradient(pink,cyan)', label: 'line ' + i }, { value: value2, label: 'point' + i + 1 }, { value: value3, label: 'line' + i + 2 }]);
 }
 
 // console.log({ data });
 
 // create chart
 const chart = new Chartscii(data, {
-    type: 'line',
+    type: 'scatter',
     // height: 15,
     width: 100,
     // color: 'gradient(cyan,pink)',
@@ -32,9 +32,9 @@ const chart = new Chartscii(data, {
     variant: 'sharp',    // 'smooth' (╭╮╰╯) or 'sharp' (/\)
     // points: true,
     // labels: false,
-    color: ['red', 'blue', 'green'],
+    color: ['red', 'gradient(pink, blue)', 'green'],
     pointChar: '◈',          // custom point character
-    // fill: '░',               // area fill under the line
+    fill: '░',               // area fill under the line
     // areaFill: true,          // enable area fill
 });
 

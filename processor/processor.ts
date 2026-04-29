@@ -20,9 +20,11 @@ class ChartProcessor {
 
     constructor(options: ChartOptions) {
         this.validator = new ChartValidator(options);
-        // Normalize gradient strings in options
-        if (options.color) {
-            options.color = normalizeColor(options.color) as typeof options.color;
+        // Normalize gradient strings in options. Array colors (per-series for
+        // line/step/scatter) are stripped upstream in chartscii.ts before the
+        // processor runs, so we only need to handle string/Gradient here.
+        if (options.color && !Array.isArray(options.color)) {
+            options.color = normalizeColor(options.color as string | Gradient) as typeof options.color;
         }
         this.options = options;
     }

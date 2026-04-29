@@ -36,7 +36,13 @@ export const defaultOptions: CustomizationOptions = {
 };
 
 /**
- * Create chart options by merging user options with defaults
+ * Create chart options by merging user options with defaults.
+ *
+ * Per-series array colors (`color: (string|Gradient)[]`) are valid only on
+ * line/step/scatter charts and are resolved to `_seriesColors` upstream in
+ * `chartscii.ts`. By the time options reach a formatter, `color` is always
+ * a scalar — the cast here is what bridges the wider input type to the
+ * narrower internal `ChartOptions` type.
  */
 export function createOptions(options: CustomizationOptions): ChartOptions {
     return {
@@ -51,7 +57,7 @@ export function createOptions(options: CustomizationOptions): ChartOptions {
             ...defaultOptions.structure,
             ...options?.structure
         }
-    };
+    } as ChartOptions;
 }
 
 class Options {
