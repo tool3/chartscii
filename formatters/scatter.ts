@@ -1,5 +1,6 @@
 import LineChartFormatter, { GridPoint } from './line';
-import { ChartOptions } from '../types/types';
+import { ChartData, ChartOptions, Gradient } from '../types/types';
+import { isGradientObject, normalizeColor } from '../utils/color';
 
 /**
  * Scatter chart — points only, no connecting lines. Layout-wise it behaves
@@ -87,6 +88,117 @@ class ScatterChartFormatter extends LineChartFormatter {
         chartWidth: number
     ): number[] {
         return new Array(chartWidth).fill(-1);
+    }
+
+    /**
+     * Single-series scatter always takes the colored path so per-point colors
+     * (from `color: 'auto'` cycling the palette, or per-point `{value, color}`)
+     * land in `gridColors`. Unlike line/step, scatter has no series-wide line
+     * color to fall back on — markers are independent.
+     */
+    public format(chartData: ChartData): string {
+        const chart = [...chartData.values()];
+        if (chart.length === 0) return '';
+
+        const height = this.options.height || 10;
+        const width = this.options.width || 80;
+        const maxValue = this.options.max.value || 1;
+        const minValue = this.options.max.min ?? 0;
+
+        const yAxisTicks = this.buildYAxisTicks(minValue, maxValue, height);
+        const yLabelWidth = Math.max(...yAxisTicks.map(t => t.label.length));
+        const requestedWidth = width - yLabelWidth - 1;
+        if (requestedWidth < 2) return '';
+
+        const points = this.mapPointsToGrid(chart, requestedWidth, height, minValue, maxValue);
+        const chartWidth = this.prepareLayout(points, requestedWidth);
+
+        const grid = this.buildGrid(chartWidth, height);
+        const gridColors: (string | undefined)[][] = Array.from(
+            { length: height }, () => new Array(chartWidth).fill(undefined)
+        );
+
+        const seriesColor = this.options._seriesColors?.[0];
+        const pointChar = this.options.pointChar || '◈';
+        this.drawPointsColored(grid, gridColors, points, pointChar, seriesColor);
+
+        return this.compose(grid, yAxisTicks, yLabelWidth, chartWidth, height, points, gridColors);
+    }
+
+    /**
+     * Override: prefer the per-point color (set by the processor's auto-color
+     * pass or the user) over the series-level fallback, so single-series
+     * scatter with `color: 'auto'` actually cycles the palette per marker.
+     */
+    protected drawPointsColored(
+        grid: string[][],
+        gridColors: (string | undefined)[][],
+        points: GridPoint[],
+        char: string,
+        color?: string | Gradient
+    ): void {
+        if (points.length === 0) return;
+        const seriesStart = points[0].col;
+        const seriesEnd = points[points.length - 1].col;
+        const height = grid.length;
+        for (const { col, row, point } of points) {
+            if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) continue;
+            grid[row][col] = char;
+            const effective: string | Gradient | undefined = point.color || color;
+            if (effective === undefined || effective === '') continue;
+            const cellColor = this.resolveCellColor(effective, col, row, seriesStart, seriesEnd, height);
+            if (cellColor) gridColors[row][col] = cellColor;
+        }
+    }
+
+    /**
+     * Color each x-axis label with its point's color when `colorLabels` is on.
+     * Labels are centered on each point's column; we render label-by-label so
+     * neighboring labels keep distinct colors instead of bleeding together.
+     */
+    protected formatXLabels(points: GridPoint[], offset: number, chartWidth: number): string {
+        if (!this.options.colorLabels) {
+            return super.formatXLabels(points, offset, chartWidth);
+        }
+
+        const seriesColors = this.options._seriesColors ?? [];
+        const seriesColor = seriesColors[0];
+        const normalizedSeries = typeof seriesColor === 'string' ? normalizeColor(seriesColor) : seriesColor;
+        // A chart-wide gradient (single-series or shared across all multi-series)
+        // takes precedence over any per-point color so labels interpolate across
+        // the x-axis the same way the gradient legend block does.
+        const chartGradient = this.sharedSeriesGradient(seriesColors)
+            ?? (isGradientObject(normalizedSeries) ? normalizedSeries as Gradient : undefined);
+        const seriesStart = points[0]?.col ?? 0;
+        const seriesEnd = points[points.length - 1]?.col ?? 0;
+        const span = seriesEnd - seriesStart;
+
+        const colorForPoint = (col: number, pointColor: string | undefined): string | undefined => {
+            if (chartGradient) {
+                const position = span > 0 ? (col - seriesStart) / span : 0;
+                const [r, g, b] = this.getColorAtPosition(chartGradient, position);
+                return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+            }
+            if (pointColor) return pointColor;
+            return typeof normalizedSeries === 'string' ? normalizedSeries : undefined;
+        };
+
+        type Cell = { ch: string; color?: string };
+        const cells: Cell[] = Array.from({ length: chartWidth }, () => ({ ch: ' ' }));
+        for (const { col, point } of points) {
+            const label = point.label;
+            const start = Math.max(0, col - Math.floor(label.length / 2));
+            const labelColor = colorForPoint(col, point.color);
+            for (let i = 0; i < label.length && start + i < chartWidth; i++) {
+                cells[start + i] = { ch: label[i], color: labelColor };
+            }
+        }
+
+        let out = ' '.repeat(offset);
+        for (const { ch, color } of cells) {
+            out += color ? this.colorify(ch, color) : ch;
+        }
+        return out;
     }
 }
 

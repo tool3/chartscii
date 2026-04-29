@@ -842,7 +842,7 @@ class LineChartFormatter extends ChartFormatter {
      * gradient (the chart-wide `color: 'gradient(...)'` case). Mixed colors
      * or per-series-different gradients return undefined.
      */
-    private sharedSeriesGradient(
+    protected sharedSeriesGradient(
         seriesColors: (string | Gradient | undefined)[]
     ): Gradient | undefined {
         if (seriesColors.length === 0) return undefined;

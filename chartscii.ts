@@ -197,10 +197,16 @@ class Chartscii {
             this.originalData = inputData;
             // For single-series line/step/scatter, treat options.color as the
             // line color (auto → first palette entry; arrays → first entry).
+            // Exception: single-series scatter with `color: 'auto'` cycles
+            // the palette per-point (each marker is independent), so we keep
+            // `color: 'auto'` and let the processor's applyAutoColor run.
             let preProcessConfig = config;
             if (isPointChartType(chartType)) {
-                const seriesColors = resolveSeriesColors(options?.color, 1);
-                preProcessConfig = { ...config, color: undefined, _seriesColors: seriesColors };
+                const isScatterAuto = chartType === 'scatter' && options?.color === 'auto';
+                if (!isScatterAuto) {
+                    const seriesColors = resolveSeriesColors(options?.color, 1);
+                    preProcessConfig = { ...config, color: undefined, _seriesColors: seriesColors };
+                }
             }
             const processor = new ChartProcessor(preProcessConfig);
             const [chart, processedOptions] = processor.process(inputData);
