@@ -122,6 +122,8 @@ class ScatterChartFormatter extends LineChartFormatter {
         const pointChar = this.options.pointChar || '◈';
         this.drawPointsColored(grid, gridColors, points, pointChar, seriesColor);
 
+        this.applyAnimationClip(grid, gridColors, chartWidth);
+
         return this.compose(grid, yAxisTicks, yLabelWidth, chartWidth, height, points, gridColors);
     }
 

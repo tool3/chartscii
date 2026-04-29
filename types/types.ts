@@ -98,6 +98,8 @@ type BaseOptions = {
     _finalMaxBarLength?: number;
     /** @internal Resolved per-series colors for line/step/scatter (set by Chartscii). */
     _seriesColors?: (string | Gradient | undefined)[];
+    /** @internal Animation progress 0..1 for line/step/scatter (left-to-right reveal). */
+    _animationProgress?: number;
 
     /**
      * Render a legend on multi-series line / step / scatter charts. Each

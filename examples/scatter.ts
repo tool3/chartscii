@@ -21,4 +21,5 @@ const chart = new Chartscii(data, {
 });
 
 //print chart
-console.log(chart.create());
+// console.log(chart.create());
+chart.animate()

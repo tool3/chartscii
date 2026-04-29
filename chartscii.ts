@@ -126,12 +126,14 @@ class Chartscii {
     private chart: ChartData;
     private asciiChart: string;
     private originalData: InputData[];
+    private originalRawData: InputData[] | InputData[][] | HeatmapData;
     private options: CustomizationOptions | undefined;
     private processedOptions: ChartOptions;
 
     constructor(data: InputData[] | InputData[][] | HeatmapData, options?: CustomizationOptions) {
         const config = createOptions(options || {});
         this.options = options;
+        this.originalRawData = data;
         const chartType = config.type || 'bar';
 
         // Per-series array colors are only meaningful on line/step/scatter.
@@ -236,6 +238,21 @@ class Chartscii {
 
     createAt(progress: number): string {
         const clampedProgress = Math.max(0, Math.min(1, progress));
+
+        // Line/step/scatter animate as a left-to-right reveal (no orientation
+        // to "fill"), so we keep the original data + layout and pass progress
+        // through to the formatter, which clips the data area at
+        // `progress * chartWidth`. Bar charts retain the value-scaling path.
+        const chartType = this.processedOptions.type;
+        if (isPointChartType(chartType)) {
+            const fixedOptions: CustomizationOptions = {
+                ...this.options,
+                _animationProgress: clampedProgress,
+            };
+            const chart = new Chartscii(this.originalRawData, fixedOptions);
+            return chart.create();
+        }
+
         // Preserve original labels to maintain consistent label widths during animation
         const scaledData = scaleInputData(this.originalData, clampedProgress, 2, true);
 

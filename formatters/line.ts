@@ -88,6 +88,8 @@ class LineChartFormatter extends ChartFormatter {
             }
         }
 
+        this.applyAnimationClip(grid, gridColors, chartWidth);
+
         return this.compose(grid, yAxisTicks, yLabelWidth, chartWidth, height, points, gridColors);
     }
 
@@ -141,6 +143,8 @@ class LineChartFormatter extends ChartFormatter {
             }
         }
 
+        this.applyAnimationClip(grid, gridColors, chartWidth);
+
         // X-axis labels come from the first series (series share the x-axis).
         return this.compose(grid, yAxisTicks, yLabelWidth, chartWidth, height, seriesPoints[0], gridColors);
     }
@@ -151,6 +155,30 @@ class LineChartFormatter extends ChartFormatter {
      */
     protected shouldDrawPoints(): boolean {
         return Boolean(this.options.points);
+    }
+
+    /**
+     * Left-to-right reveal for animation. Clears any data-area cells past
+     * the visible cutoff so line segments / points beyond the current
+     * progress disappear. Only the data grid is touched — y-axis, x-labels,
+     * legend, title, and the bottom border still render fully so the layout
+     * stays stable across frames.
+     */
+    protected applyAnimationClip(
+        grid: string[][],
+        gridColors: (string | undefined)[][] | undefined,
+        chartWidth: number
+    ): void {
+        const progress = this.options._animationProgress;
+        if (progress === undefined || progress >= 1) return;
+        const cutoff = Math.max(0, Math.min(chartWidth, Math.ceil(progress * chartWidth)));
+        if (cutoff >= chartWidth) return;
+        for (let row = 0; row < grid.length; row++) {
+            for (let col = cutoff; col < chartWidth; col++) {
+                grid[row][col] = ' ';
+                if (gridColors) gridColors[row][col] = undefined;
+            }
+        }
     }
 
     /**
