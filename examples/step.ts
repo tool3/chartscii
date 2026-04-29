@@ -17,10 +17,12 @@ const chart = new Chartscii(data, {
     width: 100,
     theme: 'pastel',
     variant: 'smooth', // 'smooth' (╭╮╰╯) or 'sharp' (/\)
-    color: ['red', 'gradient(green, red)', 'blue'],
+    color: 'auto',
     pointChar: '◈',    // custom point character
-    fillColor: 'green'
+    fillColor: 'green',
+    legend: true
 });
 
 //print chart
-console.log(chart.create());
+// console.log(chart.create());
+chart.animate()
