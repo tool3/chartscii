@@ -1,16 +1,70 @@
 import HorizontalChartFormatter from './formatters/horizontal';
 import ChartProcessor from './processor/processor';
 import { createOptions } from './options/options';
-import { InputData, ChartData, ChartOptions, CustomizationOptions, AnimationOptions, EasingFunction, Gradient } from './types/types';
+import { InputData, InputPoint, ChartData, ChartOptions, CustomizationOptions, AnimationOptions, EasingFunction, Gradient } from './types/types';
 import VerticalChartFormatter from './formatters/vertical';
 import LineChartFormatter from './formatters/line';
 import StepChartFormatter from './formatters/step';
 import ScatterChartFormatter from './formatters/scatter';
+import CandlestickChartFormatter from './formatters/candlestick';
 
 const SERIES_AUTO_COLORS = ['red', 'green', 'yellow', 'blue', 'purple', 'cyan', 'pink', 'orange', 'marine'];
+const DEFAULT_BULL_COLOR = 'green';
+const DEFAULT_BEAR_COLOR = 'red';
 
 function isPointChartType(type: string | undefined): boolean {
     return type === 'line' || type === 'step' || type === 'scatter';
+}
+
+/**
+ * Chart types whose `color` option may be an array (per-series for
+ * line/step/scatter; `[bullish, bearish]` tuple for candlestick). Other
+ * types narrow the array to a scalar to keep their formatters typed.
+ */
+function supportsArrayColor(type: string | undefined): boolean {
+    return isPointChartType(type) || type === 'candlestick';
+}
+
+/**
+ * Chart types that animate as a left-to-right reveal of the data area
+ * (rather than value-scaling each frame).
+ */
+function usesProgressReveal(type: string | undefined): boolean {
+    return isPointChartType(type) || type === 'candlestick';
+}
+
+/**
+ * Normalize candlestick input. Accepts either bare `[O,H,L,C]` tuples or
+ * `InputPoint` objects with `value: [O,H,L,C]`. Output is always
+ * `InputPoint[]` with a 4-element numeric `value` so the processor can
+ * pull O/H/L/C uniformly.
+ */
+function normalizeCandlestickInput(data: any[]): InputData[] {
+    return data.map(item => {
+        if (Array.isArray(item)) {
+            return { value: item.slice(0, 4) } as InputPoint;
+        }
+        return item as InputData;
+    });
+}
+
+/**
+ * Resolve the user-facing `color` option to a `[bullish, bearish]` pair.
+ *
+ * - `'auto'` / undefined → `['green', 'red']`
+ * - `string | Gradient` → applied to both (no bull/bear distinction)
+ * - `[bull, bear]` array → used directly (single-element arrays apply to both)
+ */
+function resolveCandlestickColors(
+    color: CustomizationOptions['color']
+): { bullColor: string | Gradient | undefined; bearColor: string | Gradient | undefined } {
+    if (color === undefined || color === 'auto') {
+        return { bullColor: DEFAULT_BULL_COLOR, bearColor: DEFAULT_BEAR_COLOR };
+    }
+    if (Array.isArray(color)) {
+        return { bullColor: color[0], bearColor: color[1] ?? color[0] };
+    }
+    return { bullColor: color, bearColor: color };
 }
 
 function resolveSeriesColors(
@@ -131,11 +185,40 @@ class Chartscii {
         this.originalRawData = data;
         const chartType = config.type || 'bar';
 
-        // Per-series array colors are only meaningful on line/step/scatter.
-        // For other chart types, narrow to a scalar so downstream formatters
-        // (typed for scalar `color`) keep working at runtime.
-        if (!isPointChartType(chartType) && Array.isArray((config as { color?: unknown }).color)) {
+        // Per-series array colors are only meaningful on line/step/scatter,
+        // and `[bullish, bearish]` tuple colors on candlestick. For other
+        // chart types, narrow to a scalar so downstream formatters (typed
+        // for scalar `color`) keep working at runtime.
+        if (!supportsArrayColor(chartType) && Array.isArray((config as { color?: unknown }).color)) {
             config.color = narrowArrayColor((config as { color?: CustomizationOptions['color'] }).color);
+        }
+
+        if (chartType === 'candlestick') {
+            // Candlestick is single-series. Normalize input (bare tuples or
+            // InputPoint with value:[O,H,L,C]) and resolve the color tuple
+            // into bull/bear slots before the processor runs.
+            const candleData = normalizeCandlestickInput(data as any[]);
+            this.originalData = candleData;
+            const { bullColor, bearColor } = resolveCandlestickColors(options?.color);
+
+            // Strip `color` from processor config so applyAutoColor doesn't
+            // cycle the palette per-candle. Per-candle overrides still flow
+            // through `point.color`. Bull/bear resolution happens here so
+            // the formatter can read it from `_bullColor` / `_bearColor`.
+            const processorConfig: ChartOptions = {
+                ...config,
+                color: undefined,
+                _bullColor: bullColor,
+                _bearColor: bearColor,
+            };
+            const processor = new ChartProcessor(processorConfig);
+            const [chart, processedOptions] = processor.process(candleData);
+            this.chart = chart;
+            this.processedOptions = processedOptions;
+
+            const candleFormatter = new CandlestickChartFormatter(processedOptions);
+            this.asciiChart = candleFormatter.format(chart);
+            return;
         }
 
         if (isPointChartType(chartType) && isMultiSeriesData(data)) {
@@ -225,12 +308,13 @@ class Chartscii {
     createAt(progress: number): string {
         const clampedProgress = Math.max(0, Math.min(1, progress));
 
-        // Line/step/scatter animate as a left-to-right reveal (no orientation
-        // to "fill"), so we keep the original data + layout and pass progress
-        // through to the formatter, which clips the data area at
-        // `progress * chartWidth`. Bar charts retain the value-scaling path.
+        // Line/step/scatter/candlestick animate as a left-to-right reveal
+        // (no orientation to "fill"), so we keep the original data + layout
+        // and pass progress through to the formatter, which clips the data
+        // area at `progress * chartWidth`. Bar charts retain the
+        // value-scaling path.
         const chartType = this.processedOptions.type;
-        if (isPointChartType(chartType)) {
+        if (usesProgressReveal(chartType)) {
             const fixedOptions: CustomizationOptions = {
                 ...this.options,
                 _animationProgress: clampedProgress,

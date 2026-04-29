@@ -26,6 +26,10 @@ class ChartValidator {
     }
 
     private validateStackedData(data: InputData[]) {
+        // Candlestick reuses the `value: number[]` slot for `[O,H,L,C]` —
+        // skip the stacked-segment uniformity check.
+        if (this.options.type === 'candlestick') return;
+
         const stackedPoints = data.filter(d => this.isStackedPoint(d));
         if (stackedPoints.length === 0) return;
 

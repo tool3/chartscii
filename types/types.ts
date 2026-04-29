@@ -25,7 +25,13 @@ export type TitleConfig = {
     padding?: TitlePadding;
 }
 
-export type ChartType = 'bar' | 'line' | 'step' | 'scatter';
+export type ChartType = 'bar' | 'line' | 'step' | 'scatter' | 'candlestick';
+
+/**
+ * Open-High-Low-Close tuple for one candlestick period.
+ * Order is fixed: `[open, high, low, close]`.
+ */
+export type OHLC = [open: number, high: number, low: number, close: number];
 
 type BaseOptions = {
     type?: ChartType;
@@ -84,6 +90,10 @@ type BaseOptions = {
     _seriesColors?: (string | Gradient | undefined)[];
     /** @internal Animation progress 0..1 for line/step/scatter (left-to-right reveal). */
     _animationProgress?: number;
+    /** @internal Resolved bullish color for candlestick (close >= open). */
+    _bullColor?: string | Gradient;
+    /** @internal Resolved bearish color for candlestick (close < open). */
+    _bearColor?: string | Gradient;
 
     /**
      * Render a legend on multi-series line / step / scatter charts. Each
@@ -161,6 +171,8 @@ export type ChartPoint = {
     scaled: number;
     percentage: number;
     segments?: ChartSegment[];
+    /** Per-candle OHLC, populated only for `type: 'candlestick'`. */
+    ohlc?: OHLC;
 }
 
 export type InputData = InputPoint | number;

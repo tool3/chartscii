@@ -31,8 +31,6 @@ export const defaultOptions: CustomizationOptions = {
     richLabels: true,
     type: 'bar',
     variant: 'sharp',
-    cellWidth: 4,
-    cellHeight: 1,
 };
 
 /**

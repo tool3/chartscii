@@ -16,4 +16,5 @@ export type {
     Structure,
     VerticalChartAlignment,
     HorizontalChartAlignment,
+    OHLC,
 } from './types/types';

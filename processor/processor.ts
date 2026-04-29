@@ -1,4 +1,4 @@
-import { InputData, ChartOptions, ChartData, InputPoint, StackedValue, ChartSegment, SegmentValue, Gradient } from '../types/types';
+import { InputData, ChartOptions, ChartData, InputPoint, StackedValue, ChartSegment, SegmentValue, Gradient, OHLC } from '../types/types';
 import ChartValidator from '../validator/validator';
 import { isGradientObject, interpolateGradientColor, normalizeColor } from '../utils/color';
 
@@ -30,7 +30,22 @@ class ChartProcessor {
     }
 
     isStackedPoint(point: InputData): point is InputPoint & { value: StackedValue } {
+        // Candlestick reuses the `value: number[]` slot for `[O,H,L,C]` —
+        // not a stacked bar, so guard the stacked path against it.
+        if (this.isCandlestick()) return false;
         return typeof point !== "number" && Array.isArray(point.value);
+    }
+
+    private isCandlestick(): boolean {
+        return this.options.type === 'candlestick';
+    }
+
+    private getOHLC(point: InputData): OHLC | undefined {
+        if (typeof point === 'number') return undefined;
+        const v = point.value;
+        if (!Array.isArray(v) || v.length < 4) return undefined;
+        const num = (x: number | SegmentValue) => typeof x === 'number' ? x : x.value;
+        return [num(v[0]), num(v[1]), num(v[2]), num(v[3])];
     }
 
     isGradient(color: any): color is Gradient {
@@ -49,6 +64,10 @@ class ChartProcessor {
     }
 
     getPointValue(point: InputData): number {
+        if (this.isCandlestick()) {
+            const ohlc = this.getOHLC(point);
+            if (ohlc) return ohlc[3]; // close — used for label fallback / value labels
+        }
         if (typeof point === "number") return point;
         if (this.isStackedPoint(point)) {
             return (point.value as Array<number | SegmentValue>).reduce<number>(
@@ -61,6 +80,7 @@ class ChartProcessor {
     getPointLabel(point: InputData, value: number): string {
         if (typeof point === "number") return point.toString();
         if (point.label) return point.label;
+        if (this.isCandlestick()) return value.toString(); // value = close
         if (this.isStackedPoint(point)) return value.toString();
         return (point.value as number).toString();
     }
@@ -99,8 +119,22 @@ class ChartProcessor {
     calculateData(data: InputData[]): number {
         const total = this.calculateTotal(data);
 
-        // First pass: calculate min and max values
+        // First pass: calculate min and max values.
+        // For candlestick, range spans `[min(low), max(high)]` across all
+        // candles — not min/max of `value`, since each candle occupies a
+        // vertical range from its low to its high.
         data.forEach(point => {
+            if (this.isCandlestick()) {
+                const ohlc = this.getOHLC(point);
+                if (ohlc) {
+                    const [, high, low] = ohlc;
+                    this.options.max.value = Math.max(high, this.options.max.value);
+                    this.options.max.min = this.options.max.min === undefined
+                        ? low
+                        : Math.min(low, this.options.max.min);
+                    return;
+                }
+            }
             const value = this.getPointValue(point);
             this.options.max.value = Math.max(value, this.options.max.value);
             if (this.options.max.min === undefined) {
@@ -283,7 +317,9 @@ class ChartProcessor {
     }
 
     sort(data: InputData[]): InputData[] {
-        if (!this.options.sort) return data;
+        // Sorting candlestick by close would scramble the time axis — silently
+        // ignore `sort: true` for candlestick to prevent foot-guns.
+        if (!this.options.sort || this.isCandlestick()) return data;
         return data.sort((a, b) => this.getPointValue(a) - this.getPointValue(b));
     }
 
@@ -299,6 +335,7 @@ class ChartProcessor {
     private createChartPoint(point: InputData, total: number) {
         const value = this.getPointValue(point);
         const segments = this.getPointSegments(point, value);
+        const ohlc = this.isCandlestick() ? this.getOHLC(point) : undefined;
 
         return {
             label: this.getPointLabel(point, value),
@@ -306,7 +343,8 @@ class ChartProcessor {
             color: this.getPointColor(point),
             scaled: Number(this.scale(value).toFixed(2)),
             percentage: this.percentage(value, total),
-            ...(segments && { segments })
+            ...(segments && { segments }),
+            ...(ohlc && { ohlc })
         };
     }
 }
