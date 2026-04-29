@@ -17,7 +17,7 @@ const chart = new Chartscii(data, {
     width: 100,
     theme: 'pastel',
     // color: ['red', 'gradient(pink, cyan)', 'blue'],
-    color: 'auto',
+    color: 'gradient(pink, cyan)',
     pointChar: '◈',    // custom point character
     fillColor: 'green',
     legend: {

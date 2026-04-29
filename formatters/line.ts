@@ -790,6 +790,11 @@ class LineChartFormatter extends ChartFormatter {
         const seriesColors = this.options._seriesColors ?? [];
         const labels = seriesColors.map((_, i) => config.values[i] ?? `Series #${i + 1}`);
 
+        const sharedGradient = this.sharedSeriesGradient(seriesColors);
+        if (sharedGradient) {
+            return this.buildGradientLegendRows(labels, sharedGradient, config, chartWidth);
+        }
+
         type Entry = { rendered: string; visualWidth: number };
         const entries: Entry[] = labels.map((label, i) => {
             const bgRgb = this.resolveLegendSwatchRgb(seriesColors[i]);
@@ -830,6 +835,90 @@ class LineChartFormatter extends ChartFormatter {
                 }
                 return content + ' '.repeat(pad);
             });
+    }
+
+    /**
+     * Returns the shared gradient when every series resolves to the same
+     * gradient (the chart-wide `color: 'gradient(...)'` case). Mixed colors
+     * or per-series-different gradients return undefined.
+     */
+    private sharedSeriesGradient(
+        seriesColors: (string | Gradient | undefined)[]
+    ): Gradient | undefined {
+        if (seriesColors.length === 0) return undefined;
+        const themeColors = this.getThemeColors();
+        const normalize = (c: string | Gradient | undefined) =>
+            typeof c === 'string' ? normalizeColor(c) : c;
+        const first = normalize(seriesColors[0]);
+        if (!isGradientObject(first)) return undefined;
+        const firstGrad = first as Gradient;
+        const signature = (g: Gradient) =>
+            g.colors.map(c => parseColorToRgb(c, themeColors).join(',')).join('|');
+        const ref = signature(firstGrad);
+        for (let i = 1; i < seriesColors.length; i++) {
+            const norm = normalize(seriesColors[i]);
+            if (!isGradientObject(norm)) return undefined;
+            if (signature(norm as Gradient) !== ref) return undefined;
+        }
+        return firstGrad;
+    }
+
+    /**
+     * Render legend labels as a single combined block painted with the chart's
+     * shared gradient. Labels are joined by single spaces and the gradient
+     * stretches across the full combined width; rows wrap to `chartWidth`
+     * while the gradient continues smoothly across wraps.
+     */
+    private buildGradientLegendRows(
+        labels: string[],
+        gradient: Gradient,
+        config: Required<LegendConfig>,
+        chartWidth: number
+    ): string[] {
+        const combined = labels.join(' ');
+        const total = combined.length;
+        if (total === 0) return [];
+
+        // Mark separator positions (the single space joined between labels)
+        // so the gradient skips them — the gradient still stretches across
+        // the full width, but the gaps between labels render as plain spaces.
+        const isSeparator = new Array(total).fill(false);
+        let cursor = 0;
+        for (let i = 0; i < labels.length; i++) {
+            cursor += labels[i].length;
+            if (i < labels.length - 1) {
+                isSeparator[cursor] = true;
+                cursor += 1;
+            }
+        }
+
+        const cells: string[] = [];
+        for (let i = 0; i < total; i++) {
+            if (isSeparator[i]) {
+                cells.push(' ');
+                continue;
+            }
+            const position = total > 1 ? i / (total - 1) : 0;
+            const [br, bg, bb] = this.getColorAtPosition(gradient, position);
+            const [fr, fg, fb] = this.contrastFgRgb([br, bg, bb]);
+            cells.push(
+                `\x1b[48;2;${br};${bg};${bb}m\x1b[38;2;${fr};${fg};${fb}m${combined[i]}\x1b[39m\x1b[49m`
+            );
+        }
+
+        const rows: string[] = [];
+        for (let start = 0; start < total; start += chartWidth) {
+            const end = Math.min(start + chartWidth, total);
+            const content = cells.slice(start, end).join('');
+            const visualWidth = end - start;
+            const pad = Math.max(0, chartWidth - visualWidth);
+            if (config.align === 'right') rows.push(' '.repeat(pad) + content);
+            else if (config.align === 'center') {
+                const left = Math.floor(pad / 2);
+                rows.push(' '.repeat(left) + content + ' '.repeat(pad - left));
+            } else rows.push(content + ' '.repeat(pad));
+        }
+        return rows;
     }
 
     private resolveLegendSwatchRgb(color: string | Gradient | undefined): [number, number, number] | undefined {
