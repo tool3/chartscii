@@ -1,6 +1,6 @@
-import { ChartData, ChartOptions, ChartPoint, Gradient } from '../types/types';
+import { ChartData, ChartOptions, ChartPoint, Gradient, LegendConfig } from '../types/types';
 import ChartFormatter, { BarDimensions } from './formatter';
-import { isGradientObject, normalizeColor } from '../utils/color';
+import { isGradientObject, normalizeColor, parseColorToRgb } from '../utils/color';
 
 /**
  * Min column distance between two adjacent labels so they have ≥ 1 space
@@ -651,6 +651,15 @@ class LineChartFormatter extends ChartFormatter {
         const title = this.formatTitle(yLabelWidth + 1 + chartWidth);
         if (title) lines.push(title);
 
+        const legendConfig = this.resolveLegendConfig();
+        const legendRows = legendConfig ? this.buildLegendRows(legendConfig, chartWidth) : [];
+        const legendPrefix = ' '.repeat(yLabelWidth) + axisChar;
+
+        if (legendConfig?.position === 'top') {
+            for (const row of legendRows) lines.push(legendPrefix + row);
+            lines.push(legendPrefix + ' '.repeat(chartWidth));
+        }
+
         for (let row = 0; row < height; row++) {
             const tick = yAxisTicks.find(t => t.row === row);
             const yLabel = tick
@@ -658,6 +667,11 @@ class LineChartFormatter extends ChartFormatter {
                 : ' '.repeat(yLabelWidth);
             const rowContent = this.colorizeRow(grid[row], row, height, chartWidth, gridColors?.[row]);
             lines.push(yLabel + axisChar + rowContent);
+        }
+
+        if (legendConfig?.position === 'bottom') {
+            lines.push(legendPrefix + ' '.repeat(chartWidth));
+            for (const row of legendRows) lines.push(legendPrefix + row);
         }
 
         if (!isNaked) {
@@ -742,6 +756,96 @@ class LineChartFormatter extends ChartFormatter {
         }
 
         return ' '.repeat(offset) + labelLine.join('');
+    }
+
+    /**
+     * Normalize the user-facing `legend` option. Returns `undefined` when the
+     * legend is disabled or the chart is single-series (multi-series only —
+     * a single-entry legend would be useless).
+     */
+    protected resolveLegendConfig(): Required<LegendConfig> | undefined {
+        const seriesCount = this.options._seriesColors?.length ?? 0;
+        if (seriesCount <= 1) return undefined;
+
+        const raw = this.options.legend;
+        if (!raw) return undefined;
+        const config = raw === true ? {} : raw;
+        if (config.enabled === false) return undefined;
+
+        return {
+            enabled: true,
+            values: config.values ?? [],
+            position: config.position ?? 'top',
+            align: config.align ?? 'left',
+        };
+    }
+
+    /**
+     * Render legend entries into `chartWidth`-wide rows. Each entry uses the
+     * series color as background with an auto-contrasted (luminance-based)
+     * foreground. Greedy-wraps to a new row when an entry would overflow,
+     * with a single space separator between entries on the same row.
+     */
+    protected buildLegendRows(config: Required<LegendConfig>, chartWidth: number): string[] {
+        const seriesColors = this.options._seriesColors ?? [];
+        const labels = seriesColors.map((_, i) => config.values[i] ?? `Series #${i + 1}`);
+
+        type Entry = { rendered: string; visualWidth: number };
+        const entries: Entry[] = labels.map((label, i) => {
+            const bgRgb = this.resolveLegendSwatchRgb(seriesColors[i]);
+            if (!bgRgb) return { rendered: label, visualWidth: label.length };
+            const [fr, fg, fb] = this.contrastFgRgb(bgRgb);
+            const [br, bg, bb] = bgRgb;
+            const rendered = `\x1b[48;2;${br};${bg};${bb}m\x1b[38;2;${fr};${fg};${fb}m${label}\x1b[39m\x1b[49m`;
+            return { rendered, visualWidth: label.length };
+        });
+
+        const rows: Entry[][] = [[]];
+        let currentWidth = 0;
+        for (const entry of entries) {
+            const sepWidth = rows[rows.length - 1].length > 0 ? 1 : 0;
+            const additional = entry.visualWidth + sepWidth;
+            if (currentWidth + additional > chartWidth && rows[rows.length - 1].length > 0) {
+                rows.push([entry]);
+                currentWidth = entry.visualWidth;
+            } else {
+                rows[rows.length - 1].push(entry);
+                currentWidth += additional;
+            }
+        }
+
+        return rows
+            .filter(row => row.length > 0)
+            .map(row => {
+                const visualWidth = row.reduce(
+                    (sum, e, i) => sum + e.visualWidth + (i > 0 ? 1 : 0),
+                    0
+                );
+                const content = row.map(e => e.rendered).join(' ');
+                const pad = Math.max(0, chartWidth - visualWidth);
+                if (config.align === 'right') return ' '.repeat(pad) + content;
+                if (config.align === 'center') {
+                    const left = Math.floor(pad / 2);
+                    return ' '.repeat(left) + content + ' '.repeat(pad - left);
+                }
+                return content + ' '.repeat(pad);
+            });
+    }
+
+    private resolveLegendSwatchRgb(color: string | Gradient | undefined): [number, number, number] | undefined {
+        if (!color) return undefined;
+        const normalized = typeof color === 'string' ? normalizeColor(color) : color;
+        if (isGradientObject(normalized)) {
+            const grad = normalized as Gradient;
+            if (grad.colors.length === 0) return undefined;
+            return parseColorToRgb(grad.colors[0], this.getThemeColors());
+        }
+        return parseColorToRgb(normalized as string, this.getThemeColors());
+    }
+
+    private contrastFgRgb(rgb: [number, number, number]): [number, number, number] {
+        const luminance = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+        return luminance > 128 ? [0, 0, 0] : [255, 255, 255];
     }
 }
 

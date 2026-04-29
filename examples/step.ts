@@ -13,19 +13,13 @@ for (let i = 0; i < 12; i++) {
 
 // create chart
 const chart = new Chartscii(data, {
-    type: 'line',
+    type: 'step',
     width: 100,
     theme: 'pastel',
-    // color: ['red', 'gradient(pink, cyan)', 'blue'],
-    color: 'auto',
+    variant: 'smooth', // 'smooth' (╭╮╰╯) or 'sharp' (/\)
+    color: ['red', 'gradient(green, red)', 'blue'],
     pointChar: '◈',    // custom point character
-    fillColor: 'green',
-    legend: {
-        enabled: true,
-        // position: 'top',
-        // align: 'left',
-        values: ['1st quarter', '2nd quarter', '3rd quarter'],
-    },
+    fillColor: 'green'
 });
 
 //print chart

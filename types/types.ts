@@ -98,6 +98,23 @@ type BaseOptions = {
     _finalMaxBarLength?: number;
     /** @internal Resolved per-series colors for line/step/scatter (set by Chartscii). */
     _seriesColors?: (string | Gradient | undefined)[];
+
+    /**
+     * Render a legend on multi-series line / step / scatter charts. Each
+     * entry is the series label with its series color as background. Single-
+     * series charts ignore this option.
+     *
+     * `true` uses defaults (`position: 'top'`, `align: 'left'`, values
+     * default to `Series #1`, `Series #2`, …).
+     */
+    legend?: boolean | LegendConfig;
+}
+
+export type LegendConfig = {
+    enabled?: boolean;
+    values?: string[];
+    position?: 'top' | 'bottom';
+    align?: 'left' | 'center' | 'right';
 }
 
 type VerticalChartOptions = BaseOptions & {
