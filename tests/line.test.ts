@@ -70,30 +70,37 @@ describe('line chart', () => {
             const output = chart.create();
 
             expect(output).to.include('◈');
+            await snap(output, 'line with points');
         });
 
-        test('legend is ignored for single-series (multi-series only)', () => {
+        test('legend is ignored for single-series (multi-series only)', async () => {
             const data = [10, 20, 30];
             const chart = new Chartscii(data, {
                 type: 'line', width: 40, height: 6, color: 'red',
                 legend: { enabled: true, values: ['Series A'] },
             });
-            const plain = stripAnsi(chart.create());
+            const output = chart.create();
+            const plain = stripAnsi(output);
             expect(plain).to.not.include('Series A');
+            await snap(output, 'line legend ignored single-series');
         });
 
-        test('animation reveals line from left to right', () => {
+        test('animation reveals line from left to right', async () => {
             const data = [10, 20, 30, 25, 40, 35, 28, 18];
             const chart = new Chartscii(data, { type: 'line', width: 60, height: 8, color: 'cyan' });
-            const empty = stripAnsi(chart.createAt(0));
-            const half = stripAnsi(chart.createAt(0.5));
-            const full = stripAnsi(chart.createAt(1));
+            const empty = chart.createAt(0);
+            const half = chart.createAt(0.5);
+            const full = chart.createAt(1);
 
-            const lineChars = (s: string) => (s.match(/[╱╲‾_]/g) || []).length;
+            const lineChars = (s: string) => (stripAnsi(s).match(/[╱╲‾_]/g) || []).length;
             expect(lineChars(empty)).to.equal(0);
             expect(lineChars(half)).to.be.greaterThan(0);
             expect(lineChars(full)).to.be.greaterThan(lineChars(half));
-            expect(chart.createAt(1)).to.equal(chart.create());
+            expect(full).to.equal(chart.create());
+
+            await snap(empty, 'line animation progress 0');
+            await snap(half, 'line animation progress 0.5');
+            await snap(full, 'line animation progress 1');
         });
     });
 
@@ -118,7 +125,7 @@ describe('line chart', () => {
             await snap(output, 'line multi-series colors');
         });
 
-        test('color: auto cycles palette across series', () => {
+        test('color: auto cycles palette across series', async () => {
             const chart = new Chartscii(multiData, {
                 type: 'line', width: 50, height: 8, color: 'auto',
             });
@@ -128,9 +135,10 @@ describe('line chart', () => {
             for (const code of seriesColors) {
                 expect(output).to.include(code);
             }
+            await snap(output, 'line multi-series auto');
         });
 
-        test('shared gradient renders gradient legend block (combined labels)', () => {
+        test('shared gradient renders gradient legend block (combined labels)', async () => {
             const chart = new Chartscii(multiData, {
                 type: 'line', width: 60, height: 8,
                 color: 'gradient(red, blue)',
@@ -142,8 +150,8 @@ describe('line chart', () => {
             expect(plain).to.include('Alpha');
             expect(plain).to.include('Beta');
             expect(plain).to.include('Gamma');
-            // Gradient legend uses bg color escapes (48;2;) per character
             expect(output).to.include('\x1b[48;2;');
+            await snap(output, 'line multi-series shared gradient + legend');
         });
     });
 
@@ -153,59 +161,65 @@ describe('line chart', () => {
             [{ value: 15 }, { value: 25 }, { value: 35 }],
         ];
 
-        test('legend: true uses defaults (top, left, "Series #N")', () => {
+        test('legend: true uses defaults (top, left, "Series #N")', async () => {
             const chart = new Chartscii(data, {
                 type: 'line', width: 50, height: 8, color: ['red', 'blue'],
                 legend: true,
             });
-            const plain = stripAnsi(chart.create());
+            const output = chart.create();
+            const plain = stripAnsi(output);
             expect(plain).to.include('Series #1');
             expect(plain).to.include('Series #2');
+            await snap(output, 'line legend default values');
         });
 
-        test('custom legend values override defaults', () => {
+        test('custom legend values override defaults', async () => {
             const chart = new Chartscii(data, {
                 type: 'line', width: 50, height: 8, color: ['red', 'blue'],
                 legend: { values: ['Sales', 'Costs'] },
             });
-            const plain = stripAnsi(chart.create());
+            const output = chart.create();
+            const plain = stripAnsi(output);
             expect(plain).to.include('Sales');
             expect(plain).to.include('Costs');
             expect(plain).to.not.include('Series #1');
+            await snap(output, 'line legend custom values');
         });
 
-        test('legend position bottom places legend after data, before axis', () => {
+        test('legend position bottom places legend after data, before axis', async () => {
             const chart = new Chartscii(data, {
                 type: 'line', width: 50, height: 8, color: ['red', 'blue'],
                 legend: { values: ['A', 'B'], position: 'bottom' },
             });
-            const lines = stripAnsi(chart.create()).split('\n');
+            const output = chart.create();
+            const lines = stripAnsi(output).split('\n');
             const legendIdx = lines.findIndex(l => l.includes('A') && l.includes('B'));
             const axisIdx = lines.findIndex(l => l.includes('╚'));
             expect(legendIdx).to.be.lessThan(axisIdx);
             expect(legendIdx).to.be.greaterThan(0);
+            await snap(output, 'line legend position bottom');
         });
 
-        test('legend bg uses the series color', () => {
+        test('legend bg uses the series color', async () => {
             const chart = new Chartscii(data, {
                 type: 'line', width: 50, height: 8, color: ['red', 'blue'],
                 legend: { values: ['A', 'B'] },
             });
             const output = chart.create();
-            // True-color bg ANSI for swatch styling
             expect(output).to.include('\x1b[48;2;');
+            await snap(output, 'line legend swatch bg');
         });
 
-        test('legend: enabled: false disables legend', () => {
+        test('legend enabled:false disables the legend', async () => {
             const chart = new Chartscii(data, {
                 type: 'line', width: 50, height: 8, color: ['red', 'blue'],
                 legend: { enabled: false, values: ['A', 'B'] },
             });
-            const plain = stripAnsi(chart.create());
-            // 'A' and 'B' would appear in the legend row; without the legend
-            // they shouldn't be in the output (unlikely to collide with axis).
+            const output = chart.create();
+            const plain = stripAnsi(output);
             const dataLines = plain.split('\n').slice(0, -2).join('\n');
             expect(dataLines).to.not.match(/\bA\b.*\bB\b/);
+            await snap(output, 'line legend disabled');
         });
     });
 });

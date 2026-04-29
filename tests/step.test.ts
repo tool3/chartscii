@@ -15,7 +15,6 @@ describe('step chart', () => {
 
             expect(output).to.include('║');
             expect(output).to.include('╚');
-            // Default variant is 'sharp' — square corners.
             expect(plain).to.match(/[┌┐└┘]/);
             expect(plain).to.not.match(/[╭╮╰╯]/);
             await snap(output, 'step sharp default');
@@ -34,18 +33,20 @@ describe('step chart', () => {
             await snap(output, 'step smooth variant');
         });
 
-        test('horizontal segments use ─ between same-row points', () => {
+        test('horizontal segments use ─ between same-row points', async () => {
             const data = [20, 20, 20];
             const chart = new Chartscii(data, { type: 'step', width: 40, height: 6 });
-            const plain = stripAnsi(chart.create());
-            expect(plain).to.include('─');
+            const output = chart.create();
+            expect(stripAnsi(output)).to.include('─');
+            await snap(output, 'step horizontal segments');
         });
 
-        test('vertical risers use │ on column transitions', () => {
+        test('vertical risers use │ on column transitions', async () => {
             const data = [5, 40, 5, 40];
             const chart = new Chartscii(data, { type: 'step', width: 40, height: 8 });
-            const plain = stripAnsi(chart.create());
-            expect(plain).to.include('│');
+            const output = chart.create();
+            expect(stripAnsi(output)).to.include('│');
+            await snap(output, 'step vertical risers');
         });
 
         test('labeled data places labels under their points', async () => {
@@ -56,21 +57,24 @@ describe('step chart', () => {
                 { value: 35, label: 'Thu' },
             ];
             const chart = new Chartscii(data, { type: 'step', width: 50, height: 6 });
-            const plain = stripAnsi(chart.create());
+            const output = chart.create();
+            const plain = stripAnsi(output);
 
             expect(plain).to.include('Mon');
             expect(plain).to.include('Tue');
             expect(plain).to.include('Wed');
             expect(plain).to.include('Thu');
+            await snap(output, 'step labeled');
         });
 
-        test('solid color paints the whole step path', () => {
+        test('solid color paints the whole step path', async () => {
             const data = [5, 15, 10, 25];
             const chart = new Chartscii(data, {
                 type: 'step', width: 40, height: 6, color: 'cyan',
             });
             const output = chart.create();
             expect(output).to.include('\x1b[96m');
+            await snap(output, 'step solid color');
         });
 
         test('horizontal gradient interpolates across the x-axis', async () => {
@@ -84,10 +88,10 @@ describe('step chart', () => {
             const colorMatches = output.match(/\x1b\[38;2;(\d+);(\d+);(\d+)m/g) || [];
             const uniqueColors = new Set(colorMatches);
             expect(uniqueColors.size).to.be.greaterThan(2);
-            await snap(output, 'step gradient');
+            await snap(output, 'step gradient horizontal');
         });
 
-        test('points: true draws point markers', () => {
+        test('points: true draws point markers', async () => {
             const data = [10, 20, 15, 30];
             const chart = new Chartscii(data, {
                 type: 'step', width: 40, height: 6,
@@ -95,20 +99,25 @@ describe('step chart', () => {
             });
             const output = chart.create();
             expect(output).to.include('◆');
+            await snap(output, 'step with points');
         });
 
-        test('animation reveals step from left to right', () => {
+        test('animation reveals step from left to right', async () => {
             const data = [10, 20, 30, 25, 40, 35, 28, 18];
             const chart = new Chartscii(data, { type: 'step', width: 60, height: 8, color: 'cyan' });
-            const empty = stripAnsi(chart.createAt(0));
-            const half = stripAnsi(chart.createAt(0.5));
-            const full = stripAnsi(chart.createAt(1));
+            const empty = chart.createAt(0);
+            const half = chart.createAt(0.5);
+            const full = chart.createAt(1);
 
-            const stepChars = (s: string) => (s.match(/[─│╭╮╰╯┌┐└┘]/g) || []).length;
+            const stepChars = (s: string) => (stripAnsi(s).match(/[─│╭╮╰╯┌┐└┘]/g) || []).length;
             expect(stepChars(empty)).to.equal(0);
             expect(stepChars(half)).to.be.greaterThan(0);
             expect(stepChars(full)).to.be.greaterThan(stepChars(half));
-            expect(chart.createAt(1)).to.equal(chart.create());
+            expect(full).to.equal(chart.create());
+
+            await snap(empty, 'step animation progress 0');
+            await snap(half, 'step animation progress 0.5');
+            await snap(full, 'step animation progress 1');
         });
     });
 
@@ -133,7 +142,7 @@ describe('step chart', () => {
             await snap(output, 'step multi-series colors');
         });
 
-        test('shared gradient renders gradient legend block', () => {
+        test('shared gradient renders gradient legend block', async () => {
             const chart = new Chartscii(multiData, {
                 type: 'step', width: 60, height: 8,
                 color: 'gradient(red, blue)',
@@ -146,15 +155,18 @@ describe('step chart', () => {
             expect(plain).to.include('Beta');
             expect(plain).to.include('Gamma');
             expect(output).to.include('\x1b[48;2;');
+            await snap(output, 'step multi-series shared gradient + legend');
         });
 
-        test('sharp variant applies to multi-series too', () => {
+        test('sharp variant applies to multi-series too', async () => {
             const chart = new Chartscii(multiData, {
                 type: 'step', width: 50, height: 8,
                 color: ['red', 'green', 'blue'], variant: 'sharp',
             });
-            const plain = stripAnsi(chart.create());
+            const output = chart.create();
+            const plain = stripAnsi(output);
             expect(plain).to.match(/[┌┐└┘]/);
+            await snap(output, 'step multi-series sharp');
         });
     });
 
@@ -164,26 +176,30 @@ describe('step chart', () => {
             [{ value: 15 }, { value: 25 }, { value: 35 }],
         ];
 
-        test('legend: true uses default series names', () => {
+        test('legend: true uses default series names', async () => {
             const chart = new Chartscii(data, {
                 type: 'step', width: 50, height: 8, color: ['red', 'blue'],
                 legend: true,
             });
-            const plain = stripAnsi(chart.create());
+            const output = chart.create();
+            const plain = stripAnsi(output);
             expect(plain).to.include('Series #1');
             expect(plain).to.include('Series #2');
+            await snap(output, 'step legend default values');
         });
 
-        test('legend custom values + bottom position', () => {
+        test('legend custom values + bottom position', async () => {
             const chart = new Chartscii(data, {
                 type: 'step', width: 50, height: 8, color: ['red', 'blue'],
                 legend: { values: ['Up', 'Down'], position: 'bottom' },
             });
-            const lines = stripAnsi(chart.create()).split('\n');
+            const output = chart.create();
+            const lines = stripAnsi(output).split('\n');
             const legendIdx = lines.findIndex(l => l.includes('Up') && l.includes('Down'));
             const axisIdx = lines.findIndex(l => l.includes('╚'));
             expect(legendIdx).to.be.greaterThan(0);
             expect(legendIdx).to.be.lessThan(axisIdx);
+            await snap(output, 'step legend custom values bottom');
         });
     });
 });
