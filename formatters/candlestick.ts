@@ -95,7 +95,7 @@ class CandlestickChartFormatter extends LineChartFormatter {
         const barCount = chart.length;
         const barSize = this.options.barSize ?? 1;
 
-        if (this.options.padding !== undefined && this.options.padding > 0) {
+        if (this.options.padding !== undefined) {
             const padding = this.options.padding;
             const slotWidth = barSize + padding;
             const starts = Array.from({ length: barCount }, (_, i) => i * slotWidth);
@@ -103,7 +103,7 @@ class CandlestickChartFormatter extends LineChartFormatter {
             return {
                 barSize,
                 candleStarts: starts,
-                chartWidth: Math.max(totalDataWidth, requestedWidth),
+                chartWidth: Math.max(totalDataWidth, barSize),
             };
         }
 
@@ -136,6 +136,51 @@ class CandlestickChartFormatter extends LineChartFormatter {
      */
     public formatMulti(charts: ChartData[]): string {
         return this.format(charts[0] ?? new Map());
+    }
+
+    /**
+     * Color each x-axis label with its candle's resolved color so labels
+     * track bull/bear, per-candle overrides, and time-decay gradients the
+     * same way the bodies do. Falls back to the uncolored base when
+     * `colorLabels` is off.
+     */
+    protected formatXLabels(points: GridPoint[], offset: number, chartWidth: number): string {
+        if (!this.options.colorLabels) {
+            return super.formatXLabels(points, offset, chartWidth);
+        }
+
+        type Cell = { ch: string; color?: string };
+        const cells: Cell[] = Array.from({ length: chartWidth }, () => ({ ch: ' ' }));
+        const total = points.length;
+
+        for (let i = 0; i < points.length; i++) {
+            const { col, point } = points[i];
+            const label = point.label ?? '';
+            if (!label) continue;
+
+            let labelColor: string | undefined;
+            if (point.ohlc) {
+                const [open, , , close] = point.ohlc;
+                labelColor = this.resolveCandleColor(point, close >= open, i, total);
+            }
+
+            const start = Math.max(0, col - Math.floor(label.length / 2));
+            for (let j = 0; j < label.length && start + j < chartWidth; j++) {
+                cells[start + j] = { ch: label[j], color: labelColor };
+            }
+        }
+
+        let out = ' '.repeat(offset);
+        for (const { ch, color } of cells) {
+            if (!color || ch === ' ') {
+                out += ch;
+            } else if (color.startsWith('\x1b[38;2;')) {
+                out += `${color}${ch}\x1b[39m`;
+            } else {
+                out += this.colorify(ch, color);
+            }
+        }
+        return out;
     }
 
     private drawCandle(

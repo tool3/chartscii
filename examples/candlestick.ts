@@ -40,9 +40,10 @@ const month: InputData[] = [
 
 const chart = new Chartscii(month, {
     type: 'candlestick',
-    width: 120,
+    // width: 120,
     height: 18,
-    title: { text: 'BTC/USD — 30d', align: 'center' },
+    color: 'gradient(green,red:reverse)',
+    title: { text: 'BTC/USD — 30d', align: 'center', color: 'gradient' },
     legend: { position: 'top', align: 'right' },
 });
 

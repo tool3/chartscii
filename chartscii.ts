@@ -208,6 +208,7 @@ class Chartscii {
             const processorConfig: ChartOptions = {
                 ...config,
                 color: undefined,
+                padding: options?.padding,
                 _bullColor: bullColor,
                 _bearColor: bearColor,
             };

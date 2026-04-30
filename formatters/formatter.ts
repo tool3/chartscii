@@ -390,11 +390,20 @@ abstract class ChartFormatter {
 
         // Apply color
         if (color === 'gradient') {
-            // Use gradient if the chart has a gradient color
-            if (this.isGradient(this.options.color)) {
-                formattedText = this.colorify(text, this.options.color);
+            // line/step/scatter stash the chart color on `_seriesColors[0]`
+            // and candlestick on `_bullColor` — `options.color` is undefined
+            // by then. Check those fallbacks so a `title.color: 'gradient'`
+            // request follows the actual chart gradient regardless of type.
+            const chartColor = this.isGradient(this.options.color)
+                ? this.options.color
+                : this.isGradient(this.options._seriesColors?.[0])
+                    ? this.options._seriesColors![0]
+                    : this.isGradient(this.options._bullColor)
+                        ? this.options._bullColor
+                        : undefined;
+            if (chartColor) {
+                formattedText = this.colorify(text, chartColor);
             }
-            // If no gradient is present, leave uncolored (per user spec)
         } else if (color) {
             // Apply the specified color (string or ANSI)
             formattedText = this.colorify(text, color);

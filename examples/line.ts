@@ -20,6 +20,10 @@ const chart = new Chartscii(data, {
     color: 'gradient(pink, cyan)',
     pointChar: '◈',    // custom point character
     fillColor: 'green',
+    title: {
+        text: 'hello',
+        color: 'gradient'
+    },
     legend: {
         enabled: true,
         // position: 'top',
@@ -29,5 +33,5 @@ const chart = new Chartscii(data, {
 });
 
 //print chart
-// console.log(chart.create());
-chart.animate();
+console.log(chart.create());
+// chart.animate();
