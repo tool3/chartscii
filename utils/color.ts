@@ -261,7 +261,8 @@ export function applyGradientToText(text: string, gradient: Gradient, themeColor
 
     let result = '';
     for (let i = 0; i < chars.length; i++) {
-        const position = chars.length > 1 ? i / (chars.length - 1) : 0;
+        let position = chars.length > 1 ? i / (chars.length - 1) : 0;
+        if (gradient.reverse) position = 1 - position;
         const [r, g, b] = getColorAtPosition(gradient, position, themeColors);
         result += `\x1b[38;2;${r};${g};${b}m${chars[i]}\x1b[39m`;
     }
