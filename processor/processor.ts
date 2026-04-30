@@ -54,6 +54,21 @@ class ChartProcessor {
         return undefined;
     }
 
+    /**
+     * Status row mode: when `value` is an array of numbers/strings, return one
+     * status key per cell. Used by the status formatter to render a row of
+     * colored cells with the point's `label` on the left.
+     */
+    private getStatuses(point: InputData): string[] | undefined {
+        if (typeof point === 'number') return undefined;
+        const v = point.value;
+        if (!Array.isArray(v)) return undefined;
+        return v.map(entry => {
+            if (typeof entry === 'number' || typeof entry === 'string') return String(entry);
+            return String((entry as SegmentValue).value);
+        });
+    }
+
     private getOHLC(point: InputData): OHLC | undefined {
         if (typeof point === 'number') return undefined;
         const v = point.value;
@@ -359,7 +374,11 @@ class ChartProcessor {
         const value = this.getPointValue(point);
         const segments = this.getPointSegments(point, value);
         const ohlc = this.isCandlestick() ? this.getOHLC(point) : undefined;
-        const status = this.isStatus() ? this.getStatus(point) : undefined;
+        const statuses = this.isStatus() ? this.getStatuses(point) : undefined;
+        // For status charts with array values we use `statuses`; only emit the
+        // scalar `status` field when there is no array (so the formatter can
+        // distinguish single-cell from row-mode points).
+        const status = this.isStatus() && !statuses ? this.getStatus(point) : undefined;
 
         return {
             label: this.getPointLabel(point, value),
@@ -369,7 +388,8 @@ class ChartProcessor {
             percentage: this.percentage(value, total),
             ...(segments && { segments }),
             ...(ohlc && { ohlc }),
-            ...(status && { status })
+            ...(status && { status }),
+            ...(statuses && { statuses })
         };
     }
 }

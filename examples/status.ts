@@ -5,7 +5,9 @@ import { InputData } from '../types/types';
 // 36 hosts across web/api/db/cache/lb/queue/search/cdn tiers — mostly
 // healthy with a few notable incidents.
 const fleet: InputData[] = [
-    { value: 1, label: 'web1' }, { value: 1, label: 'web2' }, { value: 1, label: 'web3' },
+    // { value: [1, 0, 1, 0], label: 'web1' }, 
+    // { value: [0, 1, 1, 0], label: 'web2' }, 
+    // { value: [1, 0, 1, 2], label: 'web3' },
     { value: 2, label: 'web4' }, { value: 1, label: 'web5' }, { value: 1, label: 'web6' },
     { value: 1, label: 'api1' }, { value: 1, label: 'api2' }, { value: 2, label: 'api3' },
     { value: 1, label: 'api4' }, { value: 1, label: 'api5' }, { value: 1, label: 'api6' },
@@ -17,24 +19,25 @@ const fleet: InputData[] = [
     { value: 1, label: 'cdn1' }, { value: 1, label: 'cdn2' }, { value: 1, label: 'cdn3' },
     { value: 1, label: 'mon1' }, { value: 1, label: 'mon2' }, { value: 1, label: 'log1' },
     { value: 1, label: 'log2' }, { value: 1, label: 'auth1' }, { value: 1, label: 'auth2' },
+    { value: 1, label: 'log3' }, { value: 1, label: 'auth1' }, { value: 1, label: 'auth6' },
 ];
 
 const chart = new Chartscii(fleet, {
     type: 'status',
-    width: 50,
+    width: 100,
     color: {
         0: 'red',     // down
         1: 'green',   // ok
         2: 'yellow',  // warning
         3: '#888888', // maintenance
     },
-    theme: 'nature',
+    theme: 'pastel',
     barSize: 5,
     padding: 1,
     title: { text: 'Production fleet — 36 hosts', align: 'center' },
     legend: {
         position: 'top',
-        align: 'center',
+        align: 'right',
         values: ['down', 'ok', 'warning', 'maintenance'],
     },
 });

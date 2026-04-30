@@ -185,6 +185,12 @@ export type ChartPoint = {
     ohlc?: OHLC;
     /** Status key for `type: 'status'`, used for color lookup. */
     status?: string;
+    /**
+     * Per-cell status keys for row-mode `type: 'status'` charts (when the
+     * input `value` is an array). Each entry maps to a colored cell on the
+     * row's x-axis; the row's `label` shows on the left (y-axis).
+     */
+    statuses?: string[];
 }
 
 export type InputData = InputPoint | number;
