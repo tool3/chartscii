@@ -33,11 +33,25 @@ class ChartProcessor {
         // Candlestick reuses the `value: number[]` slot for `[O,H,L,C]` —
         // not a stacked bar, so guard the stacked path against it.
         if (this.isCandlestick()) return false;
+        if (this.isStatus()) return false;
         return typeof point !== "number" && Array.isArray(point.value);
     }
 
     private isCandlestick(): boolean {
         return this.options.type === 'candlestick';
+    }
+
+    private isStatus(): boolean {
+        return this.options.type === 'status';
+    }
+
+    private getStatus(point: InputData): string | undefined {
+        // Bare number/string in the data array is the status key directly.
+        if (typeof point === 'number') return String(point);
+        const v = point.value;
+        if (typeof v === 'number') return String(v);
+        if (typeof v === 'string') return v;
+        return undefined;
     }
 
     private getOHLC(point: InputData): OHLC | undefined {
@@ -64,6 +78,7 @@ class ChartProcessor {
     }
 
     getPointValue(point: InputData): number {
+        if (this.isStatus()) return 0; // status has no numeric value; layout is fixed-size cells
         if (this.isCandlestick()) {
             const ohlc = this.getOHLC(point);
             if (ohlc) return ohlc[3]; // close — used for label fallback / value labels
@@ -78,9 +93,12 @@ class ChartProcessor {
     }
 
     getPointLabel(point: InputData, value: number): string {
-        if (typeof point === "number") return point.toString();
+        if (typeof point === "number") {
+            return this.isStatus() ? '' : point.toString();
+        }
         if (point.label) return point.label;
         if (this.isCandlestick()) return value.toString(); // value = close
+        if (this.isStatus()) return ''; // bare status keys aren't meaningful labels
         if (this.isStackedPoint(point)) return value.toString();
         return (point.value as number).toString();
     }
@@ -123,6 +141,10 @@ class ChartProcessor {
         // For candlestick, range spans `[min(low), max(high)]` across all
         // candles — not min/max of `value`, since each candle occupies a
         // vertical range from its low to its high.
+        // Status has no numeric value scale, so skip min/max entirely.
+        if (this.isStatus()) {
+            return data.reduce<number>((sum, point) => sum + this.getPointValue(point), 0);
+        }
         data.forEach(point => {
             if (this.isCandlestick()) {
                 const ohlc = this.getOHLC(point);
@@ -318,8 +340,9 @@ class ChartProcessor {
 
     sort(data: InputData[]): InputData[] {
         // Sorting candlestick by close would scramble the time axis — silently
-        // ignore `sort: true` for candlestick to prevent foot-guns.
-        if (!this.options.sort || this.isCandlestick()) return data;
+        // ignore `sort: true` for candlestick to prevent foot-guns. Status has
+        // no numeric value to sort by, so ignore it there too.
+        if (!this.options.sort || this.isCandlestick() || this.isStatus()) return data;
         return data.sort((a, b) => this.getPointValue(a) - this.getPointValue(b));
     }
 
@@ -336,6 +359,7 @@ class ChartProcessor {
         const value = this.getPointValue(point);
         const segments = this.getPointSegments(point, value);
         const ohlc = this.isCandlestick() ? this.getOHLC(point) : undefined;
+        const status = this.isStatus() ? this.getStatus(point) : undefined;
 
         return {
             label: this.getPointLabel(point, value),
@@ -344,7 +368,8 @@ class ChartProcessor {
             scaled: Number(this.scale(value).toFixed(2)),
             percentage: this.percentage(value, total),
             ...(segments && { segments }),
-            ...(ohlc && { ohlc })
+            ...(ohlc && { ohlc }),
+            ...(status && { status })
         };
     }
 }

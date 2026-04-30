@@ -1,12 +1,13 @@
 import HorizontalChartFormatter from './formatters/horizontal';
 import ChartProcessor from './processor/processor';
 import { createOptions } from './options/options';
-import { InputData, InputPoint, ChartData, ChartOptions, CustomizationOptions, AnimationOptions, EasingFunction, Gradient } from './types/types';
+import { InputData, InputPoint, ChartData, ChartOptions, CustomizationOptions, AnimationOptions, EasingFunction, Gradient, StatusColors } from './types/types';
 import VerticalChartFormatter from './formatters/vertical';
 import LineChartFormatter from './formatters/line';
 import StepChartFormatter from './formatters/step';
 import ScatterChartFormatter from './formatters/scatter';
 import CandlestickChartFormatter from './formatters/candlestick';
+import StatusChartFormatter from './formatters/status';
 
 const SERIES_AUTO_COLORS = ['red', 'green', 'yellow', 'blue', 'purple', 'cyan', 'pink', 'orange', 'marine'];
 const DEFAULT_BULL_COLOR = 'green';
@@ -30,7 +31,51 @@ function supportsArrayColor(type: string | undefined): boolean {
  * (rather than value-scaling each frame).
  */
 function usesProgressReveal(type: string | undefined): boolean {
-    return isPointChartType(type) || type === 'candlestick';
+    return isPointChartType(type) || type === 'candlestick' || type === 'status';
+}
+
+/**
+ * `color` for `type: 'status'` is a `Record<string, color>` map. This
+ * predicate distinguishes that shape from gradient objects and arrays so
+ * other chart types can narrow it away.
+ */
+function isStatusColorMap(color: any): color is StatusColors {
+    return color !== null
+        && typeof color === 'object'
+        && !Array.isArray(color)
+        && color.type !== 'gradient';
+}
+
+/**
+ * Normalize status input. Accepts:
+ *   - bare status numbers (`0`, `1`, `2`) — keys into the color map
+ *   - bare status strings (`'ok'`) — also valid keys
+ *   - `InputPoint` objects with `value: 0` or `value: 'ok'`
+ *   - `{ status: 0, label?: 'web-01' }` shorthand
+ * Output is uniform `InputPoint[]` with the status (number or string) in
+ * `value`; the processor coerces it to a string lookup key downstream.
+ */
+function normalizeStatusInput(data: any[]): InputData[] {
+    return data.map(item => {
+        if (typeof item === 'number' || typeof item === 'string') {
+            return { value: item } as InputPoint;
+        }
+        if (item && typeof item === 'object' && (item as any).status !== undefined && (item as any).value === undefined) {
+            const { status, label, color } = item as { status: string | number; label?: string; color?: string };
+            return { value: status as any, label, color } as InputPoint;
+        }
+        return item as InputData;
+    });
+}
+
+/**
+ * Pull the user-facing `color` option into a `StatusColors` map when it is
+ * a plain object map (`{ ok: 'green', error: 'red' }`). Returns undefined
+ * for any other shape — per-point `point.color` overrides still apply.
+ */
+function resolveStatusColors(color: CustomizationOptions['color']): StatusColors | undefined {
+    if (isStatusColorMap(color)) return color;
+    return undefined;
 }
 
 /**
@@ -58,7 +103,7 @@ function normalizeCandlestickInput(data: any[]): InputData[] {
 function resolveCandlestickColors(
     color: CustomizationOptions['color']
 ): { bullColor: string | Gradient | undefined; bearColor: string | Gradient | undefined } {
-    if (color === undefined || color === 'auto') {
+    if (color === undefined || color === 'auto' || isStatusColorMap(color)) {
         return { bullColor: DEFAULT_BULL_COLOR, bearColor: DEFAULT_BEAR_COLOR };
     }
     if (Array.isArray(color)) {
@@ -77,6 +122,9 @@ function resolveSeriesColors(
     if (Array.isArray(color)) {
         return Array.from({ length: seriesCount }, (_, i) => color[i]);
     }
+    if (isStatusColorMap(color)) {
+        return Array.from({ length: seriesCount }, () => undefined);
+    }
     return Array.from({ length: seriesCount }, () => color as string | Gradient | undefined);
 }
 
@@ -87,6 +135,7 @@ function resolveSeriesColors(
  */
 function narrowArrayColor(color: CustomizationOptions['color']): string | 'auto' | Gradient | undefined {
     if (Array.isArray(color)) return color[0];
+    if (isStatusColorMap(color)) return undefined;
     return color;
 }
 
@@ -191,6 +240,37 @@ class Chartscii {
         // for scalar `color`) keep working at runtime.
         if (!supportsArrayColor(chartType) && Array.isArray((config as { color?: unknown }).color)) {
             config.color = narrowArrayColor((config as { color?: CustomizationOptions['color'] }).color);
+        }
+        // Status uses a `Record<string, color>` map. For other chart types,
+        // discard that shape so it can't leak into formatters that expect a
+        // scalar.
+        if (chartType !== 'status' && isStatusColorMap((config as { color?: unknown }).color)) {
+            config.color = undefined;
+        }
+
+        if (chartType === 'status') {
+            // Status chart: a row of colored blocks where each block's color
+            // comes from a `Record<status, color>` map. Strip `color` from
+            // the processor config so applyAutoColor doesn't paint per-point;
+            // per-point `point.color` overrides still flow through.
+            const statusData = normalizeStatusInput(data as any[]);
+            this.originalData = statusData;
+            const statusColors = resolveStatusColors(options?.color);
+
+            const processorConfig: ChartOptions = {
+                ...config,
+                color: undefined,
+                padding: options?.padding,
+                _statusColors: statusColors,
+            };
+            const processor = new ChartProcessor(processorConfig);
+            const [chart, processedOptions] = processor.process(statusData);
+            this.chart = chart;
+            this.processedOptions = processedOptions;
+
+            const statusFormatter = new StatusChartFormatter(processedOptions);
+            this.asciiChart = statusFormatter.format(chart);
+            return;
         }
 
         if (chartType === 'candlestick') {

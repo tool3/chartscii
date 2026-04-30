@@ -25,13 +25,19 @@ export type TitleConfig = {
     padding?: TitlePadding;
 }
 
-export type ChartType = 'bar' | 'line' | 'step' | 'scatter' | 'candlestick';
+export type ChartType = 'bar' | 'line' | 'step' | 'scatter' | 'candlestick' | 'status';
 
 /**
  * Open-High-Low-Close tuple for one candlestick period.
  * Order is fixed: `[open, high, low, close]`.
  */
 export type OHLC = [open: number, high: number, low: number, close: number];
+
+/**
+ * Map of status keys → colors for `type: 'status'`. Each cell looks up its
+ * status name (e.g. `'ok'`, `'warning'`) in this map.
+ */
+export type StatusColors = Record<string, string | Gradient>;
 
 type BaseOptions = {
     type?: ChartType;
@@ -48,9 +54,11 @@ type BaseOptions = {
      * - a string (named color, hex, ANSI, or `gradient(...)`)
      * - `'auto'` (palette per series/point)
      * - a `Gradient` object
-     * - a `(string | Gradient)[]` for per-series colors on `line` / `step` / `scatter`
+     * - a `(string | Gradient)[]` for per-series colors on `line` / `step` / `scatter`,
+     *   or `[bullish, bearish]` for `candlestick`
+     * - a `StatusColors` map (`{ ok: 'green', error: 'red', ... }`) for `status`
      */
-    color?: string | 'auto' | Gradient | (string | Gradient)[];
+    color?: string | 'auto' | Gradient | (string | Gradient)[] | StatusColors;
     title?: string | TitleConfig;
     char?: string;
     fill?: string;
@@ -94,6 +102,8 @@ type BaseOptions = {
     _bullColor?: string | Gradient;
     /** @internal Resolved bearish color for candlestick (close < open). */
     _bearColor?: string | Gradient;
+    /** @internal Resolved status → color map for `type: 'status'`. */
+    _statusColors?: StatusColors;
 
     /**
      * Render a legend on multi-series line / step / scatter charts. Each
@@ -152,7 +162,7 @@ export type Gradient = {
 }
 
 export type InputPoint = {
-    value: number | StackedValue;
+    value: number | StackedValue | string;
     color?: string | string[];
     label?: string;
 }
@@ -173,6 +183,8 @@ export type ChartPoint = {
     segments?: ChartSegment[];
     /** Per-candle OHLC, populated only for `type: 'candlestick'`. */
     ohlc?: OHLC;
+    /** Status key for `type: 'status'`, used for color lookup. */
+    status?: string;
 }
 
 export type InputData = InputPoint | number;
