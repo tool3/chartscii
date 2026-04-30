@@ -261,6 +261,7 @@ class Chartscii {
                 ...config,
                 color: undefined,
                 padding: options?.padding,
+                width: options?.width,
                 _statusColors: statusColors,
             };
             const processor = new ChartProcessor(processorConfig);

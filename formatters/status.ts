@@ -11,7 +11,9 @@ const BLOCK_CHAR = '█';
  * (a `Record<status, color>` resolved into `_statusColors` upstream).
  *
  * Layout:
- *   - cells per row = `ceil(sqrt(N))` so the grid is roughly square
+ *   - cells per row defaults to `ceil(sqrt(N))` so the grid is roughly
+ *     square. If `width` is set, columns are packed to fit instead:
+ *     `floor((width + padding) / (barSize + padding))`.
  *   - each cell is `barSize` columns wide and `ceil(barSize / 2)` rows tall;
  *     terminal char aspect is ~2:1 (height:width) so this renders visually
  *     square. Default `barSize: 2` gives 2×1 cells.
@@ -48,7 +50,7 @@ class StatusChartFormatter extends LineChartFormatter {
         const cellHeight = Math.max(1, Math.ceil(barSize / 2));
         const padding = this.options.padding ?? 1;
         const total = chart.length;
-        const cols = Math.max(1, Math.ceil(Math.sqrt(total)));
+        const cols = this.resolveCols(total, barSize, padding);
         const rows = Math.ceil(total / cols);
         const showLabels = this.options.labels !== false;
 
@@ -119,6 +121,21 @@ class StatusChartFormatter extends LineChartFormatter {
      */
     public formatMulti(charts: ChartData[]): string {
         return this.format(charts[0] ?? new Map());
+    }
+
+    /**
+     * Pick the column count for the grid. With `width` set, pack as many
+     * `barSize`-wide cells as fit (separated by `padding`). Otherwise fall
+     * back to a roughly-square grid via `ceil(sqrt(N))`. Always clamped to
+     * `[1, total]` — no empty columns, no more columns than items.
+     */
+    private resolveCols(total: number, barSize: number, padding: number): number {
+        const width = this.options.width;
+        if (typeof width === 'number' && width > 0) {
+            const fit = Math.floor((width + padding) / (barSize + padding));
+            return Math.max(1, Math.min(total, fit));
+        }
+        return Math.max(1, Math.min(total, Math.ceil(Math.sqrt(total))));
     }
 
     /**

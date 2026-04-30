@@ -13,22 +13,23 @@ const fleet: InputData[] = [
     { value: 1, label: 'cch1' }, { value: 1, label: 'cch2' }, { value: 3, label: 'cch3' },
     { value: 1, label: 'lb1' }, { value: 1, label: 'lb2' }, { value: 1, label: 'lb3' },
     { value: 1, label: 'q1' }, { value: 1, label: 'q2' }, { value: 1, label: 'q3' },
-    // { value: 1, label: 'es1' }, { value: 1, label: 'es2' }, { value: 2, label: 'es3' },
-    // { value: 1, label: 'cdn1' }, { value: 1, label: 'cdn2' }, { value: 1, label: 'cdn3' },
-    // { value: 1, label: 'mon1' }, { value: 1, label: 'mon2' }, { value: 1, label: 'log1' },
-    // { value: 1, label: 'log2' }, { value: 1, label: 'auth1' }, { value: 1, label: 'auth2' },
+    { value: 1, label: 'es1' }, { value: 1, label: 'es2' }, { value: 2, label: 'es3' },
+    { value: 1, label: 'cdn1' }, { value: 1, label: 'cdn2' }, { value: 1, label: 'cdn3' },
+    { value: 1, label: 'mon1' }, { value: 1, label: 'mon2' }, { value: 1, label: 'log1' },
+    { value: 1, label: 'log2' }, { value: 1, label: 'auth1' }, { value: 1, label: 'auth2' },
 ];
 
 const chart = new Chartscii(fleet, {
     type: 'status',
-    width: 100,
+    width: 50,
     color: {
         0: 'red',     // down
         1: 'green',   // ok
         2: 'yellow',  // warning
         3: '#888888', // maintenance
     },
-    barSize: 2,
+    theme: 'nature',
+    barSize: 5,
     padding: 1,
     title: { text: 'Production fleet — 36 hosts', align: 'center' },
     legend: {
