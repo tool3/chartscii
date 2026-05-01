@@ -182,11 +182,13 @@ class LineChartFormatter extends ChartFormatter {
     }
 
     /**
-     * Repositions points so each segment's column span matches a pure 45°
-     * diagonal, and returns the effective chart width (shrunk to the natural
-     * layout when that's smaller than the requested width). Mutates each
-     * point's `col` and `anchor` in place. Subclasses (step) may override
-     * to keep the default evenly-spaced layout.
+     * Repositions points so each segment's column span is at least its
+     * natural 45° width (and the label-spacing minimum), then expands the
+     * spacing to fill `requestedWidth` when there's room — `drawLine` emits
+     * `‾`/`_` flats to bridge the extra cols inside each segment, so the
+     * diagonals stay 45° at peaks/troughs. Returns the effective chart
+     * width. Mutates each point's `col` and `anchor` in place. Subclasses
+     * (step) may override to drop the 45° constraint entirely.
      */
     protected prepareLayout(points: GridPoint[], requestedWidth: number): number {
         if (points.length === 0) return requestedWidth;
@@ -207,19 +209,46 @@ class LineChartFormatter extends ChartFormatter {
             }
         }
 
+        const naturalDiffs = this.computeNaturalDiffs(points);
+
+        const firstLabel = points[0].point?.label ?? '';
+        const lastLabel = points[points.length - 1].point?.label ?? '';
+        const leadPad = Math.floor(firstLabel.length / 2);
+        const trailPad = Math.max(0, lastLabel.length - 1 - Math.floor(lastLabel.length / 2));
+
+        // Try to spread points evenly across the requested data area; each
+        // segment is bumped up to its natural minimum if even-spacing would
+        // shrink it. When natural sums exceed the budget, even-spacing has
+        // no effect and the chart falls back to the natural width.
+        const evenSpan = Math.max(0, requestedWidth - 1 - leadPad - trailPad);
         points[0].col = 0;
+        for (let i = 1; i < points.length; i++) {
+            const evenCol = points.length > 1
+                ? Math.round((i * evenSpan) / (points.length - 1))
+                : 0;
+            const minCol = points[i - 1].col + naturalDiffs[i];
+            points[i].col = Math.max(evenCol, minCol);
+        }
+
+        if (leadPad > 0) for (const p of points) p.col += leadPad;
+
+        return Math.max(requestedWidth, points[points.length - 1].col + 1 + trailPad);
+    }
+
+    /**
+     * Per-segment minimum colDiff for a single line series: max of the 45°
+     * natural span (or 1 for flat segments), the label-spacing minimum, and
+     * — when points are rendered — a -1 peak/trough shrink so the `●` lands
+     * diagonally adjacent to the next change instead of two cols away.
+     * Index 0 is unused (segments are between points i-1 and i).
+     */
+    protected computeNaturalDiffs(points: GridPoint[]): number[] {
+        const diffs: number[] = [0];
         for (let i = 1; i < points.length; i++) {
             const yFrom = points[i - 1].row + (points[i - 1].anchor ?? 0);
             const yTo = points[i].row + (points[i].anchor ?? 0);
             const isFlat = points[i].row === points[i - 1].row;
-            const natural = isFlat
-                ? 1
-                : Math.max(Math.abs(yTo - yFrom), 1);
-            let colDiff = natural;
-            // When points are rendered, a peak/trough only occupies one cell
-            // (the `●`), not the two cells of a pointy `╱╲`/`╲╱`. Shrink the
-            // outgoing segment by 1 col so the next diagonal lands diagonally
-            // adjacent to the point instead of two cols away.
+            let colDiff = isFlat ? 1 : Math.max(Math.abs(yTo - yFrom), 1);
             if (this.options.points && !isFlat) {
                 const prev = i - 1;
                 if (prev > 0 && prev < points.length - 1) {
@@ -231,29 +260,13 @@ class LineChartFormatter extends ChartFormatter {
                     if (isPrevPeak || isPrevTrough) colDiff = Math.max(1, colDiff - 1);
                 }
             }
-            // Enforce ≥1 space between adjacent x-axis labels on every segment.
-            // For non-flat segments this widens the chart but preserves the
-            // diagonal — `drawLine` (Bresenham over `colDiff`) emits `‾`/`_`
-            // fillers between the diagonals as needed.
             const L1 = this.labelLength(points[i - 1].point?.label);
             const L2 = this.labelLength(points[i].point?.label);
             const labelMin = labelMinColDiff(L1, L2);
             if (labelMin > colDiff) colDiff = labelMin;
-            points[i].col = points[i - 1].col + colDiff;
+            diffs.push(colDiff);
         }
-
-        // Pad for x-label overhang so the first and last labels are not clipped.
-        const firstLabel = points[0].point?.label ?? '';
-        const lastLabel = points[points.length - 1].point?.label ?? '';
-        const leadPad = Math.floor(firstLabel.length / 2);
-        const trailPad = Math.max(0, lastLabel.length - 1 - Math.floor(lastLabel.length / 2));
-        if (leadPad > 0) for (const p of points) p.col += leadPad;
-
-        // Always use the natural 45° width. Going smaller would round
-        // colDiffs down and break the `╱╲` alignment at peaks/troughs;
-        // going larger would pad the chart with empty trailing x-axis
-        // structure after the last data point.
-        return points[points.length - 1].col + 1 + trailPad;
+        return diffs;
     }
 
     /**
@@ -262,7 +275,9 @@ class LineChartFormatter extends ChartFormatter {
      * column span is the max over all series — so the widest natural 45°
      * wins, and every series lines up on shared data-point columns.
      * Series with smaller row-diffs at a segment will use Bresenham stays
-     * (`‾`/`_`) to fill the extra cols.
+     * (`‾`/`_`) to fill the extra cols. When the requested width exceeds
+     * the natural minimum, the surplus is distributed evenly so the chart
+     * fills the requested width.
      */
     protected prepareLayoutMulti(seriesPoints: GridPoint[][], requestedWidth: number): number {
         if (seriesPoints.length === 0) return requestedWidth;
@@ -287,12 +302,12 @@ class LineChartFormatter extends ChartFormatter {
             }
         }
 
-        const sharedCols: number[] = [0];
+        // Per-segment natural minimum across all series + the shared
+        // label-spacing constraint (labels come from series 0).
+        const naturalDiffs: number[] = [0];
+        const firstSeries = seriesPoints[0];
         for (let i = 1; i < maxLen; i++) {
             let maxColDiff = 1;
-            // Series share x-axis labels (taken from the first series), so the
-            // label-spacing constraint is computed once per segment.
-            const firstSeries = seriesPoints[0];
             const L1 = this.labelLength(firstSeries[i - 1]?.point?.label);
             const L2 = this.labelLength(firstSeries[i]?.point?.label);
             const labelMin = labelMinColDiff(L1, L2);
@@ -317,7 +332,22 @@ class LineChartFormatter extends ChartFormatter {
                 if (colDiff > maxColDiff) maxColDiff = colDiff;
             }
             if (labelMin > maxColDiff) maxColDiff = labelMin;
-            sharedCols.push(sharedCols[i - 1] + maxColDiff);
+            naturalDiffs.push(maxColDiff);
+        }
+
+        const firstLabel = firstSeries[0]?.point?.label ?? '';
+        const lastLabel = firstSeries[firstSeries.length - 1]?.point?.label ?? '';
+        const leadPad = Math.floor(firstLabel.length / 2);
+        const trailPad = Math.max(0, lastLabel.length - 1 - Math.floor(lastLabel.length / 2));
+
+        const evenSpan = Math.max(0, requestedWidth - 1 - leadPad - trailPad);
+        const sharedCols: number[] = [0];
+        for (let i = 1; i < maxLen; i++) {
+            const evenCol = maxLen > 1
+                ? Math.round((i * evenSpan) / (maxLen - 1))
+                : 0;
+            const minCol = sharedCols[i - 1] + naturalDiffs[i];
+            sharedCols.push(Math.max(evenCol, minCol));
         }
 
         for (const points of seriesPoints) {
@@ -326,11 +356,6 @@ class LineChartFormatter extends ChartFormatter {
             }
         }
 
-        const firstSeries = seriesPoints[0];
-        const firstLabel = firstSeries[0]?.point?.label ?? '';
-        const lastLabel = firstSeries[firstSeries.length - 1]?.point?.label ?? '';
-        const leadPad = Math.floor(firstLabel.length / 2);
-        const trailPad = Math.max(0, lastLabel.length - 1 - Math.floor(lastLabel.length / 2));
         if (leadPad > 0) {
             for (const points of seriesPoints) {
                 for (const p of points) p.col += leadPad;
@@ -340,15 +365,17 @@ class LineChartFormatter extends ChartFormatter {
         const lastCol = Math.max(
             ...seriesPoints.map(p => p[p.length - 1]?.col ?? 0)
         );
-        return lastCol + 1 + trailPad;
+        return Math.max(requestedWidth, lastCol + 1 + trailPad);
     }
 
     /**
      * Draws each segment as pure 45° diagonals using a state machine over
      * (row, pos). `╱` moves the line up one half-step; `╲` moves down; `‾`
-     * or `_` keeps the line on its current anchor (only emitted for runs of
-     * consecutive equal values). The last change in every segment lands on
-     * p2's column, giving clean `╱╲` peaks and `╲╱` troughs at data points.
+     * or `_` keeps the line on its current anchor. When `colDiff > absYDiff`
+     * the row changes are placed contiguously (clustered) rather than
+     * spread evenly — see `pickClusterAnchor` — so slopes look like a
+     * single straight diagonal with a flat plateau on one side, rather
+     * than a jagged staircase.
      */
     protected drawLine(grid: string[][], points: GridPoint[], chartWidth: number): number[] {
         const chars = LINE_CHARS;
@@ -388,13 +415,7 @@ class LineChartFormatter extends ChartFormatter {
             const yDiff = yEnd - yStart;
             const absYDiff = Math.abs(yDiff);
 
-            const changeCols = new Set<number>();
-            if (absYDiff > 0) {
-                const steps = Math.min(absYDiff, colDiff);
-                for (let k = 1; k <= steps; k++) {
-                    changeCols.add(p1.col + Math.round((k * colDiff) / steps));
-                }
-            }
+            const changeCols = this.buildChangeCols(points, i, p1.col, p2.col, absYDiff, colDiff);
 
             let row = p1.row;
             let pos = startPos;
@@ -415,6 +436,65 @@ class LineChartFormatter extends ChartFormatter {
         }
 
         return lineBottom;
+    }
+
+    /**
+     * Decides whether a segment's row changes should cluster at the start
+     * (`╱╱╱‾‾‾`, line leaves p_a sharply) or end (`‾‾‾╱╱╱`, line lands on
+     * p_b sharply). The rule:
+     *   - If p_b is a peak/trough/last point → end (sharp arrival)
+     *   - Else if p_a is a peak/trough/first point → start (sharp departure)
+     *   - Otherwise (both endpoints are continuing) → end
+     * This keeps peaks/troughs sharp `‾‾╱╲‾‾` and avoids the jagged
+     * `‾╱‾╱‾╱` staircase that even-spread Bresenham produces when the
+     * segment's colDiff exceeds its rowDiff.
+     */
+    protected pickClusterAnchor(points: GridPoint[], i: number): 'start' | 'end' {
+        if (i + 1 === points.length - 1) return 'end';
+
+        const pbRow = points[i + 1].row;
+        const pbBefore = points[i].row;
+        const pbAfter = points[i + 2].row;
+        if ((pbBefore > pbRow && pbAfter > pbRow) || (pbBefore < pbRow && pbAfter < pbRow)) {
+            return 'end';
+        }
+
+        if (i === 0) return 'start';
+
+        const paRow = points[i].row;
+        const paBefore = points[i - 1].row;
+        const paAfter = points[i + 1].row;
+        if ((paBefore > paRow && paAfter > paRow) || (paBefore < paRow && paAfter < paRow)) {
+            return 'start';
+        }
+
+        return 'end';
+    }
+
+    /**
+     * Builds the set of columns where the line drawing should emit a row
+     * change (`╱` or `╲`). Cols not in the set get a flat `‾`/`_` filler.
+     * Changes are placed contiguously at the segment's start or end based
+     * on `pickClusterAnchor`.
+     */
+    protected buildChangeCols(
+        points: GridPoint[],
+        i: number,
+        p1Col: number,
+        p2Col: number,
+        absYDiff: number,
+        colDiff: number
+    ): Set<number> {
+        const changeCols = new Set<number>();
+        if (absYDiff <= 0) return changeCols;
+        const steps = Math.min(absYDiff, colDiff);
+        const anchor = this.pickClusterAnchor(points, i);
+        if (anchor === 'start') {
+            for (let k = 1; k <= steps; k++) changeCols.add(p1Col + k);
+        } else {
+            for (let k = 0; k < steps; k++) changeCols.add(p2Col - k);
+        }
+        return changeCols;
     }
 
     protected buildYAxisTicks(min: number, max: number, height: number): { label: string; row: number }[] {
@@ -605,13 +685,7 @@ class LineChartFormatter extends ChartFormatter {
             const yDiff = yEnd - yStart;
             const absYDiff = Math.abs(yDiff);
 
-            const changeCols = new Set<number>();
-            if (absYDiff > 0) {
-                const steps = Math.min(absYDiff, colDiff);
-                for (let k = 1; k <= steps; k++) {
-                    changeCols.add(p1.col + Math.round((k * colDiff) / steps));
-                }
-            }
+            const changeCols = this.buildChangeCols(points, i, p1.col, p2.col, absYDiff, colDiff);
 
             let row = p1.row;
             let pos = startPos;

@@ -43,8 +43,9 @@
   "license": "MIT",
   "sideEffects": false,
   "devDependencies": {
-    "shellfie": "file:../shellfie",
+    "@types/node": "^25.6.0",
     "dvd": "file:../dvd",
+    "shellfie": "^2.4.4",
     "snaptdout": "^2.1.0",
     "ts-node": "10.9.2",
     "typescript": "5.4.5",

@@ -5,7 +5,7 @@
     "moduleResolution": "nodenext",
     "outDir": "./dist",
     "rootDir": ".",
-    "types": ["@types/node", "vitest/globals"]
+    "types": ["node", "vitest/globals"]
   },
   "include": [
     "index.ts",
