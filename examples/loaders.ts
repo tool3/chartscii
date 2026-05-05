@@ -1,30 +1,28 @@
 import Chartscii from '../chartscii';
 import { InputData } from '../types/types';
 
-const createAsciiCharts = () => {
+const labels = ['CPU', 'RAM', 'DISK']
+
+const render = () => {
     // generate random chart data
     const data: InputData[] = [];
     for (let i = 0; i < 3; i++) {
-        data.push({ value: Math.floor(Math.random() * 10) + 1, label: 'loading' });
+        data.push({ value: Math.floor(Math.random() * 10) + 1, label: labels[i] });
     }
 
     // create chart
     const chart = new Chartscii(data, {
         width: 50,
-        maxValue: 20,
         padding: 2,
-        color: 'green',
+        color: 'gradient(red,lime)',
         naked: true,
         fill: '░',
+        fillColor: 'auto',
         colorLabels: true,
-        theme: 'pastel'
+        theme: 'beach',
     });
 
-    //print chart
-    process.stdout.write('\x1Bc');
-    process.stdout.write(`${chart.create()}\n`);
-
+    chart.animate()
 };
 
-
-setInterval(() => createAsciiCharts(), 300);
+render()

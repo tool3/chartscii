@@ -1,19 +1,7 @@
 import Chartscii from '../chartscii';
 import { InputData } from '../types/types';
 
-const createAsciiCharts = () => {
-    let color = '';
-
-    const colors = [
-        'green',
-        'red',
-        'cyan',
-        'pink',
-        'blue',
-        'yellow',
-        'purple',
-    ];
-
+const render = () => {
     const emojis = [
         '🔥',
         '🌟',
@@ -28,29 +16,25 @@ const createAsciiCharts = () => {
     // generate random chart data
     const data: InputData[] = [];
 
-    for (let i = 0; i <= colors.length; i++) {
-        color = colors[Math.floor(Math.random() * colors.length)];
-        data.push({ value: Math.floor(Math.random() * 10) + 1, color, label: `${i} ${emojis[i]}` });
+    for (let i = 0; i <= 7; i++) {
+        // color = colors[Math.floor(Math.random() * colors.length)];
+        data.push({ value: Math.floor(Math.random() * 10) + 2, label: `${emojis[i]}` });
     }
 
     // create chart
     const chart = new Chartscii(data, {
-        title: 'Fancy Chart',
-        width: 100,
-        padding: 4,
+        // title: 'Fancy Chart',
+        // width: 100,
+        padding: 1,
         percentage: true,
-        color: color,
+        color: 'gradient(purple,lime:vertical)',
         fill: '░',
-        orientation: 'vertical',
+        // orientation: 'vertical',
         colorLabels: true,
         theme: 'pastel'
     });
 
-    //print chart
-    process.stdout.write('\x1Bc');
-    process.stdout.write(`${chart.create()}\n`);
-
+    chart.animate({ duration: 500 })
 };
 
-
-setInterval(() => createAsciiCharts(), 300);
+render()

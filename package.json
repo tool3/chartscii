@@ -2,8 +2,21 @@
   "name": "chartscii",
   "version": "3.2.0",
   "description": "awesome ascii charts",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/tool3/chartscii"
@@ -12,9 +25,13 @@
     "./dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "test": "mocha -r ts-node/register index.test.ts",
-    "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" "
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "test": "vitest run",
+    "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" ",
+    "print:tests": "node -e \"const fs = require('fs'); const path = require('path'); const dir = './tests/snapshots'; fs.readdirSync(dir).filter(f => f.endsWith('.json')).forEach(file => { console.log('\\n=== ' + file + ' ===\\n'); const data = require(path.join(process.cwd(), dir, file)); Object.keys(data).forEach(key => console.log(key + '\\n' + data[key].join('\\n'))); });\"",
+    "print:test": "node -e \"const name = process.argv[1]; const data = require('./tests/snapshots/' + name + '.test.json'); Object.keys(data).forEach(key => console.log(key + '\\n' + data[key].join('\\n')));\" --"
   },
   "keywords": [
     "bar-chart",
@@ -24,15 +41,15 @@
   ],
   "author": "Tal Hayut",
   "license": "MIT",
+  "sideEffects": false,
   "devDependencies": {
-    "@types/chai": "4.3.14",
-    "@types/mocha": "10.0.6",
-    "chai": "4.2.0",
-    "mocha": "^10.0.0",
-    "shellfie": "^1.3.1",
+    "@types/node": "^25.6.0",
+    "dvd": "file:../dvd",
+    "shellfie": "^2.4.4",
     "snaptdout": "^2.1.0",
     "ts-node": "10.9.2",
-    "typescript": "5.4.5"
+    "typescript": "5.4.5",
+    "vitest": "^4.0.18"
   },
   "dependencies": {
     "styl3": "3.1.1"

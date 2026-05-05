@@ -3,7 +3,7 @@ import { InputData } from '../types/types';
 
 // generate random chart data
 const data: InputData[] = [];
-for (let i = 1; i <= 10; i++) {
+for (let i = 1; i <= 5; i++) {
     data.push(Math.floor(Math.random() * 10) + 1);
 }
 
@@ -13,7 +13,7 @@ const chart = new Chartscii(data, {
     fill: '░',
     // char: '█',
     color: 'pink',
-    colorLabels: true,
+    colorLabels: false,
     labels: true,
     barSize: 2,
     orientation: 'vertical',
