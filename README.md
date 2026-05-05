@@ -9,7 +9,7 @@
 **Render your data as beautiful ASCII charts**   
 with full color, gradients, stacked bars, animations, and rich text, straight from your terminal.
 
-[![npm](https://img.shields.io/badge/npm-v10-green)](https://www.npmjs.com/package/chartscii)
+[![npm](https://img.shields.io/badge/npm-v10-blue)](https://www.npmjs.com/package/chartscii)
 [![npm downloads](https://img.shields.io/npm/dm/chartscii)](https://www.npmjs.com/package/chartscii)
 [![license](https://img.shields.io/badge/license-MIT-orange)](./LICENSE)
 
