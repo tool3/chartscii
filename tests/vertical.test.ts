@@ -26,7 +26,7 @@ function generateChartData() {
     return data;
 }
 
-describe.only('vertical', () => {
+describe('vertical', () => {
     test('should support vertical orientation', async () => {
         const data = generateChartData();
         const chart = new Chartscii(data, { width: 100, color: 'pink', colorLabels: true, orientation: 'vertical', });
