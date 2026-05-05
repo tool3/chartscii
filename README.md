@@ -20,6 +20,7 @@ Transform your data into stunning ASCII bar charts with full color support, stac
 ✅ Fill color - automatically follow gradient/color or separately.  
 ✅ Relative scaling control - relative and absolute.  
 ✅ Auto color mode - cycle through colors automatically.  
+✅ 5 new chart types - line, step, scatter, candlestick and status charts.  
 ✅ Animate - create chart animations (using cursor reset).
 
 ---
@@ -98,7 +99,7 @@ const chart = new Chartscii(data, { colorLabels: true, valueLabels: true });
 ## API
 
 ```typescript
-const chart = new Chartscii(data: InputData[], options?: ChartOptions);
+const chart = new Chartscii(data: InputData[] | InputData[][], options?: ChartOptions);
 chart.create(); // returns the chart as a string
 ```
 
@@ -106,11 +107,25 @@ chart.create(); // returns the chart as a string
 type InputData =
   | number
   | {
-      value: number | number[] | { value: number; color?: string }[];
+      // bar / line / step / scatter:        number
+      // stacked bar:                        number[]  or  { value: number; color?: string }[]
+      // candlestick:                        [open, high, low, close]  (number[])
+      // status (grid mode):                 number | string  (status key)
+      // status (row mode):                  number[] | string[]  (one cell per entry)
+      value: number | number[] | string | { value: number; color?: string }[];
       label?: string;
       color?: string | string[];
     };
 ```
+
+> Multi-series `line` / `step` / `scatter` charts accept `InputData[][]` — one inner array per data point, with one entry per series:
+>
+> ```typescript
+> const data: InputData[][] = months.map((m, i) => [
+>   { value: salesA[i], label: m },   // series 1
+>   { value: salesB[i], label: m },   // series 2
+> ]);
+> ```
 
 ---
 
@@ -119,35 +134,40 @@ type InputData =
 <details>
 <summary><strong>All Options</strong></summary>
 
-| Option                     | Type                           | Default        | Description                                          |
-| -------------------------- | ------------------------------ | -------------- | ---------------------------------------------------- |
-| `width`                    | `number`                       | `100`          | Chart width in characters                            |
-| `height`                   | `number`                       | `10`           | Chart height in lines                                |
-| `padding`                  | `number`                       | `0`            | Space between bars                                   |
-| `barSize`                  | `number`                       | `1`            | Thickness of each bar                                |
-| `orientation`              | `string`                       | `'horizontal'` | `'horizontal'` or `'vertical'`                       |
-| `alignBars`                | `string`                       | `'justify'`    | Bar alignment                                        |
-| `title`                    | `string \| TitleConfig`        | `''`           | Chart title                                          |
-| `char`                     | `string`                       | `'█'`          | Character used for bars                              |
-| `fill`                     | `string`                       | —              | Fill character for empty space                       |
-| `fillColor`                | `string`                       | —              | Fill color or `'auto'`                               |
-| `color`                    | `string`                       | —              | Bar color, gradient string, or `'auto'`              |
-| `theme`                    | `string`                       | `''`           | Theme name from styl3                                |
-| `naked`                    | `boolean`                      | `false`        | Hide structure characters                            |
-| `labels`                   | `boolean`                      | `true`         | Show bar labels                                      |
-| `colorLabels`              | `boolean`                      | `true`         | Color the labels                                     |
-| `valueLabels`              | `boolean`                      | `false`        | Show values on bars (segment values for stacked)     |
-| `valueLabelsFloatingPoint` | `number`                       | —              | Decimal precision                                    |
-| `labelFormat`              | `function`                     | —              | Custom label formatter                               |
-| `valueLabelFormat`         | `(values: string[]) => string` | —              | Custom value label formatter                         |
-| `percentage`               | `boolean`                      | `false`        | Show percentages                                     |
-| `sort`                     | `boolean`                      | `false`        | Sort ascending                                       |
-| `reverse`                  | `boolean`                      | `false`        | Reverse order                                        |
-| `scale`                    | `string \| number`             | `'auto'`       | `'auto'`, `'relative'`, `'relative-zero'`, or number |
-| `stackColors`              | `string[]`                     | —              | Stacked segment colors                               |
-| `stackLabels`              | `string[]`                     | —              | Stacked segment labels                               |
-| `richLabels`               | `boolean`                      | `true`         | Enable styl3 rich text decorators in labels          |
-| `structure`                | `object`                       | —              | Custom border characters                             |
+| Option                     | Type                           | Default        | Description                                                                            |
+| -------------------------- | ------------------------------ | -------------- | -------------------------------------------------------------------------------------- |
+| `type`                     | `ChartType`                    | `'bar'`        | `'bar'`, `'line'`, `'step'`, `'scatter'`, `'candlestick'`, `'status'`                  |
+| `width`                    | `number`                       | `100`          | Chart width in characters                                                              |
+| `height`                   | `number`                       | `10`           | Chart height in lines                                                                  |
+| `padding`                  | `number`                       | `0`            | Space between bars / cells                                                             |
+| `barSize`                  | `number`                       | `1`            | Thickness of each bar / candlestick body / status cell                                 |
+| `orientation`              | `string`                       | `'horizontal'` | `'horizontal'` or `'vertical'` (bar charts only)                                       |
+| `alignBars`                | `string`                       | `'justify'`    | Bar alignment                                                                          |
+| `title`                    | `string \| TitleConfig`        | `''`           | Chart title                                                                            |
+| `char`                     | `string`                       | `'█'`          | Character used for bars                                                                |
+| `fill`                     | `string`                       | —              | Fill character for empty space (line/step area fill on bar charts)                     |
+| `fillColor`                | `string`                       | —              | Fill color or `'auto'`                                                                 |
+| `color`                    | see [Color forms](#color-forms) | —             | Bar color, gradient, `'auto'`, per-series array, `[bull, bear]`, or status map         |
+| `theme`                    | `string`                       | `''`           | Theme name from styl3                                                                  |
+| `naked`                    | `boolean`                      | `false`        | Hide structure characters                                                              |
+| `labels`                   | `boolean`                      | `true`         | Show bar / x-axis / cell labels                                                        |
+| `colorLabels`              | `boolean`                      | `true`         | Color the labels                                                                       |
+| `valueLabels`              | `boolean`                      | `false`        | Show values on bars (segment values for stacked)                                       |
+| `valueLabelsFloatingPoint` | `number`                       | —              | Decimal precision                                                                      |
+| `labelFormat`              | `function`                     | —              | Custom label formatter                                                                 |
+| `valueLabelFormat`         | `(values: string[]) => string` | —              | Custom value label formatter                                                           |
+| `percentage`               | `boolean`                      | `false`        | Show percentages                                                                       |
+| `sort`                     | `boolean`                      | `false`        | Sort ascending                                                                         |
+| `reverse`                  | `boolean`                      | `false`        | Reverse order                                                                          |
+| `scale`                    | `string \| number`             | `'auto'`       | `'auto'`, `'relative'`, `'relative-zero'`, or number                                   |
+| `stackColors`              | `string[]`                     | —              | Stacked segment colors                                                                 |
+| `stackLabels`              | `string[]`                     | —              | Stacked segment labels                                                                 |
+| `richLabels`               | `boolean`                      | `true`         | Enable styl3 rich text decorators in labels                                            |
+| `structure`                | `object`                       | —              | Custom border characters                                                               |
+| `variant`                  | `'sharp' \| 'smooth'`          | `'sharp'`      | `step` corner style (`smooth` rounds with `╭╮╰╯`); `line` ignores (always `'sharp'`)   |
+| `points`                   | `boolean`                      | `false`        | Draw a marker at each data point on `line` / `step`                                    |
+| `pointChar`                | `string`                       | `'●'`          | Character used for point markers (also `scatter`'s default marker)                     |
+| `legend`                   | `boolean \| LegendConfig`      | `false`        | Show a legend on multi-series `line` / `step` / `scatter`, on `candlestick`, `status`  |
 
 </details>
 
@@ -177,6 +197,180 @@ structure: {
 ```
 
 </details>
+
+<details>
+<summary><strong id="color-forms">Color forms</strong></summary>
+
+`color` accepts different shapes depending on chart type:
+
+```typescript
+// Any chart — single color, gradient, or auto palette
+color: 'green'
+color: 'gradient(pink,cyan)'
+color: 'auto'
+
+// Multi-series line / step / scatter — one entry per series
+color: ['gradient(pink,cyan)', 'gradient(orange,yellow)', 'red']
+
+// Candlestick — [bullish, bearish] (close >= open vs close < open)
+color: ['green', 'red']
+
+// Status — map of status key → color
+color: { 0: 'red', 1: 'green', 2: 'yellow', 3: '#888' }
+color: { ok: 'green', warning: 'yellow', error: 'red' }
+```
+
+</details>
+
+<details>
+<summary><strong>Legend Config</strong></summary>
+
+```typescript
+legend: {
+  enabled?: boolean;             // default: true when `legend` is provided
+  values?: string[];             // labels per series; defaults to "Series #1", "Series #2", …
+  position?: 'top' | 'bottom';   // default: 'top'
+  align?: 'left' | 'center' | 'right'; // default: 'left'
+}
+```
+
+`legend: true` uses defaults. Single-series line/step/scatter ignore the legend (no legend would be useful with one entry). For `status`, `values` labels the status keys in legend order.
+
+</details>
+
+---
+
+## Chart Types
+
+Set `type` to switch the renderer. All types share the core options (`width`, `height`, `title`, `theme`, `color`, `naked`, …) but each has its own visual model and a few type-specific options.
+
+### Bar (default)
+
+```typescript
+const chart = new Chartscii([10, 25, 40, 15], {
+  type: 'bar', // default
+  orientation: 'vertical',
+  color: 'gradient(cyan,purple)',
+});
+```
+
+`bar` is the original chartscii renderer — supports stacked segments, horizontal/vertical orientation, alignment (`alignBars`), value labels, and percentages.
+
+### Line
+
+Smooth 45° polyline through the data points. Single or multi-series.
+
+```typescript
+const chart = new Chartscii(data, {
+  type: 'line',
+  width: 80,
+  height: 12,
+  color: 'gradient(pink,cyan)',
+  fill: '░',           // optional area fill below the line
+  fillColor: 'pink',
+  points: true,        // draw a marker (●) at each data point
+  pointChar: '◈',      // override the marker char
+});
+```
+
+For multi-series, pass `InputData[][]` and an array of colors:
+
+```typescript
+const chart = new Chartscii(seriesData, {
+  type: 'line',
+  width: 150,
+  color: ['gradient(pink,cyan)', 'gradient(orange,yellow)', 'red'],
+  legend: { values: ['Q1', 'Q2', 'Q3'], position: 'top', align: 'right' },
+});
+```
+
+Notes:
+- `variant` only matters for `step`; line is always sharp 45°.
+- Slopes longer than the natural 45° span are clustered as a single contiguous diagonal followed by a flat plateau, so peaks render as sharp `╱╲` rather than a jagged staircase.
+- `width` is respected like other chart types — if the natural diagonal width is smaller, the segments are spread to fill the requested width.
+
+### Step
+
+Like `line`, but transitions are square (or rounded) right-angle steps — useful for state changes that are constant between samples (e.g. server count over time).
+
+```typescript
+const chart = new Chartscii(data, {
+  type: 'step',
+  width: 80,
+  variant: 'smooth',  // 'sharp' (┌┐└┘) or 'smooth' (╭╮╰╯)
+  color: 'auto',
+  points: true,
+});
+```
+
+Multi-series and `legend` work the same as `line`.
+
+### Scatter
+
+Points only — no connecting line. Each marker can be its own color.
+
+```typescript
+const chart = new Chartscii(data, {
+  type: 'scatter',
+  width: 100,
+  color: 'auto',          // cycle palette per point
+  pointChar: '◈',         // default '●'
+  colorLabels: true,      // tint x-axis labels with their point's color
+});
+```
+
+Per-point overrides win over the series color, so `{ value, color }` colors that specific marker.
+
+### Candlestick
+
+OHLC bars with bullish / bearish coloring. Each input point's `value` must be a 4-tuple `[open, high, low, close]`.
+
+```typescript
+const chart = new Chartscii(month, {
+  type: 'candlestick',
+  width: 100,
+  height: 18,
+  color: ['#4caf50', '#ef5350'],  // [bullish, bearish]
+  // color: 'auto',               // also valid — uses theme bull/bear pair
+  title: { text: 'BTC/USD — 30d', align: 'center', color: 'gradient' },
+  legend: { position: 'top', align: 'right' },
+});
+```
+
+`barSize` controls body width (default 1 — a one-cell-wide candle); `padding` controls the gap between candles. Doji candles (open == close) render as `─`.
+
+### Status
+
+A grid (or row layout) of colored cells — useful for dashboards (host health, build matrix, etc). The `value` is a status key (number or string) that's looked up in the `color` map.
+
+```typescript
+// Grid mode — one cell per input
+const chart = new Chartscii(fleet, {
+  type: 'status',
+  width: 100,
+  barSize: 5,
+  padding: 1,
+  color: {
+    0: 'red',     // down
+    1: 'green',   // ok
+    2: 'yellow',  // warning
+    3: '#888',    // maintenance
+  },
+  legend: { values: ['down', 'ok', 'warning', 'maintenance'] },
+});
+```
+
+Pass `value: number[]` (or `string[]`) on any input point to switch into **row mode** — each input becomes one row labelled on the left, with its array values rendered as colored cells along the x-axis:
+
+```typescript
+const data: InputData[] = [
+  { value: [1, 1, 0, 1, 2, 1, 1], label: 'web1' },
+  { value: [1, 0, 0, 1, 1, 1, 2], label: 'web2' },
+  { value: [1, 1, 1, 1, 1, 1, 1], label: 'web3' },
+];
+```
+
+Mixed input is allowed — scalar `value`s become single-cell rows. Per-point `color` overrides apply to every cell on that row.
 
 # Examples and features
 
