@@ -2,18 +2,19 @@
   "name": "chartscii",
   "version": "4.0.0",
   "description": "awesome ascii charts",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/types/index.d.ts",
-        "default": "./dist/esm/index.js"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       },
       "require": {
-        "types": "./dist/types/index.d.ts",
-        "default": "./dist/cjs/index.js"
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       }
     }
   },
@@ -25,9 +26,7 @@
     "./dist"
   ],
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "tsup",
     "test": "vitest run",
     "print": "node -e \"const keys = require('./snapshots/index.test'); Object.keys(keys).map(key => console.log(key + '\\n' + keys[key].join('\\n'))) \" ",
     "print:tests": "node -e \"const fs = require('fs'); const path = require('path'); const dir = './tests/snapshots'; fs.readdirSync(dir).filter(f => f.endsWith('.json')).forEach(file => { console.log('\\n=== ' + file + ' ===\\n'); const data = require(path.join(process.cwd(), dir, file)); Object.keys(data).forEach(key => console.log(key + '\\n' + data[key].join('\\n'))); });\"",
@@ -48,6 +47,7 @@
     "shellfie": "^2.4.4",
     "snaptdout": "^2.1.0",
     "ts-node": "10.9.2",
+    "tsup": "^8.5.1",
     "typescript": "5.4.5",
     "vitest": "^4.0.18"
   },
