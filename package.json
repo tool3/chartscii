@@ -1,6 +1,6 @@
 {
   "name": "chartscii",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "awesome ascii charts",
   "type": "module",
   "main": "./dist/index.cjs",
